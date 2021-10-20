@@ -31,10 +31,10 @@ if ( !params.fastq ) {
 
 Set reference = ['sars-cov2'] // can be extended later on
 if ( !params.reference && !params.ref_genome && !params.ref_annotation ) {
-    exit 1, "reference missing, use [--ref_genome] and [--ref_annotation] or choose of " + reference + "with [--reference]"
+    exit 1, "reference missing, use [--ref_genome] (and [--ref_annotation]) or choose of " + reference + " with [--reference]"
 }
-if ( params.reference && params.ref_genome && params.ref_annotation ) {
-    exit 1, "too many references, use either [--ref_genome] and [--ref_annotation], or [--reference]"
+if ( params.reference && params.ref_genome ) {
+    exit 1, "too many references, use either [--ref_genome] (and [--ref_annotation]), or [--reference]"
 }
 if ( params.reference && ! (params.reference in reference) ) {
     exit 1, "unknown reference, currently supported: " + reference
@@ -59,6 +59,8 @@ if ( params.reference ) {
     referenceGenomeChannel = Channel
         .fromPath( params.ref_genome, checkIfExists: true )
         .map { file -> tuple(file.simpleName, file) }
+}
+if ( params.ref_annotation ) {
     referenceAnnotationChannel = Channel
         .fromPath( params.ref_annotation, checkIfExists: true )
         .map { file -> tuple(file.simpleName, file) }
