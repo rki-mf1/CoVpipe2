@@ -88,6 +88,20 @@ if (params.mode == 'paired') {
         }
 }
 
+// load primers [optional]
+if (params.primer) { primerInputChannel = Channel
+        .fromPath( params.primer, checkIfExists: true)
+        .map { file -> tuple(file.simpleName, file) }
+}
+
+// load adapters [optional]
+if (params.adapter) { adapterInputChannel = Channel
+        .fromPath( params.adapter, checkIfExists: true)
+        .map { file -> tuple(file.simpleName, file) }
+} else {
+    adapterInputChannel = Channel.empty()
+}
+
 /************************** 
 * MODULES
 **************************/
@@ -124,13 +138,56 @@ workflow indexing {
 
 }
 
+// amplicon primer clipping
+workflow primer {
+    take: illumina_reads
+          primer_set
+
+    main:
+        clip(illumina_reads.combine(primer_set.map {primer_file_name, primer_file -> primer_file}))
+
+    emit:
+        clip.out.reads
+}
+
+// quality trimming and optional adapter clipping
+workflow read_qc {
+    take: illumina_reads
+          adapter_fasta
+
+    main:
+        if (params.adapter) {
+            adapter_trim(illumina_reads.combine(adapter_fasta.map {adapter_file_name, adapter_file -> adapter_file}))
+            reads_trimmed = adapter_trim.out.reads
+            fastp_json = adapter_trim.out.json
+        } else {
+            qual_trim(illumina_reads)            
+            reads_trimmed = qual_trim.out.reads
+            fastp_json = qual_trim.out.json
+        }
+
+    emit: 
+        reads_trimmed
+        fastp_json
+}
+
 /************************** 
 * MAIN WORKFLOW
 **************************/
 workflow {
 
-    // generate all indices
+    // generate all indices for the reference
     indexing(referenceGenomeChannel)
+
+    // primer clipping [optional]
+    if (params.primer) {
+        primer(fastqInputChannel, primerInputChannel)
+        fastqInputChannel = primer.out
+    }
+
+    // quality and adapter trimming
+    reads_ch = read_qc(fastqInputChannel, adapterInputChannel).reads_trimmed
+
 }
 
 /************************** 
