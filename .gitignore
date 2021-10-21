@@ -3,3 +3,4 @@ results/
 conda/
 .nextflow/
 .nextflow.log*
+nextflow-autodownload-databases/
