@@ -4,14 +4,14 @@ process dos2unix {
     publishDir "${params.output}", mode: 'copy', pattern: "${name}.prepared.fasta"
 
     input:
-    tuple val(name), path(reference)
+    path(reference)
 
     output:
-    tuple val(name), path("${name}.prepared.fasta"), emit: reference
+    path("${reference.simpleName}.prepared.fasta"), emit: reference
 
     script:
     """
     dos2unix ${reference}
-    mv ${reference} ${name}.prepared.fasta
+    mv ${reference} ${reference.simpleName}.prepared.fasta
     """
 }

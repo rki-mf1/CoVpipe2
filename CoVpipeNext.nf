@@ -39,7 +39,10 @@ if ( params.reference && params.ref_genome ) {
 if ( params.reference && ! (params.reference in reference) ) {
     exit 1, "unknown reference, currently supported: " + reference
 }
-
+// kraken input test
+if (params.kraken && ! params.taxid) {
+    exit 1, "Kraken2 database defined but no --taxid!"
+}
 
 /************************** 
 * INPUT
@@ -50,20 +53,16 @@ if ( params.reference ) {
     if ( params.reference == 'sars-cov2' ) {
         referenceGenomeChannel = Channel
             .fromPath( workflow.projectDir + '/data/reference_SARS-CoV2/NC_045512.2.fasta' , checkIfExists: true )
-            .map { file -> tuple(file.simpleName, file) }
         referenceAnnotationChannel = Channel
             .fromPath( workflow.projectDir + '/data/reference_SARS-CoV2/NC_045512.2.gff3' , checkIfExists: true )
-            .map { file -> tuple(file.simpleName, file) }
     }
 } else {
     referenceGenomeChannel = Channel
         .fromPath( params.ref_genome, checkIfExists: true )
-        .map { file -> tuple(file.simpleName, file) }
 }
 if ( params.ref_annotation ) {
     referenceAnnotationChannel = Channel
         .fromPath( params.ref_annotation, checkIfExists: true )
-        .map { file -> tuple(file.simpleName, file) }
 }
 
 // illumina reads input & --list support
@@ -71,35 +70,29 @@ if (params.mode == 'paired') {
     if (params.fastq && params.list) { fastqInputChannel = Channel
         .fromPath( params.fastq, checkIfExists: true )
         .splitCsv()
-        .map { row -> [row[0], [file(row[1], checkIfExists: true), file(row[2], checkIfExists: true)]] }
-        }
+        .map { row -> [row[0], [file(row[1], checkIfExists: true), file(row[2], checkIfExists: true)]] }}
     else if (params.fastq) { fastqInputChannel = Channel
-        .fromFilePairs( params.fastq, checkIfExists: true )
-        }
+        .fromFilePairs( params.fastq, checkIfExists: true )}
 } else {
     if (params.fastq && params.list) { fastqInputChannel = Channel
         .fromPath( params.fastq, checkIfExists: true )
         .splitCsv()
-        .map { row -> [row[0], [file(row[1], checkIfExists: true)]] }
-        }
+        .map { row -> [row[0], [file(row[1], checkIfExists: true)]] }}
     else if (params.fastq) { fastqInputChannel = Channel
         .fromPath( params.fastq, checkIfExists: true )
-        .map { file -> [file.simpleName, [file]]}
-        }
+        .map { file -> [file.simpleName, [file]]}}
 }
 
 // load primers [optional]
 if (params.primer) { primerInputChannel = Channel
         .fromPath( params.primer, checkIfExists: true)
-        .map { file -> tuple(file.simpleName, file) }
 }
 
 // load adapters [optional]
 if (params.adapter) { adapterInputChannel = Channel
         .fromPath( params.adapter, checkIfExists: true)
-        .map { file -> tuple(file.simpleName, file) }
 } else {
-    adapterInputChannel = Channel.empty()
+    adapterInputChannel = Channel.fromPath('NO_ADAPTERS')
 }
 
 /************************** 
@@ -110,12 +103,42 @@ if (params.adapter) { adapterInputChannel = Channel
 include { dos2unix } from './modules/dos2unix'
 include { index_samtools } from './modules/samtools'
 include { index_picard } from './modules/picard'
-include { index_bwa } from './modules/bwa'
 
+
+// clip & trim
+include { trim_primer } from './modules/trimprimer'
+include { fastp } from './modules/fastp'
+
+// read taxonomy classification
+include { kraken_db; kraken; filter_virus_reads } from './modules/kraken'
+
+// map
+include { index_bwa; bwa } from './modules/bwa'
 
 /************************** 
 * DATABASES
 **************************/
+
+/* Comment section:
+The Database Section is designed to "auto-get" pre-prepared databases.
+It is written for local use and perspective cloud use via params.cloudProcess (see nextflow.config).
+*/
+
+workflow download_kraken_db {
+    main:
+        if (params.kraken) {
+            // local storage via storeDir
+            if (!params.cloudProcess) { kraken_db() ; database_kraken = kraken_db.out}
+            // cloud storage file.exists()?
+            if (params.cloudProcess) { 
+                kraken_db_preload = file("${params.databases}/kraken/GRCh38.p13_GBcovid19-2020-05-22.tar.gz")
+                if (kraken_db_preload.exists()) { database_kraken = kraken_db_preload }    
+                else { kraken_db() ; database_kraken = kraken_db.out }
+            }
+        }
+    emit: database_kraken
+}  
+
 
 /************************** 
 * SUB WORKFLOWS
@@ -127,49 +150,78 @@ workflow indexing {
     main:
         dos2unix(reference_fasta)
 
-        index_samtools(dos2unix.out)
-        index_picard(dos2unix.out) // this seems to be unused
-        index_bwa(dos2unix.out)
+        // index_samtools(dos2unix.out)
+        // index_picard(dos2unix.out) // this seems to be unused
 
     emit: 
         ref = dos2unix.out
-        fai = index_samtools.out
-        bwa = index_bwa.out.index
-
+        // fai = index_samtools.out
 }
 
-// amplicon primer clipping
+// 2: amplicon primer clipping [optional]
 workflow primer {
-    take: illumina_reads
-          primer_set
-
+    take:
+        illumina_reads
+        primer_set
     main:
-        clip(illumina_reads.combine(primer_set.map {primer_file_name, primer_file -> primer_file}))
-
+        trim_primer(illumina_reads, primer_set)
     emit:
-        clip.out.reads
+        trim_primer.out.reads
 }
 
-// quality trimming and optional adapter clipping
+// 3: quality trimming and optional adapter clipping [optional]
 workflow read_qc {
-    take: illumina_reads
-          adapter_fasta
-
+    take: 
+        illumina_reads
+        adapter_fasta
     main:
-        if (params.adapter) {
-            adapter_trim(illumina_reads.combine(adapter_fasta.map {adapter_file_name, adapter_file -> adapter_file}))
-            reads_trimmed = adapter_trim.out.reads
-            fastp_json = adapter_trim.out.json
-        } else {
-            qual_trim(illumina_reads)            
-            reads_trimmed = qual_trim.out.reads
-            fastp_json = qual_trim.out.json
-        }
-
+        fastp(illumina_reads, adapter_fasta)
+        reads_trimmed = fastp.out.reads
+        fastp_json = fastp.out.json
     emit: 
         reads_trimmed
         fastp_json
 }
+
+// 4: taxonomic read classification [optional]
+workflow classify {
+    take:
+        reads
+        db
+    main:
+        filter_virus_reads(kraken(reads, db).fastq)
+    emit:
+        reads = filter_virus_reads.out.fastq
+        report = kraken.out.kraken_report
+}
+
+// 5: read mapping
+workflow mapping {
+    take: 
+        illumina_reads
+        reference_fasta
+    main:
+
+        index_bwa(reference_fasta)
+        bwa(illumina_reads, index_bwa.out)
+        // // combine the reference fasta file with the corresponding bwa index and remove the reference file name
+        // indexed_reference_ch = reference_fasta.join(index_bwa.out).map {ref_name, ref_fasta, ref_bwa_index -> tuple (ref_fasta, ref_bwa_index)}
+        // // now add the reference fasta and bwa index to each processed read pair for mapping
+        // prepared_mapping_ch = illumina_reads.combine(indexed_reference_ch) 
+
+    //     index_bam(
+    //         sort(
+    //             map(
+    //                 prepared_mapping_ch).bam
+    //         ).bam
+    //     )
+    //     get_cov(sort.out.bam)
+    // emit:
+    //     bam = sort.out.bam
+    //     index = index_bam.out.index
+    //     coverage = get_cov.out.tsv
+}
+
 
 /************************** 
 * MAIN WORKFLOW
@@ -178,15 +230,27 @@ workflow {
 
     // generate all indices for the reference
     indexing(referenceGenomeChannel)
+    reference_ch = indexing.out.ref
 
     // primer clipping [optional]
     if (params.primer) {
         primer(fastqInputChannel, primerInputChannel)
         fastqInputChannel = primer.out
     }
-
+    
     // quality and adapter trimming
     reads_ch = read_qc(fastqInputChannel, adapterInputChannel).reads_trimmed
+    
+    // taxonomic read classification
+    if (params.kraken) {
+        classify(reads_ch, download_kraken_db())
+        reads_ch = classify.out.reads
+        kraken_reports = classify.out.report
+    }
+
+    // read mapping
+    // mapping(reads_ch, reference_ch)
+
 
 }
 
