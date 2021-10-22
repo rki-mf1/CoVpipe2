@@ -1,7 +1,5 @@
 process index_bwa {
-    label 'bwa'  
-    
-    publishDir "${params.output}", mode: 'copy', pattern: "${reference}.*"
+    label 'bwa'
     
     input:
     path(reference)
@@ -16,7 +14,9 @@ process index_bwa {
 }
 
 process bwa {
-    label 'bwa'  
+    label 'bwa'
+
+    publishDir "${params.output}/${params.mapping_dir}/${name}", mode: params.publish_dir_mode
 
     input:
     tuple val(name), path(reads)

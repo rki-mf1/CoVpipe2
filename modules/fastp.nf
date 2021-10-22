@@ -1,6 +1,7 @@
 process fastp {
+    label 'fastp'
 
-    label 'fastp'  
+    publishDir "${params.output}/${params.read_dir}/${name}/trimming", mode: params.publish_dir_mode
 
     input:
         tuple val(name), path(reads)

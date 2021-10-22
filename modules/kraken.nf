@@ -30,7 +30,9 @@ process kraken_db {
 }
 
 process kraken {
-    label 'kraken'  
+    label 'kraken'
+
+    publishDir "${params.output}/${params.read_dir}/${name}/kraken", mode: params.publish_dir_mode, pattern: "*.txt"
 
     input:
     tuple val(name), path(reads)
@@ -58,6 +60,8 @@ process kraken {
 process filter_virus_reads {
     // label just some environment or container where we are sure that wget and tar are available
     label 'dos2unix'
+
+    publishDir "${params.output}/${params.read_dir}/${name}/kraken/classified", mode: params.publish_dir_mode
 
     input:
     tuple val(name), path(reads)

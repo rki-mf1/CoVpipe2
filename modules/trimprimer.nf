@@ -1,7 +1,7 @@
 process trim_primer {
     label 'ptrimmer' 
 
-    publishDir "${params.output}", mode: 'copy', pattern: "*.log"
+    publishDir "${params.output}/${params.read_dir}//${name}/primer-clipping", mode: params.publish_dir_mode
 
     input:
     tuple val(name), path(reads)

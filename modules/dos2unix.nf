@@ -1,7 +1,7 @@
 process dos2unix {
-    label 'dos2unix'  
+    label 'dos2unix'
 
-    publishDir "${params.output}", mode: 'copy', pattern: "${name}.prepared.fasta"
+    publishDir "${params.output}/${params.genome_dir}", mode: params.publish_dir_mode
 
     input:
     path(reference)

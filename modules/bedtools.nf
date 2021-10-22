@@ -4,6 +4,8 @@
 process get_genomecov {
     label 'bedtools'
 
+    publishDir "${params.output}/${params.mapping_dir}/${name}", mode: params.publish_dir_mode
+
     input:
     tuple val(name), path(bam)
 

@@ -1,9 +1,5 @@
 process index_picard {
-
-    label 'gatk'  
-
-    publishDir "${params.output}", mode: 'copy', pattern: "*.dict"
-    publishDir "${params.output}", mode: 'copy', pattern: "*.log"
+    label 'gatk'
 
     input:
     tuple val(name), file(reference)

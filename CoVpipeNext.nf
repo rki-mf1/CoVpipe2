@@ -86,13 +86,17 @@ if (params.mode == 'paired') {
 // load primers [optional]
 if (params.primer) { primerInputChannel = Channel
         .fromPath( params.primer, checkIfExists: true)
+        .collect()
 }
 
 // load adapters [optional]
 if (params.adapter) { adapterInputChannel = Channel
         .fromPath( params.adapter, checkIfExists: true)
+        .collect()
 } else {
-    adapterInputChannel = Channel.fromPath('NO_ADAPTERS')
+    adapterInputChannel = Channel
+        .fromPath('NO_ADAPTERS')
+        .collect()
 }
 
 /************************** 
@@ -137,7 +141,7 @@ workflow download_kraken_db {
                 else { kraken_db() ; database_kraken = kraken_db.out }
             }
         }
-    emit: database_kraken
+    emit: database_kraken.collect()
 }  
 
 
@@ -201,7 +205,7 @@ workflow mapping {
     main:
 
         index_bwa(reference_fasta)
-        bwa(illumina_reads, index_bwa.out) |
+        bwa(illumina_reads, index_bwa.out.collect()) |
             (index_bam & get_genomecov)
     emit:
         bam = bwa.out.bam
@@ -222,21 +226,21 @@ workflow {
     // primer clipping [optional]
     if (params.primer) {
         primer(fastqInputChannel, primerInputChannel)
-        fastqInputChannel = primer.out
     }
-    
+    reads_ch = params.primer ? primer.out : fastqInputChannel
+
     // quality and adapter trimming
-    reads_ch = read_qc(fastqInputChannel, adapterInputChannel).reads_trimmed
-    
+    reads_qc_ch = read_qc(reads_ch, adapterInputChannel).reads_trimmed
+
     // taxonomic read classification
     if (params.kraken) {
-        classify(reads_ch, download_kraken_db())
-        reads_ch = classify.out.reads
+        classify(reads_qc_ch, download_kraken_db())
         kraken_reports = classify.out.report
     }
+    reads_qc_cl_ch = params.kraken ? classify.out.reads : reads_qc_ch
 
     // read mapping
-    mapping(reads_ch, reference_ch)
+    mapping(reads_qc_cl_ch, reference_ch)
 
 }
 

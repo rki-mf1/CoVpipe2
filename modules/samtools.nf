@@ -1,5 +1,7 @@
 process index_fasta {
-    label 'samtools'  
+    label 'samtools'
+
+    publishDir "${params.output}/${params.genome_dir}", mode: params.publish_dir_mode
 
     input:
     path(reference)
@@ -14,7 +16,9 @@ process index_fasta {
 }
 
 process index_bam {
-    label 'samtools'  
+    label 'samtools'
+
+    publishDir "${params.output}/${params.mapping_dir}/${name}", mode: params.publish_dir_mode
 
     input:
     tuple val(name), path(bam)
