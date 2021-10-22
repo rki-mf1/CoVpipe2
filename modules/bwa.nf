@@ -1,18 +1,17 @@
 process index_bwa {
     label 'bwa'  
     
-    publishDir "${params.output}", mode: 'copy', pattern: "${name}_bwa_index.tar.gz"
+    publishDir "${params.output}", mode: 'copy', pattern: "${reference}.*"
     
     input:
-    tuple val(name), path(reference)
+    path(reference)
     
     output:
-    tuple path(reference), path("${name}_bwa_index.tar.gz"), emit: index
+    tuple path(reference), path("${reference}.*"), emit: index
 
     script:
     """
     bwa index ${reference} &> /dev/null
-    tar -zcvf ${name}_bwa_index.tar.gz ${reference}.*
     """
 }
 
@@ -23,14 +22,16 @@ process bwa {
     tuple val(name), path(reads)
     tuple path(reference), path(index)
 
+    output:
+    tuple val(name), path("${name}.bam"), emit: bam
+
     script:
     """
-    (   time \
-                bwa mem -t ${task.cpus} \
-                    -R '@RG\tID:${name}\tPU:${name}\tSM:${name}\tPL:ILLUMINA\tLB:000' \
-                    ${reference} \
-                    ${reads} | \
-                    samtools view -Sb -@ ${task.cpus} -o ${name}.bam \
-            ) &> ${name}_map2reference.log
+    bwa mem -t ${task.cpus} \
+        -R '@RG\\tID:${name}\\tPU:${name}\\tSM:${name}\\tPL:ILLUMINA\\  tLB:000' \
+        ${reference} \
+        ${reads} | \
+        samtools view -Sb -@ ${task.cpus} | \
+        samtools sort -@ ${task.cpus} > ${name}.bam
     """
 }

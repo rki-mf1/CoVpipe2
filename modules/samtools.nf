@@ -1,17 +1,29 @@
-process index_samtools {
-
+process index_fasta {
     label 'samtools'  
 
-    publishDir "${params.output}", mode: 'copy', pattern: "*.fai"
-
     input:
-    tuple val(name), file(reference)
+    path(reference)
 
     output:
-    tuple val(name), file("${reference}.fai"), emit: index
+    path("${reference}.fai"), emit: index
 
     script:
     """
     samtools faidx ${reference}
+    """
+}
+
+process index_bam {
+    label 'samtools'  
+
+    input:
+    tuple val(name), path(bam)
+
+    output:
+    tuple val(name), path("${bam}.bai"), emit: index
+
+    script:
+    """
+    samtools index ${bam}
     """
 }

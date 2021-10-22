@@ -101,9 +101,6 @@ if (params.adapter) { adapterInputChannel = Channel
 
 // preprocess & index
 include { dos2unix } from './modules/dos2unix'
-include { index_samtools } from './modules/samtools'
-include { index_picard } from './modules/picard'
-
 
 // clip & trim
 include { trim_primer } from './modules/trimprimer'
@@ -114,6 +111,10 @@ include { kraken_db; kraken; filter_virus_reads } from './modules/kraken'
 
 // map
 include { index_bwa; bwa } from './modules/bwa'
+include { get_genomecov } from './modules/bedtools'
+
+// utils
+include { index_fasta; index_bam } from './modules/samtools'
 
 /************************** 
 * DATABASES
@@ -144,18 +145,15 @@ workflow download_kraken_db {
 * SUB WORKFLOWS
 **************************/
 
-// 1: indexing
-workflow indexing {
+// 1: reference preprocessing
+workflow reference_preprocessing {
     take: reference_fasta
     main:
-        dos2unix(reference_fasta)
-
-        // index_samtools(dos2unix.out)
-        // index_picard(dos2unix.out) // this seems to be unused
-
+        dos2unix(reference_fasta) \
+            | index_fasta
     emit: 
         ref = dos2unix.out
-        // fai = index_samtools.out
+        fai = index_fasta.out
 }
 
 // 2: amplicon primer clipping [optional]
@@ -203,23 +201,12 @@ workflow mapping {
     main:
 
         index_bwa(reference_fasta)
-        bwa(illumina_reads, index_bwa.out)
-        // // combine the reference fasta file with the corresponding bwa index and remove the reference file name
-        // indexed_reference_ch = reference_fasta.join(index_bwa.out).map {ref_name, ref_fasta, ref_bwa_index -> tuple (ref_fasta, ref_bwa_index)}
-        // // now add the reference fasta and bwa index to each processed read pair for mapping
-        // prepared_mapping_ch = illumina_reads.combine(indexed_reference_ch) 
-
-    //     index_bam(
-    //         sort(
-    //             map(
-    //                 prepared_mapping_ch).bam
-    //         ).bam
-    //     )
-    //     get_cov(sort.out.bam)
-    // emit:
-    //     bam = sort.out.bam
-    //     index = index_bam.out.index
-    //     coverage = get_cov.out.tsv
+        bwa(illumina_reads, index_bwa.out) |
+            (index_bam & get_genomecov)
+    emit:
+        bam = bwa.out.bam
+        index = index_bam.out.index
+        coverage = get_genomecov.out.tsv
 }
 
 
@@ -229,8 +216,8 @@ workflow mapping {
 workflow {
 
     // generate all indices for the reference
-    indexing(referenceGenomeChannel)
-    reference_ch = indexing.out.ref
+    reference_preprocessing(referenceGenomeChannel)
+    reference_ch = reference_preprocessing.out.ref
 
     // primer clipping [optional]
     if (params.primer) {
@@ -249,8 +236,7 @@ workflow {
     }
 
     // read mapping
-    // mapping(reads_ch, reference_ch)
-
+    mapping(reads_ch, reference_ch)
 
 }
 
