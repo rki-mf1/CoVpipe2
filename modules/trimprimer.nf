@@ -9,7 +9,6 @@ process trim_primer {
 
     output:
     tuple val(name), path("${name}*.noprimer.fastq.gz"),  emit: reads
-    tuple val(name), path("${name}_trimPrimer.log"),      emit: log
 
     script:
 
@@ -24,7 +23,7 @@ process trim_primer {
         -r ${reads[1]} \
         -e ${name}.R2.noprimer.fastq \
         -m ${params.max_primer_mismatches} \
-        --keep &> ${name}_trimPrimer.log
+        --keep
     gzip ${name}.R1.noprimer.fastq ${name}.R2.noprimer.fastq
     """
 }
