@@ -45,7 +45,7 @@ process kraken {
 
     script:
     """
-    ( kraken2 \
+    kraken2 \
         --threads ${task.cpus} \
         --db ${db} \
         --paired \
@@ -53,7 +53,7 @@ process kraken {
         --output ${name}.kraken.out.txt \
         --report ${name}.kraken.report.txt \
         --gzip-compressed \
-        ${reads[0]} ${reads[1]} ) 2> ${name}.classify.log
+        ${reads[0]} ${reads[1]}
     """
 }
 

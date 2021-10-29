@@ -11,13 +11,12 @@ process fastp {
         tuple val(name), path("${name}.R{1,2}.fastq.gz"),       emit: reads
         tuple val(name), path("${name}.fastp.json"),            emit: json
         tuple val(name), path("${name}.fastp.html"),            emit: html
-        tuple val(name), path("${name}_trimReads.log"),         emit: log
     
     script:
     set_adapters = adapter.getName() == 'NO_ADAPTERS' ? '' : "--adapter_fasta ${adapter}"
     set_paired_reads = params.mode == 'single' ? '' : "--in2 ${reads[1]} --out2 ${name}.R2.fastq.gz --unpaired1 ${name}.SE.R1.fastq.gz --unpaired2 ${name}.SE.R2.fastq.gz"
     """
-    (fastp \
+    fastp \
         --in1 ${reads[0]} \
         --out1 ${name}.R1.fastq.gz \
         ${set_paired_reads} \
@@ -27,6 +26,6 @@ process fastp {
         --low_complexity_filter \
         --overrepresentation_analysis \
         --thread ${task.cpus} \
-        ${params.fastp_additional_parameters} ) &> ${name}_trimReads.log
+        ${params.fastp_additional_parameters}
     """
 }
