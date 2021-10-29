@@ -104,142 +104,44 @@ if (params.adapter) { adapterInputChannel = Channel
 **************************/
 
 // preprocess & index
-include { dos2unix } from './modules/dos2unix'
+include { reference_preprocessing } from './workflows/reference_preprocessing_wf'
 
 // clip & trim
-include { trim_primer } from './modules/trimprimer'
-include { fastp } from './modules/fastp'
+include { trim_primer } from './workflows/trim_primer_wf'
+include { read_qc } from './workflows/read_qc_wf'
 
 // read taxonomy classification
-include { kraken_db; kraken; filter_virus_reads } from './modules/kraken'
+include { download_kraken_db } from './workflows/kraken_download_wf'
+include { classify_reads } from './workflows/classify_reads_wf'
 
 // map
-include { index_bwa; bwa } from './modules/bwa'
-include { get_genomecov } from './modules/bedtools'
-
-// utils
-include { index_fasta; index_bam } from './modules/samtools'
-
-/************************** 
-* DATABASES
-**************************/
-
-/* Comment section:
-The Database Section is designed to "auto-get" pre-prepared databases.
-It is written for local use and perspective cloud use via params.cloudProcess (see nextflow.config).
-*/
-
-workflow download_kraken_db {
-    main:
-        if (params.kraken) {
-            // local storage via storeDir
-            if (!params.cloudProcess) { kraken_db() ; database_kraken = kraken_db.out}
-            // cloud storage file.exists()?
-            if (params.cloudProcess) { 
-                kraken_db_preload = file("${params.databases}/kraken/GRCh38.p13_GBcovid19-2020-05-22.tar.gz")
-                if (kraken_db_preload.exists()) { database_kraken = kraken_db_preload }    
-                else { kraken_db() ; database_kraken = kraken_db.out }
-            }
-        }
-    emit: database_kraken.collect()
-}  
-
-
-/************************** 
-* SUB WORKFLOWS
-**************************/
-
-// 1: reference preprocessing
-workflow reference_preprocessing {
-    take: reference_fasta
-    main:
-        dos2unix(reference_fasta) \
-            | index_fasta
-    emit: 
-        ref = dos2unix.out
-        fai = index_fasta.out
-}
-
-// 2: amplicon primer clipping [optional]
-workflow primer {
-    take:
-        illumina_reads
-        primer_set
-    main:
-        trim_primer(illumina_reads, primer_set)
-    emit:
-        trim_primer.out.reads
-}
-
-// 3: quality trimming and optional adapter clipping [optional]
-workflow read_qc {
-    take: 
-        illumina_reads
-        adapter_fasta
-    main:
-        fastp(illumina_reads, adapter_fasta)
-        reads_trimmed = fastp.out.reads
-        fastp_json = fastp.out.json
-    emit: 
-        reads_trimmed
-        fastp_json
-}
-
-// 4: taxonomic read classification [optional]
-workflow classify {
-    take:
-        reads
-        db
-    main:
-        filter_virus_reads(kraken(reads, db).fastq)
-    emit:
-        reads = filter_virus_reads.out.fastq
-        report = kraken.out.kraken_report
-}
-
-// 5: read mapping
-workflow mapping {
-    take: 
-        illumina_reads
-        reference_fasta
-    main:
-
-        index_bwa(reference_fasta)
-        bwa(illumina_reads, index_bwa.out.collect()) |
-            (index_bam & get_genomecov)
-    emit:
-        bam = bwa.out.bam
-        index = index_bam.out.index
-        coverage = get_genomecov.out.tsv
-}
-
+include { mapping } from './workflows/mapping_wf'
 
 /************************** 
 * MAIN WORKFLOW
 **************************/
 workflow {
-
-    // generate all indices for the reference
+    // 1: reference preprocessing
     reference_preprocessing(referenceGenomeChannel)
     reference_ch = reference_preprocessing.out.ref
 
-    // primer clipping [optional]
+    // 2: amplicon primer clipping [optional]
     if (params.primer) {
-        primer(fastqInputChannel, primerInputChannel)
+        trim_primer(fastqInputChannel, primerInputChannel)
     }
-    reads_ch = params.primer ? primer.out : fastqInputChannel
+    reads_ch = params.primer ? trim_primer.out : fastqInputChannel
 
-    // quality and adapter trimming
+    // 3: quality trimming and optional adapter clipping [optional]
     reads_qc_ch = read_qc(reads_ch, adapterInputChannel).reads_trimmed
 
-    // taxonomic read classification
+    // 4: taxonomic read classification [optional]
     if (params.kraken) {
-        classify(reads_qc_ch, download_kraken_db())
-        kraken_reports = classify.out.report
+        classify_reads(reads_qc_ch, download_kraken_db())
+        kraken_reports = classify_reads.out.report
     }
-    reads_qc_cl_ch = params.kraken ? classify.out.reads : reads_qc_ch
+    reads_qc_cl_ch = params.kraken ? classify_reads.out.reads : reads_qc_ch
 
-    // read mapping
+    // 5: read mapping
     mapping(reads_qc_cl_ch, reference_ch)
 
 }

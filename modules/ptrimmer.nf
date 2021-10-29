@@ -1,4 +1,4 @@
-process trim_primer {
+process ptrimmer {
     label 'ptrimmer' 
 
     publishDir "${params.output}/${params.read_dir}//${name}/primer-clipping", mode: params.publish_dir_mode
@@ -8,12 +8,10 @@ process trim_primer {
     path(primer_txt)
 
     output:
-    tuple val(name), path("${name}*.noprimer.fastq.gz"),  emit: reads
+    tuple val(name), path("${name}*.noprimer.fastq"),  emit: reads
 
     script:
-
     mode = params.mode == 'paired' ? 'pair' : 'single' 
-
     """
     ptrimmer \
         -t ${mode} \
@@ -24,6 +22,5 @@ process trim_primer {
         -e ${name}.R2.noprimer.fastq \
         -m ${params.max_primer_mismatches} \
         --keep
-    gzip ${name}.R1.noprimer.fastq ${name}.R2.noprimer.fastq
     """
 }
