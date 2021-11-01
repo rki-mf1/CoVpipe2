@@ -155,6 +155,8 @@ workflow {
     // 6: variant calling and annotation
     variant_calling(reference_ch, reference_preprocessing.out.fai.collect(), mapping_ch)
     annotate_variant(variant_calling.out.vcf, reference_ch)
+
+    // 7: create consensus
 }
 
 /************************** 
@@ -207,7 +209,13 @@ def helpMSG() {
     ${c_yellow}Primer detection: ${c_reset}
     --primer                 Provide the path to the primer BEDPE file. [default: $params.primer]
                                  ${c_dim}TAB-delimited text file containing at least 6 fields, see here:
-                                     https://bedtools.readthedocs.io/en/latest/content/general-usage.html#bedpe-format${c_reset}
+                                 https://bedtools.readthedocs.io/en/latest/content/general-usage.html#bedpe-format${c_reset}
+
+    ${c_yellow}Variant calling:${c_reset}
+    --vcount                 Minimum number of reads at a position to be considered for variant calling. [default: $params.vcount]
+    --cov                    Minimum number of supporting reads which are required to call a variant. [default: $params.cov]
+    --frac                   Minimum percentage of supporting reads at the respective position required to call a variant. 
+                                 In turn, variants supported by (1 - frac)*100% reads will be explicitly called. [default: $params.frac]
 
     ${c_yellow}Computing options:${c_reset}
     --cores                  Max cores per process for local use [default: $params.cores]

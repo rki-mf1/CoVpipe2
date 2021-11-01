@@ -106,10 +106,16 @@ nextflow pull RKIBioinformaticsPipelines/covpipenext -hub gitlab -r <RELEASE>
                                  https://zenodo.org/record/3854856 and stored locally [default: true]
     --taxid                  Taxonomic ID used together with the kraken2 database for read filtering [default: 2697049]
 
-        Primer detection: 
-    --primer                 Provide the path to the primer BEDPE file. [default: ../covpipe/bedpe.txt]
+    Primer detection: 
+    --primer                 Provide the path to the primer BEDPE file. [default: false]
                                  TAB-delimited text file containing at least 6 fields, see here:
-                                     https://bedtools.readthedocs.io/en/latest/content/general-usage.html#bedpe-format
+                                 https://bedtools.readthedocs.io/en/latest/content/general-usage.html#bedpe-format
+
+    Variant calling:
+    --vcount                 Minimum number of reads at a position to be considered for variant calling. [default: 10]
+    --cov                    Minimum number of supporting reads which are required to call a variant. [default: 20]
+    --frac                   Minimum percentage of supporting reads at the respective position required to call a variant. 
+                                 In turn, variants supported by (1 - frac)*100% reads will be explicitly called. [default: 0.1]
 
     Computing options:
     --cores                  Max cores per process for local use [default: 4]
