@@ -170,14 +170,61 @@ def helpMSG() {
 
     ${c_yellow}Inputs:
     Illumina read data:${c_reset}
-    ${c_green}--fastq ${c_reset}            e.g.: 'sample{1,2}.fastq' or '*.fastq.gz' or '*/*.fastq.gz'
-    --list              this flag activates csv input for the above flags [default: false]
-                        style of the csv is: ${c_dim}samplename,path_r1,path_r2${c_reset}
-    --mode                     switch between 'paired'- and 'single'-end FASTQ 
+    ${c_green}--fastq ${c_reset}                 e.g.: 'sample{1,2}.fastq' or '*.fastq.gz' or '*/*.fastq.gz'
+    --list                   This flag activates csv input for the above flags [default: false]
+                                 ${c_dim}style of the csv is: samplename,path_r1,path_r2${c_reset}
+    --mode                          Switch between 'paired'- and 'single'-end FASTQ 
+
     ${c_yellow}Reference:${c_reset}
-    ${c_green}--reference ${c_reset}        currently supported: SARS-CoV2 (NC_045512)
+    ${c_green}--reference ${c_reset}             Currently supported: 'sars-cov2' (NC_045512)
     OR
-    ${c_green}--ref_genome ${c_reset}       e.g.: 'ref.fasta'
-    ${c_green}--ref_annotation ${c_reset}   e.g.: 'ref.fasta'
+    ${c_green}--ref_genome ${c_reset}            e.g.: 'ref.fasta'
+    ${c_green}--ref_annotation ${c_reset}        e.g.: 'ref.gff'
+
+    ${c_yellow}Primer detection: ${c_reset}
+    --primer                 Provide the path to the primer file. [default: $params.primer]
+                                 ${c_dim}The primer file is a TAB-delimited text file containing the following fields:
+                                     1. forward primer sequence (5' -> 3') [mandatory]
+                                     2. reverse primer sequence (reverse-complement 5' -> 3') [mandatory]
+                                     3. insert length between the primer pair [mandatory]
+                                     4. auxiliary information [optional]${c_reset}
+     --max_primer_mismatches Define the maximum number of mismatches allowed to occur in amplicon primer sequences. [default: $params.max_primer_mismatches]
+
+    ${c_yellow}Adapter clipping:${c_reset}
+     --adapter               Define the path of a FASTA file containing the adapter sequences to be clipped. [default: $params.adapter]
+
+    ${c_yellow}Trimming and QC:${c_reset}
+    --fastp_additional_parameters      Additional parameters for FeatureCounts [default: $params.featurecounts_additional_params]
+    
+    ${c_yellow}Taxonomic read filter:${c_reset}
+    --kraken                 Activate taxonomic read filtering to exclude reads not classified as SARS-COV-2 (NCBI taxonomy ID 2697049) 
+                                 from read mapping. A pre-processed kraken2 database will be automatically downloaded from 
+                                 https://zenodo.org/record/3854856 and stored locally [default: $params.kraken]
+
+    --taxid                  Taxonomic ID used together with the kraken2 database for read filtering [default: $params.taxid]
+
+    ${c_yellow}Computing options:${c_reset}
+    --cores                  Max cores per process for local use [default: $params.cores]
+    --max_cores              Max cores used on the machine for local use [default: $params.max_cores]
+    --memory                 Max memory in GB for local use [default: $params.memory]
+    --output                 Name of the result folder [default: $params.output]
+
+    ${c_yellow}Caching:${c_reset}
+    --dbs                    Location for auto-download data like databases [default: $params.dbs]
+    --condaCachedir          Location for storing the conda environments [default: $params.condaCachedir]
+    --singularityCachedir    Location for storing the singularity images [default: $params.singularityCachedir]
+    --publish_dir_mode       Mode of output publishing: 'copy', 'symlink' [default: $params.publish_dir_mode]
+
+    
+    ${c_yellow}Execution/Engine profiles:${c_reset}
+    The pipeline supports profiles to run via different ${c_green}Executers${c_reset} and ${c_blue}Engines${c_reset} e.g.: -profile ${c_green}local${c_reset},${c_blue}conda${c_reset}
+    
+    ${c_green}Executer${c_reset} (choose one):
+      local
+    
+    ${c_blue}Engines${c_reset} (choose one):
+      conda
+    
+    Per default: -profile local,conda is executed. 
     """
 }
