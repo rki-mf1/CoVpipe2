@@ -111,6 +111,13 @@ nextflow pull RKIBioinformaticsPipelines/covpipenext -hub gitlab -r <RELEASE>
                                  TAB-delimited text file containing at least 6 fields, see here:
                                      https://bedtools.readthedocs.io/en/latest/content/general-usage.html#bedpe-format
 
+    Consensus generation:
+    --cns_min_cov            Minimum number of reads required so that the respective position in the consensus sequence 
+                                 is NOT hard masked. [default: 20]
+    --cns_gt_adjust          Minimum fraction of reads supporting a variant which leads to an explicit call of this 
+                                 variant (genotype adjustment). The value has to be greater than 0.5 but not greater than 1. 
+                                 To turn genotype adjustment off, set the value to 0. [default: 0.9]
+
     Computing options:
     --cores                  Max cores per process for local use [default: 4]
     --max_cores              Max cores used on the machine for local use [default: 12]

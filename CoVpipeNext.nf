@@ -209,6 +209,13 @@ def helpMSG() {
                                  ${c_dim}TAB-delimited text file containing at least 6 fields, see here:
                                      https://bedtools.readthedocs.io/en/latest/content/general-usage.html#bedpe-format${c_reset}
 
+    ${c_yellow}Consensus generation:${c_reset}
+    --cns_min_cov            Minimum number of reads required so that the respective position in the consensus sequence 
+                                 is NOT hard masked. [default: $params.cns_min_cov]
+    --cns_gt_adjust          Minimum fraction of reads supporting a variant which leads to an explicit call of this 
+                                 variant (genotype adjustment). The value has to be greater than 0.5 but not greater than 1. 
+                                 To turn genotype adjustment off, set the value to 0. [default: $params.cns_gt_adjust]
+
     ${c_yellow}Computing options:${c_reset}
     --cores                  Max cores per process for local use [default: $params.cores]
     --max_cores              Max cores used on the machine for local use [default: $params.max_cores]
