@@ -111,6 +111,16 @@ nextflow pull RKIBioinformaticsPipelines/covpipenext -hub gitlab -r <RELEASE>
                                  TAB-delimited text file containing at least 6 fields, see here:
                                      https://bedtools.readthedocs.io/en/latest/content/general-usage.html#bedpe-format
 
+    Variant hard filtering:
+    --var_mqm                Minimal mean mapping quality of observed alternate alleles (MQM). The mapping quality (MQ) 
+                                measures how good reads align to the respective reference genome region. Good mapping qualities are 
+                                around MQ 60. GATK recommends hard filtering of variants with MQ less than 40. [default: 40]
+    --var_sap                Strand balance probability for the alternate allele (SAP). The SAP is the Phred-scaled 
+                                probability that there is strand bias at the respective site. A value near 0 indicates little or 
+                                no strand bias.  [default: 60]
+    --var_qual               Minimal variant call quality. Freebayes produces a general judgement of the 
+                                variant call. [default: 10]
+
     Consensus generation:
     --cns_min_cov            Minimum number of reads required so that the respective position in the consensus sequence 
                                  is NOT hard masked. [default: 20]
