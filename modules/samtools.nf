@@ -24,7 +24,7 @@ process index_bam {
     tuple val(name), path(bam)
 
     output:
-    tuple val(name), path("${bam}.bai"), emit: index
+    tuple val(name), path (bam), path("${bam}.bai")
 
     script:
     """

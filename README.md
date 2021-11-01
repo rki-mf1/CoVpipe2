@@ -94,15 +94,6 @@ nextflow pull RKIBioinformaticsPipelines/covpipenext -hub gitlab -r <RELEASE>
     --ref_genome             e.g.: 'ref.fasta'
     --ref_annotation         e.g.: 'ref.gff'
 
-    Primer detection: 
-    --primer                 Provide the path to the primer file. [default: ../covpipe/bedpe.txt]
-                                 The primer file is a TAB-delimited text file containing the following fields:
-                                     1. forward primer sequence (5' -> 3') [mandatory]
-                                     2. reverse primer sequence (reverse-complement 5' -> 3') [mandatory]
-                                     3. insert length between the primer pair [mandatory]
-                                     4. auxiliary information [optional]
-     --max_primer_mismatches Define the maximum number of mismatches allowed to occur in amplicon primer sequences. [default: 1]
-
     Adapter clipping:
      --adapter               Define the path of a FASTA file containing the adapter sequences to be clipped. [default: false]
 
@@ -113,8 +104,12 @@ nextflow pull RKIBioinformaticsPipelines/covpipenext -hub gitlab -r <RELEASE>
     --kraken                 Activate taxonomic read filtering to exclude reads not classified as SARS-COV-2 (NCBI taxonomy ID 2697049) 
                                  from read mapping. A pre-processed kraken2 database will be automatically downloaded from 
                                  https://zenodo.org/record/3854856 and stored locally [default: true]
-
     --taxid                  Taxonomic ID used together with the kraken2 database for read filtering [default: 2697049]
+
+        Primer detection: 
+    --primer                 Provide the path to the primer BEDPE file. [default: ../covpipe/bedpe.txt]
+                                 TAB-delimited text file containing at least 6 fields, see here:
+                                     https://bedtools.readthedocs.io/en/latest/content/general-usage.html#bedpe-format
 
     Computing options:
     --cores                  Max cores per process for local use [default: 4]

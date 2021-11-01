@@ -12,7 +12,6 @@ workflow mapping {
         bwa(illumina_reads, index_bwa.out.collect()) |
             (index_bam & get_genomecov)
     emit:
-        bam = bwa.out.bam
-        index = index_bam.out.index
+        bam_bai= index_bam.out
         coverage = get_genomecov.out.tsv
 }

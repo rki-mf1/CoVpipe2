@@ -83,12 +83,6 @@ if (params.mode == 'paired') {
         .map { file -> [file.simpleName, [file]]}}
 }
 
-// load primers [optional]
-if (params.primer) { primerInputChannel = Channel
-        .fromPath( params.primer, checkIfExists: true)
-        .collect()
-}
-
 // load adapters [optional]
 if (params.adapter) { adapterInputChannel = Channel
         .fromPath( params.adapter, checkIfExists: true)
@@ -96,6 +90,12 @@ if (params.adapter) { adapterInputChannel = Channel
 } else {
     adapterInputChannel = Channel
         .fromPath('NO_ADAPTERS')
+        .collect()
+}
+
+// load primers [optional]
+if (params.primer) { primerInputChannel = Channel
+        .fromPath( params.primer, checkIfExists: true)
         .collect()
 }
 
@@ -107,7 +107,7 @@ if (params.adapter) { adapterInputChannel = Channel
 include { reference_preprocessing } from './workflows/reference_preprocessing_wf'
 
 // clip & trim
-include { trim_primer } from './workflows/trim_primer_wf'
+include { clip_primer } from './workflows/clip_primer_wf'
 include { read_qc } from './workflows/read_qc_wf'
 
 // read taxonomy classification
@@ -125,24 +125,28 @@ workflow {
     reference_preprocessing(referenceGenomeChannel)
     reference_ch = reference_preprocessing.out.ref
 
-    // 2: amplicon primer clipping [optional]
-    if (params.primer) {
-        trim_primer(fastqInputChannel, primerInputChannel)
-    }
-    reads_ch = params.primer ? trim_primer.out : fastqInputChannel
+    // 2: quality trimming and optional adapter clipping [optional]
+    reads_qc_ch = read_qc(fastqInputChannel, adapterInputChannel).reads_trimmed
 
-    // 3: quality trimming and optional adapter clipping [optional]
-    reads_qc_ch = read_qc(reads_ch, adapterInputChannel).reads_trimmed
-
-    // 4: taxonomic read classification [optional]
+    // 3: taxonomic read classification [optional]
     if (params.kraken) {
         classify_reads(reads_qc_ch, download_kraken_db())
         kraken_reports = classify_reads.out.report
     }
     reads_qc_cl_ch = params.kraken ? classify_reads.out.reads : reads_qc_ch
 
-    // 5: read mapping
+    // 4: read mapping
     mapping(reads_qc_cl_ch, reference_ch)
+
+    // 5: primer clipping [optional]
+    if (params.primer) {
+        clip_primer(mapping.out.bam_bai, primerInputChannel)
+    }
+
+    mapping_ch = params.primer ? clip_primer.out : mapping.out.bam_bai
+
+    // 6: variant calling
+    // variants(reference_ch, reference_preprocessing.out.fai, mapping.out.bam, mapping.out.index)
 
 }
 
@@ -181,15 +185,6 @@ def helpMSG() {
     ${c_green}--ref_genome ${c_reset}            e.g.: 'ref.fasta'
     ${c_green}--ref_annotation ${c_reset}        e.g.: 'ref.gff'
 
-    ${c_yellow}Primer detection: ${c_reset}
-    --primer                 Provide the path to the primer file. [default: $params.primer]
-                                 ${c_dim}The primer file is a TAB-delimited text file containing the following fields:
-                                     1. forward primer sequence (5' -> 3') [mandatory]
-                                     2. reverse primer sequence (reverse-complement 5' -> 3') [mandatory]
-                                     3. insert length between the primer pair [mandatory]
-                                     4. auxiliary information [optional]${c_reset}
-     --max_primer_mismatches Define the maximum number of mismatches allowed to occur in amplicon primer sequences. [default: $params.max_primer_mismatches]
-
     ${c_yellow}Adapter clipping:${c_reset}
      --adapter               Define the path of a FASTA file containing the adapter sequences to be clipped. [default: $params.adapter]
 
@@ -200,8 +195,12 @@ def helpMSG() {
     --kraken                 Activate taxonomic read filtering to exclude reads not classified as SARS-COV-2 (NCBI taxonomy ID 2697049) 
                                  from read mapping. A pre-processed kraken2 database will be automatically downloaded from 
                                  https://zenodo.org/record/3854856 and stored locally [default: $params.kraken]
-
     --taxid                  Taxonomic ID used together with the kraken2 database for read filtering [default: $params.taxid]
+
+    ${c_yellow}Primer detection: ${c_reset}
+    --primer                 Provide the path to the primer BEDPE file. [default: $params.primer]
+                                 ${c_dim}TAB-delimited text file containing at least 6 fields, see here:
+                                     https://bedtools.readthedocs.io/en/latest/content/general-usage.html#bedpe-format${c_reset}
 
     ${c_yellow}Computing options:${c_reset}
     --cores                  Max cores per process for local use [default: $params.cores]
