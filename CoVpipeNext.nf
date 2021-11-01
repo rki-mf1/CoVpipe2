@@ -106,8 +106,7 @@ if (params.primer) { primerInputChannel = Channel
 // preprocess & index
 include { reference_preprocessing } from './workflows/reference_preprocessing_wf'
 
-// clip & trim
-include { clip_primer } from './workflows/clip_primer_wf'
+// qc & trim
 include { read_qc } from './workflows/read_qc_wf'
 
 // read taxonomy classification
@@ -117,13 +116,22 @@ include { classify_reads } from './workflows/classify_reads_wf'
 // map
 include { mapping } from './workflows/mapping_wf'
 
+// primer clipping
+include { clip_primer } from './workflows/clip_primer_wf'
+
+// variant calling
+include { variant_calling } from './workflows/variant_calling_wf'
+
+// annotation variant
+include { annotate_variant } from './workflows/annotate_variant_wf'
+
 /************************** 
 * MAIN WORKFLOW
 **************************/
 workflow {
     // 1: reference preprocessing
     reference_preprocessing(referenceGenomeChannel)
-    reference_ch = reference_preprocessing.out.ref
+    reference_ch = reference_preprocessing.out.ref.collect()
 
     // 2: quality trimming and optional adapter clipping [optional]
     reads_qc_ch = read_qc(fastqInputChannel, adapterInputChannel).reads_trimmed
@@ -142,12 +150,11 @@ workflow {
     if (params.primer) {
         clip_primer(mapping.out.bam_bai, primerInputChannel)
     }
-
     mapping_ch = params.primer ? clip_primer.out : mapping.out.bam_bai
 
-    // 6: variant calling
-    // variants(reference_ch, reference_preprocessing.out.fai, mapping.out.bam, mapping.out.index)
-
+    // 6: variant calling and annotation
+    variant_calling(reference_ch, reference_preprocessing.out.fai.collect(), mapping_ch)
+    annotate_variant(variant_calling.out.vcf, reference_ch)
 }
 
 /************************** 
