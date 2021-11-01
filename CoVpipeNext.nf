@@ -211,8 +211,8 @@ def helpMSG() {
 
     ${c_yellow}Caching:${c_reset}
     --dbs                    Location for auto-download data like databases [default: $params.dbs]
-    --condaCachedir          Location for storing the conda environments [default: $params.condaCachedir]
-    --singularityCachedir    Location for storing the singularity images [default: $params.singularityCachedir]
+    --conda_cache_dir          Location for storing the conda environments [default: $params.conda_cache_dir]
+    --singularity_cache_dir    Location for storing the singularity images [default: $params.singularity_cache_dir]
     --publish_dir_mode       Mode of output publishing: 'copy', 'symlink' [default: $params.publish_dir_mode]
 
     
