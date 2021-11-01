@@ -119,11 +119,12 @@ include { mapping } from './workflows/mapping_wf'
 // primer clipping
 include { clip_primer } from './workflows/clip_primer_wf'
 
-// variant calling
+// variant calling and annotation
 include { variant_calling } from './workflows/variant_calling_wf'
-
-// annotation variant
 include { annotate_variant } from './workflows/annotate_variant_wf'
+
+// generate consensus
+include { generate_consensus } from './workflow/generate_consensus_wf'
 
 /************************** 
 * MAIN WORKFLOW
@@ -155,6 +156,9 @@ workflow {
     // 6: variant calling and annotation
     variant_calling(reference_ch, reference_preprocessing.out.fai.collect(), mapping_ch)
     annotate_variant(variant_calling.out.vcf, reference_ch)
+
+    // 7: generate consensus
+    generate_consensus(variant_calling.out.vcf, reference_ch, mapping_ch)
 }
 
 /************************** 
