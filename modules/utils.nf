@@ -12,3 +12,20 @@ process compress_reads {
   pigz -f -p ${task.cpus} ${reads}
   """
 }
+
+process bgzip_compress {
+  label 'samtools'
+
+  publishDir "${params.publish_dir}/${name}", mode: params.publish_dir_mode
+
+  input:
+  tuple val(name), path(file)
+
+  output:
+  tuple val(name), path("${file}.gz")
+
+  script:
+  """
+  bgzip -@ ${task.cpus} ${file}
+  """
+}

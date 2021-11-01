@@ -8,8 +8,8 @@ process snpeff {
         path(reference)
 
     output:
-        path("${vcf.baseName}.annotation.html"), emit: html
-        path("${vcf.baseName}.annotation.covered.af.vcf"), emit: vcf
+        tuple val(name), path("${vcf.baseName}.annotation.html"), emit: html
+        tuple val(name), path("${vcf.baseName}.annotation.covered.af.vcf"), emit: vcf
 
     script:
     """
