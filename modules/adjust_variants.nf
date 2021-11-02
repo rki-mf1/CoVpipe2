@@ -10,7 +10,7 @@ process adjust_gt {
 
     script:
     """
-    python ../bin/adjust_gt.py --vf ${params.cns_gt_adjust} --gz ${vcf} -o ${name}.filtered.gt_adjust.vcf
+    adjust_gt.py --vf ${params.cns_gt_adjust} --gz ${vcf} -o ${name}.filtered.gt_adjust.vcf
     """
 }
 
@@ -22,10 +22,10 @@ process adjust_del {
     tuple val(name), path(vcf)
 
     output:
-    tuple val(name), path()
+    tuple val(name), path("${vcf.baseName}.del_adjusted.vcf")
 
     script:
     """
-    python ../bin/adjust_gt.py --gz ${vcf} -o ${name}.filtered.del_adjusted.vcf
+    adjust_gt.py --gz ${vcf} -o ${vcf.baseName}.del_adjusted.vcf
     """
 }

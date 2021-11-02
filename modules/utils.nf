@@ -3,7 +3,7 @@ process compress_reads {
 
   input:
   tuple val(name), path(reads)
-  
+
   output:
   tuple val(name), path("*.fastq.gz")
 
@@ -31,6 +31,7 @@ process bgzip_compress {
 }
 
 process adapt_consensus_header {
+  publishDir "${params.output}/${params.consensus_dir}/${name}", mode: params.publish_dir_mode
 
   input:
   tuple val(name), path(fasta)
@@ -50,6 +51,8 @@ process adapt_consensus_header {
 
 
 process mask_iupac {
+  publishDir "${params.output}/${params.consensus_dir}/${name}", mode: params.publish_dir_mode
+
   input:
   tuple val(name), path(fasta)
 

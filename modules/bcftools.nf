@@ -18,22 +18,26 @@ process index_vcf {
 process filter_variants_hard {
     label 'bcftools'
 
+    publishDir "${params.output}/${params.consensus_dir}/${name}", mode: params.publish_dir_mode
+
     input:
     tuple val(name), path(vcf)
 
     output:
-    tuple val(name), path(vcf)
+    tuple val(name), path("${name}.filtered.vcf.gz")
 
     script:
     """
     bcftools filter -e \
                     "INFO/MQM < ${params.var_mqm} | INFO/SAP > ${params.var_sap} | QUAL < ${params.var_qual}" \
-                    -o ${name}.filtered.vcf -O z ${vcf}
+                    -o ${name}.filtered.vcf.gz -O z ${vcf}
     """
 }
 
 process create_low_coverage_mask {
     label 'bcftools'
+
+    publishDir "${params.output}/${params.consensus_dir}/${name}", mode: params.publish_dir_mode
 
     input:
     tuple val(name), file(bam)
@@ -52,13 +56,11 @@ process consensus_ambiguous {
     label 'bcftools'
 
     input:
-    tuple val(name), path(vcf)
+    tuple val(name), path(vcf), path(csi), path(mask_bed)
     path(reference)
-    tuple val(name), path(mask_bed)
-
 
     output:
-    path("${vcf.baseName}.iupac_consensus.tmp")
+    tuple val(name), path("${vcf.baseName}.iupac_consensus.tmp")
 
     script:
     """
@@ -67,7 +69,7 @@ process consensus_ambiguous {
                     -o ${vcf.baseName}.iupac_consensus.tmp \
                     -f ${reference} \
                     -m ${mask_bed} \
-                    --sample ${vcf.baseName} \
+                    --sample ${name} \
                     ${vcf}
     """
 }
