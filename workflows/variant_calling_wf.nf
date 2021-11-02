@@ -9,9 +9,9 @@ workflow variant_calling {
         bam_bai
 
     main:
-        freebayes(reference, reference_fai, bam_bai) |
-            bgzip_compress |
-            index_vcf
+        freebayes(reference, reference_fai, bam_bai) \
+            | bgzip_compress \
+            | index_vcf
         
     emit:
         vcf = freebayes.out
