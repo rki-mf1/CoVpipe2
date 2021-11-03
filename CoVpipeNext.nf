@@ -127,6 +127,9 @@ include { annotate_variant } from './workflows/annotate_variant_wf'
 include { generate_consensus } from './workflows/generate_consensus_wf'
 include { annotate_consensus } from './workflows/annotate_consensus_wf'
 
+// assign linages
+include { assign_linages } from './workflows/assign_linages'
+
 /************************** 
 * MAIN WORKFLOW
 **************************/
@@ -135,7 +138,7 @@ workflow {
     reference_preprocessing(referenceGenomeChannel)
     reference_ch = reference_preprocessing.out.ref.collect()
 
-    // 2: quality trimming and optional adapter clipping [optional]
+    // 2: quality trimming and optional adapter clipping
     reads_qc_ch = read_qc(fastqInputChannel, adapterInputChannel).reads_trimmed
 
     // 3: taxonomic read classification [optional]
@@ -165,6 +168,9 @@ workflow {
     if (params.reference || params.ref_annotation) {
         annotate_consensus(generate_consensus.out.consensus_ambiguous, reference_ch, referenceAnnotationChannel.collect())
     }
+
+    // 9: linage assignment
+    assign_linages(generate_consensus.out.consensus_ambiguous)
     
 }
 
