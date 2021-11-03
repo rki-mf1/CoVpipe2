@@ -125,6 +125,7 @@ include { annotate_variant } from './workflows/annotate_variant_wf'
 
 // generate consensus
 include { generate_consensus } from './workflows/generate_consensus_wf'
+include { annotate_consensus } from './workflows/annotate_consensus_wf'
 
 /************************** 
 * MAIN WORKFLOW
@@ -160,6 +161,11 @@ workflow {
     // 7: generate consensus
     generate_consensus(variant_calling.out.vcf, reference_ch, mapping_ch.map{ it[0,1]})
 
+    // 8: annotate consensus [optional]
+    if (params.reference || params.ref_annotation) {
+        annotate_consensus(generate_consensus.out.consensus_ambiguous, reference_ch, referenceAnnotationChannel.collect())
+    }
+    
 }
 
 /************************** 
