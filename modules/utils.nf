@@ -3,7 +3,7 @@ process compress_reads {
 
   input:
   tuple val(name), path(reads)
-  
+
   output:
   tuple val(name), path("*.fastq.gz")
 
@@ -28,4 +28,44 @@ process bgzip_compress {
   """
   bgzip -@ ${task.cpus} ${file}
   """
+}
+
+process adapt_consensus_header {
+  publishDir "${params.output}/${params.consensus_dir}/${name}", mode: params.publish_dir_mode
+
+  input:
+  tuple val(name), path(fasta)
+
+  output:
+  tuple val(name), path("${name}.iupac_consensus.fasta")
+
+  script:
+  """
+    VERSION='unknown_version'
+    if [ ${workflow.revision} != 'null' ]; then
+      VERSION=${workflow.revision}
+    fi
+    sed "1 s/.*/>${name}_iupac_consensus_\${VERSION}/" ${fasta} 1> ${name}.iupac_consensus.fasta
+  """
+  }
+
+
+process mask_iupac {
+  publishDir "${params.output}/${params.consensus_dir}/${name}", mode: params.publish_dir_mode
+
+  input:
+  tuple val(name), path(fasta)
+
+  output:
+  tuple val(name), path("${name}.masked_consensus.fasta")
+
+  script:
+    """
+      VERSION='unknown_version'
+      if [ ${workflow.revision} != 'null' ]; then
+        VERSION=${workflow.revision}
+      fi
+      echo ">${name}_masked_consensus_\${VERSION}\" 1> ${name}.masked_consensus.fasta 2> ${name}_createMaskedConsensus.log
+      tail -n +2 ${fasta} | tr "RYSWKMBDHVN" "N" 1>> ${name}.masked_consensus.fasta 2>> ${name}_createMaskedConsensus.log
+    """
 }

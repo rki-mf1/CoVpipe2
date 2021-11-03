@@ -9,8 +9,8 @@ workflow mapping {
     main:
 
         index_bwa(reference_fasta)
-        bwa(illumina_reads, index_bwa.out.collect()) |
-            (index_bam & get_genomecov)
+        bwa(illumina_reads, index_bwa.out.collect()) \
+            | (index_bam & get_genomecov)
     emit:
         bam_bai= index_bam.out
         coverage = get_genomecov.out.tsv

@@ -117,6 +117,23 @@ nextflow pull RKIBioinformaticsPipelines/covpipenext -hub gitlab -r <RELEASE>
     --frac                   Minimum percentage of supporting reads at the respective position required to call a variant. 
                                  In turn, variants supported by (1 - frac)*100% reads will be explicitly called. [default: 0.1]
 
+    Variant hard filtering:
+    --var_mqm                Minimal mean mapping quality of observed alternate alleles (MQM). The mapping quality (MQ) 
+                                measures how good reads align to the respective reference genome region. Good mapping qualities are 
+                                around MQ 60. GATK recommends hard filtering of variants with MQ less than 40. [default: 40]
+    --var_sap                Strand balance probability for the alternate allele (SAP). The SAP is the Phred-scaled 
+                                probability that there is strand bias at the respective site. A value near 0 indicates little or 
+                                no strand bias.  [default: 60]
+    --var_qual               Minimal variant call quality. Freebayes produces a general judgement of the 
+                                variant call. [default: 10]
+
+    Consensus generation:
+    --cns_min_cov            Minimum number of reads required so that the respective position in the consensus sequence 
+                                 is NOT hard masked. [default: 20]
+    --cns_gt_adjust          Minimum fraction of reads supporting a variant which leads to an explicit call of this 
+                                 variant (genotype adjustment). The value has to be greater than 0.5 but not greater than 1. 
+                                 To turn genotype adjustment off, set the value to 0. [default: 0.9]
+
     Computing options:
     --cores                  Max cores per process for local use [default: 4]
     --max_cores              Max cores used on the machine for local use [default: 12]

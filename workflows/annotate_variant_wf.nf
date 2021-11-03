@@ -10,8 +10,8 @@ workflow annotate_variant {
     main:
         snpeff(vcf, reference)
 
-        bgzip_compress(snpeff.out.vcf) |
-            index_vcf
+        bgzip_compress(snpeff.out.vcf) \
+            | index_vcf
 
     emit:
         html = snpeff.out.html

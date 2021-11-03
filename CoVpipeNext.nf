@@ -119,11 +119,13 @@ include { mapping } from './workflows/mapping_wf'
 // primer clipping
 include { clip_primer } from './workflows/clip_primer_wf'
 
-// variant calling
+// variant calling and annotation
 include { variant_calling } from './workflows/variant_calling_wf'
-
-// annotation variant
 include { annotate_variant } from './workflows/annotate_variant_wf'
+
+// generate consensus
+include { generate_consensus } from './workflows/generate_consensus_wf'
+include { annotate_consensus } from './workflows/annotate_consensus_wf'
 
 /************************** 
 * MAIN WORKFLOW
@@ -156,7 +158,14 @@ workflow {
     variant_calling(reference_ch, reference_preprocessing.out.fai.collect(), mapping_ch)
     annotate_variant(variant_calling.out.vcf, reference_ch)
 
-    // 7: create consensus
+    // 7: generate consensus
+    generate_consensus(variant_calling.out.vcf, reference_ch, mapping_ch.map{ it[0,1]})
+
+    // 8: annotate consensus [optional]
+    if (params.reference || params.ref_annotation) {
+        annotate_consensus(generate_consensus.out.consensus_ambiguous, reference_ch, referenceAnnotationChannel.collect())
+    }
+    
 }
 
 /************************** 
@@ -216,6 +225,23 @@ def helpMSG() {
     --cov                    Minimum number of supporting reads which are required to call a variant. [default: $params.cov]
     --frac                   Minimum percentage of supporting reads at the respective position required to call a variant. 
                                  In turn, variants supported by (1 - frac)*100% reads will be explicitly called. [default: $params.frac]
+
+    ${c_yellow}Variant hard filtering:${c_reset}
+    --var_mqm                Minimal mean mapping quality of observed alternate alleles (MQM). The mapping quality (MQ) 
+                                measures how good reads align to the respective reference genome region. Good mapping qualities are 
+                                around MQ 60. GATK recommends hard filtering of variants with MQ less than 40. [default: $params.var_mqm]
+    --var_sap                Strand balance probability for the alternate allele (SAP). The SAP is the Phred-scaled 
+                                probability that there is strand bias at the respective site. A value near 0 indicates little or 
+                                no strand bias.  [default: $params.var_sap]
+    --var_qual               Minimal variant call quality. Freebayes produces a general judgement of the 
+                                variant call. [default: $params.var_qual]
+
+    ${c_yellow}Consensus generation:${c_reset}
+    --cns_min_cov            Minimum number of reads required so that the respective position in the consensus sequence 
+                                 is NOT hard masked. [default: $params.cns_min_cov]
+    --cns_gt_adjust          Minimum fraction of reads supporting a variant which leads to an explicit call of this 
+                                 variant (genotype adjustment). The value has to be greater than 0.5 but not greater than 1. 
+                                 To turn genotype adjustment off, set the value to 0. [default: $params.cns_gt_adjust]
 
     ${c_yellow}Computing options:${c_reset}
     --cores                  Max cores per process for local use [default: $params.cores]
