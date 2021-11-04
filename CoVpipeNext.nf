@@ -51,18 +51,16 @@ if (params.kraken && ! params.taxid) {
 // load reference
 if ( params.reference ) {
     if ( params.reference == 'sars-cov2' ) {
-        referenceGenomeChannel = Channel
-            .fromPath( workflow.projectDir + '/data/reference_SARS-CoV2/NC_045512.2.fasta' , checkIfExists: true )
-        referenceAnnotationChannel = Channel
-            .fromPath( workflow.projectDir + '/data/reference_SARS-CoV2/NC_045512.2.gff3' , checkIfExists: true )
+        ref_genome_file = file( workflow.projectDir + '/data/reference_SARS-CoV2/NC_045512.2.fasta' , checkIfExists: true )
+        ref_annotation_file = file( workflow.projectDir + '/data/reference_SARS-CoV2/NC_045512.2.gff3' , checkIfExists: true )
     }
 } else {
-    referenceGenomeChannel = Channel
-        .fromPath( params.ref_genome, checkIfExists: true )
-}
-if ( params.ref_annotation ) {
-    referenceAnnotationChannel = Channel
-        .fromPath( params.ref_annotation, checkIfExists: true )
+    if ( params.ref_genome ) {
+        reference_file = file( params.ref_genome, checkIfExists: true )
+    }
+    if ( params.ref_annotation ) {
+        ref_annotation_file = file( params.ref_annotation, checkIfExists: true )
+    }
 }
 
 // illumina reads input & --list support
@@ -84,20 +82,10 @@ if (params.mode == 'paired') {
 }
 
 // load adapters [optional]
-if (params.adapter) { adapterInputChannel = Channel
-        .fromPath( params.adapter, checkIfExists: true)
-        .collect()
-} else {
-    adapterInputChannel = Channel
-        .fromPath('NO_ADAPTERS')
-        .collect()
-}
+adapter_file = params.adapter ? file(params.adapter, checkIfExists: true) : file('NO_ADAPTERS')
 
 // load primers [optional]
-if (params.primer) { primerInputChannel = Channel
-        .fromPath( params.primer, checkIfExists: true)
-        .collect()
-}
+if( params.primer ){ file(params.primer, checkIfExists: true) }
 
 /************************** 
 * MODULES
@@ -132,11 +120,11 @@ include { annotate_consensus } from './workflows/annotate_consensus_wf'
 **************************/
 workflow {
     // 1: reference preprocessing
-    reference_preprocessing(referenceGenomeChannel)
-    reference_ch = reference_preprocessing.out.ref.collect()
+    reference_preprocessing(ref_genome_file)
+    reference_ch = reference_preprocessing.out.ref
 
     // 2: quality trimming and optional adapter clipping [optional]
-    reads_qc_ch = read_qc(fastqInputChannel, adapterInputChannel).reads_trimmed
+    reads_qc_ch = read_qc(fastqInputChannel, adapter_file).reads_trimmed
 
     // 3: taxonomic read classification [optional]
     if (params.kraken) {
@@ -150,12 +138,12 @@ workflow {
 
     // 5: primer clipping [optional]
     if (params.primer) {
-        clip_primer(mapping.out.bam_bai, primerInputChannel)
+        clip_primer(mapping.out.bam_bai, primer_file)
     }
     mapping_ch = params.primer ? clip_primer.out : mapping.out.bam_bai
 
     // 6: variant calling and annotation
-    variant_calling(reference_ch, reference_preprocessing.out.fai.collect(), mapping_ch)
+    variant_calling(reference_ch, reference_preprocessing.out.fai, mapping_ch)
     annotate_variant(variant_calling.out.vcf, reference_ch)
 
     // 7: generate consensus
@@ -163,7 +151,7 @@ workflow {
 
     // 8: annotate consensus [optional]
     if (params.reference || params.ref_annotation) {
-        annotate_consensus(generate_consensus.out.consensus_ambiguous, reference_ch, referenceAnnotationChannel.collect())
+        annotate_consensus(generate_consensus.out.consensus_ambiguous, reference_ch, ref_annotation_file)
     }
     
 }
