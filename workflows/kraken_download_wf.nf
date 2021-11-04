@@ -12,5 +12,5 @@ workflow download_kraken_db {
                 else { kraken_db() ; database_kraken = kraken_db.out }
             }
         }
-    emit: database_kraken.collect()
+    emit: database_kraken
 }
