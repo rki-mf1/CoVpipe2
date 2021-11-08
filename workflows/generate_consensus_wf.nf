@@ -31,5 +31,5 @@ workflow generate_consensus{
         hard_filtered_variants = filter_variants_hard.out
         consensus_ambiguous = adapt_consensus_header.out
         consensus_masked = consensus_masked.out
-        low_coverage_bed = create_low_coverage_mask
+        low_coverage_bed = create_low_coverage_mask.out
 }
