@@ -85,7 +85,10 @@ if (params.mode == 'paired') {
 adapter_file = params.adapter ? file(params.adapter, checkIfExists: true) : file('NO_ADAPTERS')
 
 // load primers [optional]
-if( params.primer ){ file(params.primer, checkIfExists: true) }
+if( params.primer ){ primer_file = file(params.primer, checkIfExists: true) }
+
+// load vois [optional]
+if( params.vois ){ vois_file = file(params.vois, checkIfExists: true) }
 
 /************************** 
 * MODULES
@@ -114,6 +117,9 @@ include { annotate_variant } from './workflows/annotate_variant_wf'
 // generate consensus
 include { generate_consensus } from './workflows/generate_consensus_wf'
 include { annotate_consensus } from './workflows/annotate_consensus_wf'
+
+// variants of interest
+include { inspect_vois } from './workflows/inspect_vois_wf'
 
 // assign linages
 include { assign_linages } from './workflows/assign_linages'
@@ -157,8 +163,16 @@ workflow {
         annotate_consensus(generate_consensus.out.consensus_ambiguous, reference_ch, ref_annotation_file)
     }
 
-    // 9: linage assignment
+    // 9: compare with variants of interest [optional]
+    if ( params. vois ) {
+        inspect_vois(vois_file, variant_calling.out.vcf_csi, generate_consensus.out.low_coverage_bed)
+    }
+
+    // 10: linage assignment
     assign_linages(generate_consensus.out.consensus_ambiguous)
+
+    // 11: report
+    // report(inspect_vois.out)
     
 }
 
