@@ -11,8 +11,10 @@ workflow variant_calling {
     main:
         freebayes(reference, reference_fai, bam_bai) \
             | bgzip_compress \
-            | index_vcf
+            | index_vcf \
+            | set { index }
         
     emit:
         vcf = freebayes.out
+        vcf_csi = index
 }
