@@ -122,7 +122,9 @@ include { annotate_consensus } from './workflows/annotate_consensus_wf'
 include { inspect_vois } from './workflows/inspect_vois_wf'
 
 // assign linages
-include { assign_linages } from './workflows/assign_linages'
+include { assign_linages } from './workflows/assign_linages_wf'
+// genome quality (president)
+include { genome_quality } from './workflows/genome_quality_wf'
 
 /************************** 
 * MAIN WORKFLOW
@@ -164,15 +166,16 @@ workflow {
     }
 
     // 9: compare with variants of interest [optional]
-    if ( params. vois ) {
+    if ( params.vois ) {
         inspect_vois(vois_file, variant_calling.out.vcf_csi, generate_consensus.out.low_coverage_bed)
     }
 
-    // 10: linage assignment
+    // 10: linage assignment, genome quality
     assign_linages(generate_consensus.out.consensus_ambiguous)
+    genome_quality(generate_consensus.out.consensus_ambiguous, reference_ch)
 
     // 11: report
-    // report(inspect_vois.out)
+    // report(inspect_vois.out, genome_quality.out)
     
 }
 
