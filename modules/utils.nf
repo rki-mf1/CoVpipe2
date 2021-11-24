@@ -109,8 +109,8 @@ process make_voi_table {
     dt.voi_diff_sample\$key = paste(dt.voi_diff_sample\$CHROM, dt.voi_diff_sample\$POS, dt.voi_diff_sample\$REF, dt.voi_diff_sample\$ALT, sep="-")
     dt.voi_diff_sample\$key2 = paste(dt.voi_diff_sample\$CHROM, dt.voi_diff_sample\$POS, dt.voi_diff_sample\$REF, sep="-")
 
-    dt.voi\$sample <- case_when(dt.voi\$key %in% dt.voi_low_cov\$key ~ "low coverage", dt.voi\$key %in% dt.voi_not\$key ~ "not found", dt.voi\$key %in% dt.voi_exact\$key ~ "exact match", dt.voi\$key %in% dt.voi_diff_voi\$key ~ dt.voi_diff_sample[dt.voi_diff_sample\$key2 == dt.voi_diff_voi\$key2]\$ALT)
-
+    dt.voi\$status <- case_when(dt.voi\$key %in% dt.voi_low_cov\$key ~ "low coverage", dt.voi\$key %in% dt.voi_not\$key ~ "not found", dt.voi\$key %in% dt.voi_exact\$key ~ "exact match", dt.voi\$key %in% dt.voi_diff_voi\$key ~ dt.voi_diff_sample[dt.voi_diff_sample\$key2 == dt.voi_diff_voi\$key2]\$ALT)
+    dt.voi <- cbind(sample = "${name}", dt.voi)
     write.csv(dt.voi[,!grepl("key",names(dt.voi))], quote = FALSE, row.names = FALSE, "${name}_vois.csv")
     """
 }
