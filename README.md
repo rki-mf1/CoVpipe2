@@ -123,7 +123,7 @@ nextflow pull RKIBioinformaticsPipelines/covpipenext -hub gitlab -r <RELEASE>
     --output                 Name of the result folder [default: results]
 
     Caching:
-    --dbs                    Location for auto-download data like databases [default: nextflow-autodownload-databases]
+    --databases                Location for auto-download data like databases [default: nextflow-autodownload-databases]
     --conda_cache_dir          Location for storing the conda environments [default: conda]
     --singularity_cache_dir    Location for storing the singularity images [default: singularity]
     --publish_dir_mode       Mode of output publishing: 'copy', 'symlink' [default: copy]
