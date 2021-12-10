@@ -244,7 +244,7 @@ def helpMSG() {
     --output                 Name of the result folder [default: $params.output]
 
     ${c_yellow}Caching:${c_reset}
-    --dbs                    Location for auto-download data like databases [default: $params.dbs]
+    --databases                Location for auto-download data like databases [default: $params.databases]
     --conda_cache_dir          Location for storing the conda environments [default: $params.conda_cache_dir]
     --singularity_cache_dir    Location for storing the singularity images [default: $params.singularity_cache_dir]
     --publish_dir_mode       Mode of output publishing: 'copy', 'symlink' [default: $params.publish_dir_mode]
