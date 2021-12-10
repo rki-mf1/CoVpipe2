@@ -35,7 +35,7 @@ process filter_variants_hard {
 }
 
 process create_low_coverage_mask {
-    label 'bcftools'
+    label 'bedtools'
 
     publishDir "${params.output}/${params.consensus_dir}/${name}", mode: params.publish_dir_mode
 
