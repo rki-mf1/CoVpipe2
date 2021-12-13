@@ -7,9 +7,6 @@ workflow genome_quality {
         reference
     main:
         president(fasta, reference)
-        president_result = president.out.report
-            | map {it -> it[1]} \
-            | collectFile(name: 'president_results.tsv', skip: 1, keepHeader: true)
     emit:
-        president_result
+        president.out.report
 }

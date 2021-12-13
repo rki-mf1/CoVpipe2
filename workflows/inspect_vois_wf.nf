@@ -8,10 +8,7 @@ workflow inspect_vois {
         low_coverage
     main:
         isec_vois(vois, vars.join(low_coverage)) \
-            | make_voi_table \
-            | map {it -> it[1]} \
-            | collectFile(name: 'vois_results.tsv', skip: 1, keepHeader: true)
-            | set{ vois_results }
+            | make_voi_table
     emit:
-        vois_results
+        make_voi_table.out
 }

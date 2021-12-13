@@ -18,3 +18,100 @@ process desh_qc {
     echo ${name},\$N,\$IUPAC,\$COVTH >> ${name}_desh.tsv
     """
 }
+
+// process fastp_table {
+    // label 'r'
+    // label 'smallTask'
+
+    // input:
+
+    // output:
+
+    // script:
+    // """
+    // """
+// }
+
+// process kraken_table {
+    // label 'r'
+    // label 'smallTask'
+
+    // input:
+
+    // output:
+
+    // script:
+    // """
+    // """
+// }
+
+// process flagstat_table {
+    // label 'r'
+    // label 'smallTask'
+
+    // input:
+
+    // output:
+
+    // script:
+    // """
+    // """
+// }
+
+// process fragment_size_table {
+    // label 'r'
+    // label 'smallTask'
+
+    // input:
+
+    // output:
+
+    // script:
+    // """
+    // """
+// }
+
+// process coverage_table {
+    // label 'r'
+    // label 'smallTask'
+
+    // input:
+
+    // output:
+
+    // script:
+    // """
+    // """
+// }
+
+process multiqc_report {
+    label 'multiqc'
+    label 'smallTask'
+
+    input:
+    path(fastp)
+    path(kraken)
+    path(flagstat)
+    path(pangolin)
+
+    output:
+    path ("multiqc_report.html")
+
+    script:
+    """
+    multiqc .
+    """
+}
+
+// process rmarkdown_report {
+    // label 'r'
+    // label 'smallTask'
+
+    // input:
+
+    // output:
+
+    // script:
+    // """
+    // """
+// }

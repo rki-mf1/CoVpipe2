@@ -6,7 +6,7 @@ nextflow.enable.dsl=2
 if (params.help) { exit 0, helpMSG() }
 
 // parameter sanity check
-Set valid_params = ['cores', 'max_cores', 'memory', 'help', 'profile', 'workdir', 'fastq', 'list', 'mode', 'reference', 'ref_genome', 'ref_annotation', 'adapter', 'fastp_additional_parameters', 'kraken', 'taxid', 'primer', 'vcount', 'frac', 'cov', 'vois', 'var_mqm', 'var_sap', 'var_qual', 'cns_min_cov', 'cns_gt_adjust', 'output', 'genome_dir', 'read_dir', 'mapping_dir', 'variant_calling_dir', 'consensus_dir', 'linage_dir', 'report_dir', 'runinfo_dir', 'singularity_cache_dir', 'conda_cache_dir', 'databases', 'publish_dir_mode', 'cloudProcess', 'cloud-process']
+Set valid_params = ['cores', 'max_cores', 'memory', 'help', 'profile', 'workdir', 'fastq', 'list', 'mode', 'reference', 'ref_genome', 'ref_annotation', 'adapter', 'fastp_additional_parameters', 'kraken', 'taxid', 'primer', 'vcount', 'frac', 'cov', 'vois', 'var_mqm', 'var_sap', 'var_qual', 'cns_min_cov', 'cns_gt_adjust', 'update_pangolin', 'output', 'genome_dir', 'read_dir', 'mapping_dir', 'variant_calling_dir', 'consensus_dir', 'linage_dir', 'report_dir', 'runinfo_dir', 'singularity_cache_dir', 'conda_cache_dir', 'databases', 'publish_dir_mode', 'cloudProcess', 'cloud-process']
 def parameter_diff = params.keySet() - valid_params
 if (parameter_diff.size() != 0){
     exit 1, "ERROR: Parameter(s) $parameter_diff is/are not valid in the pipeline!\n"
@@ -137,6 +137,8 @@ include { assign_linages } from './workflows/assign_linages_wf'
 // genome quality (president)
 include { genome_quality } from './workflows/genome_quality_wf'
 
+include { summary_report } from './workflows/report_wf'
+
 /************************** 
 * MAIN WORKFLOW
 **************************/
@@ -179,6 +181,9 @@ workflow {
     // 9: compare with variants of interest [optional]
     if ( params.vois ) {
         inspect_vois(vois_file, variant_calling.out.vcf_csi, generate_consensus.out.low_coverage_bed)
+        vois = inspect_vois.out
+    } else {
+        vois = Channel.empty()
     }
 
     // 10: linage assignment, genome quality
@@ -186,7 +191,7 @@ workflow {
     genome_quality(generate_consensus.out.consensus_ambiguous, reference_ch)
 
     // 11: report
-    // report(inspect_vois.out, genome_quality.out)
+    summary_report(generate_consensus.out.consensus_ambiguous, read_qc.out.fastp_json, kraken_reports.ifEmpty([]), mapping.out.flagstat, mapping.out.flagstat_csv, mapping.out.fragment_size, mapping.out.coverage, genome_quality.out, assign_linages.out, vois.ifEmpty([]) )
     
 }
 
