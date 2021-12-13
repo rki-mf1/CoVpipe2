@@ -1,10 +1,11 @@
-include { pangolin } from '../modules/pangolin'
+include { pangolin ; update_pangolin } from '../modules/pangolin'
 
 workflow assign_linages {
     take:
         fasta
     main:
-        pangolin(fasta)
+        update_pangolin()
+        pangolin(fasta, update_pangolin.out)
     emit:
         pangolin.out
 }
