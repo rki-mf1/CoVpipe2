@@ -5,6 +5,13 @@ nextflow.enable.dsl=2
 // help message
 if (params.help) { exit 0, helpMSG() }
 
+// parameter sanity check
+Set valid_params = ['cores', 'max_cores', 'memory', 'help', 'profile', 'workdir', 'fastq', 'list', 'mode', 'reference', 'ref_genome', 'ref_annotation', 'adapter', 'fastp_additional_parameters', 'kraken', 'taxid', 'primer', 'vcount', 'frac', 'cov', 'var_mqm', 'var_sap', 'var_qual', 'cns_min_cov', 'cns_gt_adjust', 'output', 'genome_dir', 'read_dir', 'mapping_dir', 'variant_calling_dir', 'consensus_dir', 'linage_dir', 'runinfo_dir', 'singularity_cache_dir', 'conda_cache_dir', 'databases', 'publish_dir_mode', 'cloudProcess', 'cloud-process']
+def parameter_diff = params.keySet() - valid_params
+if (parameter_diff.size() != 0){
+    exit 1, "ERROR: Parameter(s) $parameter_diff is/are not valid in the pipeline!\n"
+}
+
 // error codes
 if (params.profile) {
     exit 1, "--profile is WRONG use -profile" }
@@ -12,14 +19,18 @@ if (params.workdir) {
     exit 1, "--workdir is WRONG use -w" }
 
 // warnings
-if ( workflow.profile == 'standard' ) { 
-    "NO EXECUTION PROFILE SELECTED, using [-profile local,conda]" }
-
+def folder = new File(params.output)
+if ( folder.exists() ) { 
+    println ""
+    println "\033[0;33mWARNING: Output folder already exists. Results might be overwritten! You can adjust the output folder via [--output]\033[0m"
+}
 if ( !workflow.revision ) { 
     println ""
-    println "\u001B[31mWARN: no revision selected, please use -r for full reproducibility\033[0m"
+    println "\033[0;33mWARNING: not a stable execution. Please use -r for full reproducibility.\033[0m"
 }
 
+// print info message
+defaultMSG()
 
 /************************** 
 * PARAMETERS
@@ -261,7 +272,7 @@ def helpMSG() {
     --output                 Name of the result folder [default: $params.output]
 
     ${c_yellow}Caching:${c_reset}
-    --dbs                    Location for auto-download data like databases [default: $params.dbs]
+    --databases                Location for auto-download data like databases [default: $params.databases]
     --conda_cache_dir          Location for storing the conda environments [default: $params.conda_cache_dir]
     --singularity_cache_dir    Location for storing the singularity images [default: $params.singularity_cache_dir]
     --publish_dir_mode       Mode of output publishing: 'copy', 'symlink' [default: $params.publish_dir_mode]
@@ -278,4 +289,31 @@ def helpMSG() {
     
     Per default: -profile local,conda is executed. 
     """
+}
+def defaultMSG(){
+    println " "
+    println "\u001B[32mProfile: $workflow.profile\033[0m"
+    println " "
+    println "\033[2mCurrent User: $workflow.userName"
+    println "Nextflow-version: $nextflow.version"
+    println "Starting time: $workflow.start"
+    println "Workdir location:"
+    println "  $workflow.workDir"
+    println "Launchdir location:"
+    println "  $workflow.launchDir"
+    println "Permanent cache directory:"
+    println "  $params.databases"
+    if ( workflow.profile.contains('conda') || workflow.profile.contains('standard') ) { 
+        println "Conda cache directory:"
+        println "  $params.conda_cache_dir"
+    }
+    println "Configuration files:"
+    println "  $workflow.configFiles"
+    println "Cmd line:"
+    println "  $workflow.commandLine\u001B[0m"
+    if (workflow.repository != null){ println "\033[2mGit info: $workflow.repository - $workflow.revision [$workflow.commitId]\u001B[0m" }
+    println " "
+    if (workflow.profile.contains('standard') || workflow.profile.contains('local')) {
+        println "\033[2mCPUs to use: $params.cores, maximal CPUs to use: $params.max_cores\u001B[0m"
+    }
 }
