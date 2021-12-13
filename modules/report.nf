@@ -20,16 +20,17 @@ process desh_qc {
 }
 
 // process fastp_table {
-    // label 'r'
-    // label 'smallTask'
+//     label 'r'
+//     label 'smallTask'
 
-    // input:
+//     input:
+    
 
-    // output:
+//     output:
 
-    // script:
-    // """
-    // """
+//     script:
+//     """
+//     """
 // }
 
 // process kraken_table {
@@ -45,18 +46,41 @@ process desh_qc {
     // """
 // }
 
-// process flagstat_table {
-    // label 'r'
-    // label 'smallTask'
+process flagstat_table {
+    label 'r'
+    label 'smallTask'
+    executor 'local'
 
-    // input:
+    input:
+    path(flagstat_csv)
 
-    // output:
+    output:
+    path("mapping_stats.csv")
 
-    // script:
-    // """
-    // """
-// }
+    script:
+    file_list = flagstat_csv.collect{ "\"${it}\"" }.join(",")
+    """
+    #!/usr/bin/env Rscript
+    library("dplyr")
+    df.bamstat.data <- ldply(c(${file_list}), fread, sep = ';')
+    colnames(df.bamstat.data) <- c("sample", "count", "unknown", "description")
+
+    df.output <- data.frame("sample" = unique(df.bamstat.data\$sample),
+                            "input" = df.bamstat.data\$count[grepl("in total", df.bamstat.data\$description)],
+                            "mapped" = df.bamstat.data\$count[grepl("properly paired", df.bamstat.data\$description)])
+
+    df.output\$mapping.rate <- df.output\$mapped / df.output\$input
+
+    # save table as csv for later use
+    write.csv(  x=df.output, 
+                row.names = FALSE, 
+                file = file.path("mapping_stats.csv")
+    )
+
+    df.output\$input <- f.color_bar("lightgreen")(df.output\$input)
+    df.output\$mapped <- f.color_bar("lightgreen")(df.output\$mapped)
+    """
+}
 
 // process fragment_size_table {
     // label 'r'

@@ -1,4 +1,4 @@
-include { desh_qc; multiqc_report } from '../modules/report'
+include { desh_qc; flagstat_table; multiqc_report } from '../modules/report'
 
 workflow summary_report {
     take:
@@ -19,9 +19,10 @@ workflow summary_report {
 
         // fastp
         // kraken
-        // flagstat
         // fragment_size
         // coverage
+
+        flagstat_table(flagstat_csv.map {it -> it[1]}.collect())
         
         president_results = president.map {it -> it[1]}.collectFile(name: 'president_results.tsv', skip: 1, keepHeader: true)
         
@@ -29,5 +30,5 @@ workflow summary_report {
         
         vois_results = vois_tsv.map {it -> it[1]}.collectFile(name: 'vois_results.tsv', skip: 1, keepHeader: true)
 
-        multiqc_report(fastq_json.map{ it -> it[1] }.collect(), kraken.map{ it -> it[1] }.collect(), mapping_flagstat.map{ it -> it[1] }.collect(), pangolin.map{ it -> it[1] }.collect())
+        multiqc_report(fastq_json.map {it -> it[1]}.collect(), kraken.map{ it -> it[1] }.collect(), flagstat.map{ it -> it[1] }.collect(), pangolin.map{ it -> it[1] }.collect())
 }
