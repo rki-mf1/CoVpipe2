@@ -94,15 +94,6 @@ nextflow pull RKIBioinformaticsPipelines/covpipenext -hub gitlab -r <RELEASE>
     --ref_genome             e.g.: 'ref.fasta'
     --ref_annotation         e.g.: 'ref.gff'
 
-    Primer detection: 
-    --primer                 Provide the path to the primer file. [default: ../covpipe/bedpe.txt]
-                                 The primer file is a TAB-delimited text file containing the following fields:
-                                     1. forward primer sequence (5' -> 3') [mandatory]
-                                     2. reverse primer sequence (reverse-complement 5' -> 3') [mandatory]
-                                     3. insert length between the primer pair [mandatory]
-                                     4. auxiliary information [optional]
-     --max_primer_mismatches Define the maximum number of mismatches allowed to occur in amplicon primer sequences. [default: 1]
-
     Adapter clipping:
      --adapter               Define the path of a FASTA file containing the adapter sequences to be clipped. [default: false]
 
@@ -113,8 +104,35 @@ nextflow pull RKIBioinformaticsPipelines/covpipenext -hub gitlab -r <RELEASE>
     --kraken                 Activate taxonomic read filtering to exclude reads not classified as SARS-COV-2 (NCBI taxonomy ID 2697049) 
                                  from read mapping. A pre-processed kraken2 database will be automatically downloaded from 
                                  https://zenodo.org/record/3854856 and stored locally [default: true]
-
     --taxid                  Taxonomic ID used together with the kraken2 database for read filtering [default: 2697049]
+
+    Primer detection: 
+    --primer                 Provide the path to the primer BEDPE file. [default: false]
+                                 TAB-delimited text file containing at least 6 fields, see here:
+                                 https://bedtools.readthedocs.io/en/latest/content/general-usage.html#bedpe-format
+
+    Variant calling:
+    --vcount                 Minimum number of reads at a position to be considered for variant calling. [default: 10]
+    --cov                    Minimum number of supporting reads which are required to call a variant. [default: 20]
+    --frac                   Minimum percentage of supporting reads at the respective position required to call a variant. 
+                                 In turn, variants supported by (1 - frac)*100% reads will be explicitly called. [default: 0.1]
+
+    Variant hard filtering:
+    --var_mqm                Minimal mean mapping quality of observed alternate alleles (MQM). The mapping quality (MQ) 
+                                measures how good reads align to the respective reference genome region. Good mapping qualities are 
+                                around MQ 60. GATK recommends hard filtering of variants with MQ less than 40. [default: 40]
+    --var_sap                Strand balance probability for the alternate allele (SAP). The SAP is the Phred-scaled 
+                                probability that there is strand bias at the respective site. A value near 0 indicates little or 
+                                no strand bias.  [default: 60]
+    --var_qual               Minimal variant call quality. Freebayes produces a general judgement of the 
+                                variant call. [default: 10]
+
+    Consensus generation:
+    --cns_min_cov            Minimum number of reads required so that the respective position in the consensus sequence 
+                                 is NOT hard masked. [default: 20]
+    --cns_gt_adjust          Minimum fraction of reads supporting a variant which leads to an explicit call of this 
+                                 variant (genotype adjustment). The value has to be greater than 0.5 but not greater than 1. 
+                                 To turn genotype adjustment off, set the value to 0. [default: 0.9]
 
     Computing options:
     --cores                  Max cores per process for local use [default: 4]
@@ -123,7 +141,7 @@ nextflow pull RKIBioinformaticsPipelines/covpipenext -hub gitlab -r <RELEASE>
     --output                 Name of the result folder [default: results]
 
     Caching:
-    --dbs                    Location for auto-download data like databases [default: nextflow-autodownload-databases]
+    --databases                Location for auto-download data like databases [default: nextflow-autodownload-databases]
     --conda_cache_dir          Location for storing the conda environments [default: conda]
     --singularity_cache_dir    Location for storing the singularity images [default: singularity]
     --publish_dir_mode       Mode of output publishing: 'copy', 'symlink' [default: copy]
