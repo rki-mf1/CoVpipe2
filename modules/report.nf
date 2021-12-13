@@ -61,7 +61,10 @@ process flagstat_table {
     file_list = flagstat_csv.collect{ "\"${it}\"" }.join(",")
     """
     #!/usr/bin/env Rscript
-    library("dplyr")
+    
+    library("data.table")
+    library("plyr")
+
     df.bamstat.data <- ldply(c(${file_list}), fread, sep = ';')
     colnames(df.bamstat.data) <- c("sample", "count", "unknown", "description")
 
