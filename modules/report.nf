@@ -49,7 +49,6 @@ process desh_qc {
 process flagstat_table {
     label 'r'
     label 'smallTask'
-    executor 'local'
 
     input:
     path(flagstat_csv)
