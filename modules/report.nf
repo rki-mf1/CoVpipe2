@@ -58,14 +58,18 @@ process flagstat_table {
     path("mapping_stats.csv")
 
     script:
+    name_list = flagstat_csv.collect{ "\"${it.getBaseName()}\"" }.join(",")
     file_list = flagstat_csv.collect{ "\"${it}\"" }.join(",")
     """
     #!/usr/bin/env Rscript
-    
+
     library("data.table")
     library("plyr")
 
-    df.bamstat.data <- ldply(c(${file_list}), fread, sep = ';')
+    f.list <- c(${file_list})
+    names(f.list) <- c(${name_list})
+
+    df.bamstat.data <- ldply(f.list, fread, sep = ';')
     colnames(df.bamstat.data) <- c("sample", "count", "unknown", "description")
 
     df.output <- data.frame("sample" = unique(df.bamstat.data\$sample),
@@ -80,8 +84,8 @@ process flagstat_table {
                 file = file.path("mapping_stats.csv")
     )
 
-    df.output\$input <- f.color_bar("lightgreen")(df.output\$input)
-    df.output\$mapped <- f.color_bar("lightgreen")(df.output\$mapped)
+    #df.output\$input <- f.color_bar("lightgreen")(df.output\$input)
+    #df.output\$mapped <- f.color_bar("lightgreen")(df.output\$mapped)
     """
 }
 

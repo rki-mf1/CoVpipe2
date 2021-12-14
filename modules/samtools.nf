@@ -42,12 +42,12 @@ process flagstat {
 
     output:
     tuple val(name), path("${name}.flagstat"), emit: flagstat
-    tuple val(name), path("${name}_flagstat.csv"), emit: csv
+    tuple val(name), path("${name}.csv"), emit: csv
 
     script:
     """
     samtools flagstat ${bam} -@ ${task.cpus} > ${name}.flagstat
-    cat ${name}.flagstat | sed -e 's/ + /;/' | sed -e 's/ /;/' 1> ${name}_flagstat.csv
+    cat ${name}.flagstat | sed -e 's/ + /;/' | sed -e 's/ /;/' 1> ${name}.csv
     """
 }
 
