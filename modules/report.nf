@@ -19,36 +19,156 @@ process desh_qc {
     """
 }
 
-// process fastp_table {
-//     label 'r'
-//     label 'smallTask'
+process fastp_table {
+    label 'r'
 
-//     input:
+    input:
+    path(json)
+
+    output:
+    path("read_stats.csv"), emit: stats
+    path("read_stats_filter.csv"), emit: stats_filter
+
+    script:
+    name_list = json.collect{ "\"${it.getSimpleName()}\"" }.join(",")
+    file_list = json.collect{ "\"${it}\"" }.join(",")
+    """
+    #!/usr/bin/env Rscript
+
+    library("data.table")
+    library("plyr")
+    library("rjson")
+
+    f.list <- c(${file_list})
+    names(f.list) <- c(${name_list})
+
+    l.trimming.data.json <- lapply(f.list, function(x){
+        fromJSON(file = x)
+    })
+
+    df.trimming.data <- ldply(l.trimming.data.json, function(e){
+        df.before <- as.data.frame(do.call(rbind, e\$summary\$before_filtering))
+        colnames(df.before) <- c("before.trimming")
+        df.after  <- as.data.frame(do.call(rbind, e\$summary\$after_filtering))
+        colnames(df.after) <- c("after.trimming")
+
+        df.output <- data.frame(feature = rownames(df.before),
+                                before = df.before\$before.trimming,
+                                after = df.after\$after.trimming)
+        return(df.output)
+    })
+
+    # rename 1st column
+    tmp <- colnames(df.trimming.data)
+    tmp[1] <- c("sample")
+    colnames(df.trimming.data) <- tmp
+
+    df.filter.data <- ldply(l.trimming.data.json, function(e){
+        
+        df.output <- data.frame(passed_filter = e\$filtering_result\$passed_filter_reads,
+                                low_qual = e\$filtering_result\$low_quality_reads,
+                                high_N = e\$filtering_result\$too_many_N_reads,
+                                low_complex = e\$filtering_result\$low_complexity_reads,
+                                short = e\$filtering_result\$too_short_reads
+                                )
+        return(df.output)
+    })
+
+    # rename 1st column
+    tmp <- colnames(df.filter.data)
+    tmp[1] <- c("sample")
+    colnames(df.filter.data) <- tmp
+
+    df.summary <- data.frame(sample = unique(df.trimming.data\$sample),
+                        reads.before.clip = df.trimming.data\$before[grepl("total_reads", df.trimming.data\$feature)],
+                        reads.after.clip  = df.trimming.data\$after[grepl("total_reads", df.trimming.data\$feature)],
+                        ratio.clip = df.trimming.data\$after[grepl("total_reads", df.trimming.data\$feature)] / 
+                            df.trimming.data\$before[grepl("total_reads", df.trimming.data\$feature)],
+                        q30.before.clip = df.trimming.data\$before[grepl("q30_rate", df.trimming.data\$feature)],
+                        q30.after.clip  = df.trimming.data\$after[grepl("q30_rate", df.trimming.data\$feature)]
+    )
+
+    df.table <- df.summary
+
+    # add coloured bar charts to table
+    # df.table\$reads.before.clip <- f.color_bar("lightgreen")(df.table\$reads.before.clip)
+    # df.table\$reads.after.clip <- f.color_bar("lightgreen")(df.table\$reads.after.clip)
+
+    write.csv(  x=df.summary, 
+            row.names = FALSE, 
+            file = file.path("read_stats.csv")
+        )
+    write.csv(  x=df.filter.data, 
+            row.names = FALSE, 
+            file = file.path("read_stats_filter.csv")
+        )
+    """
+}
+
+process kraken_table {
+    label 'r'
+
+    input:
+    path(report)
+    val(tax_id)
+
+    output:
+    path("species_filtering.csv")
+
+    script:
+    name_list = report.collect{ "\"${it.getSimpleName()}\"" }.join(",")
+    file_list = report.collect{ "\"${it}\"" }.join(",")
+
+    """
+    #!/usr/bin/env Rscript
+
+    library("data.table")
+    library("plyr")
+
+    f.list <- c(${file_list})
+    names(f.list) <- c(${name_list})
+
+    df.kraken_output <- data.frame()
+
+    dt.kraken_data <- ldply(f.list, fread)
+    colnames(dt.kraken_data) <- c("sample", "read_ratio", "read_count", "read_count_specific", "rank", "ncbi_taxid", "sciname")
+    # select unclassified and user supplied tax id
+    df.kraken_output <- dt.kraken_data[dt.kraken_data\$ncbi_taxid %in% c(0, ${tax_id}, "9606"), c("sample", "read_ratio", "read_count", "ncbi_taxid", "sciname")]
+    # make tables wide for absolute and relative read counts
+    dt.ratio <- data.table::dcast(as.data.table(df.kraken_output), sample ~ sciname, value.var = c("read_ratio"))
+    dt.count <- data.table::dcast(as.data.table(df.kraken_output), sample ~ sciname, value.var = c("read_count"))
+    # join both tables for output
+    df.kraken_output <- join(dt.ratio, dt.count, by = "sample")
     
+    if (length(colnames(df.kraken_output)) == 3) {
+        colnames(df.kraken_output) <- paste0(colnames(df.kraken_output), c("", " (ratio)", " (count)"))
+    } else if (length(colnames(df.kraken_output)) == 5) {
+        colnames(df.kraken_output) <- paste0(colnames(df.kraken_output), c("", " (ratio)", " (ratio)", " (count)", " (count)"))
+    } else if (length(colnames(df.kraken_output)) == 7) {
+        colnames(df.kraken_output) <- paste0(colnames(df.kraken_output), c("", " (ratio)", " (ratio)", " (ratio)", " (count)", " (count)", " (count)"))
+    }
 
-//     output:
-
-//     script:
-//     """
-//     """
-// }
-
-// process kraken_table {
-    // label 'r'
-    // label 'smallTask'
-
-    // input:
-
-    // output:
-
-    // script:
-    // """
-    // """
-// }
+    # add rows for reproducible colour scaling
+    if (length(colnames(df.kraken_output)) == 3) {
+        df.tmp <- as.data.frame(matrix(rep(c(0,100),3), ncol = 3))
+    } else if (length(colnames(df.kraken_output)) == 5) {
+        df.tmp <- as.data.frame(matrix(rep(c(0,100),5), ncol = 5))
+    } else if (length(colnames(df.kraken_output)) == 7) {
+        df.tmp <- as.data.frame(matrix(rep(c(0,100),7), ncol = 7))
+    }
+    colnames(df.tmp) <- colnames(df.kraken_output)
+    df.kraken_output <- rbind(df.kraken_output, df.tmp)
+    
+    # save table as csv for later use
+    write.csv(  x=df.kraken_output, 
+                row.names = FALSE, 
+                file = file.path("species_filtering.csv")
+    )
+    """
+}
 
 process flagstat_table {
     label 'r'
-    label 'smallTask'
 
     input:
     path(flagstat_csv)
@@ -57,7 +177,7 @@ process flagstat_table {
     path("mapping_stats.csv")
 
     script:
-    name_list = flagstat_csv.collect{ "\"${it.getBaseName()}\"" }.join(",")
+    name_list = flagstat_csv.collect{ "\"${it.getSimpleName()}\"" }.join(",")
     file_list = flagstat_csv.collect{ "\"${it}\"" }.join(",")
     """
     #!/usr/bin/env Rscript
@@ -77,7 +197,6 @@ process flagstat_table {
 
     df.output\$mapping.rate <- df.output\$mapped / df.output\$input
 
-    # save table as csv for later use
     write.csv(  x=df.output, 
                 row.names = FALSE, 
                 file = file.path("mapping_stats.csv")
@@ -88,31 +207,108 @@ process flagstat_table {
     """
 }
 
-// process fragment_size_table {
-    // label 'r'
-    // label 'smallTask'
+process fragment_size_table {
+    label 'r'
 
-    // input:
+    input:
+    path(tsv)
 
-    // output:
+    output:
 
-    // script:
-    // """
-    // """
-// }
+    script:
+    name_list = tsv.collect{ "\"${it.getSimpleName()}\"" }.join(",")
+    file_list = tsv.collect{ "\"${it}\"" }.join(",")
+    """
+    #!/usr/bin/env Rscript
 
-// process coverage_table {
-    // label 'r'
-    // label 'smallTask'
+    library("data.table")
+    library("plyr")
 
-    // input:
+    f.list <- c(${file_list})
+    names(f.list) <- c(${name_list})
 
-    // output:
+    # read.csv produces a new column for each read file
+    dt.fragsizes <- as.data.table(ldply(f.list, fread))
+    colnames(dt.fragsizes) <- c("sample", "fragsize")
 
-    // script:
-    // """
-    // """
-// }
+    dt.fragsizes\$fragsize.abs <- abs(dt.fragsizes\$fragsize)
+    dt.fragsizes.median <- dt.fragsizes[, median(fragsize.abs), by = c("sample")]
+    setnames(dt.fragsizes.median, "V1", "median.fragsize")
+    dt.fragsizes.median\$median.fragsize <- as.numeric(as.character(dt.fragsizes.median\$median.fragsize))
+
+    # add standard deviation
+    dt.fragsizes.median\$sd.fragsize <- dt.fragsizes[, sd(fragsize.abs), by = c("sample")]\$V1
+
+    # conditional formatting for fragsizes not between 90 and 110
+    #dt.fragsizes.median\$median.fragsize <- ifelse(dt.fragsizes.median\$median.fragsize >= 110 | dt.fragsizes.median\$median.fragsize <= 90,
+    #                                          cell_spec(dt.fragsizes.median\$median.fragsize, background = "orange", align = "right"),
+    #                                          dt.fragsizes.median\$median.fragsize)
+
+    write.csv(  x=dt.fragsizes.median, 
+            row.names = FALSE, 
+            file = file.path("fragment_sizes.csv")
+    )
+    """
+}
+
+process coverage_table {
+    label 'r'
+
+    input:
+    path(tsv)
+    val(min_cov)
+
+    output:
+    path("coverage_table.csv"), emit: coverage_table
+    path("positive_samples.csv"), emit: positive
+    path("negative_samples.csv"), emit: negative
+    path("coverage_samples.csv"), emit:sample_cov
+
+    script:
+    name_list = tsv.collect{ "\"${it.getSimpleName()}\"" }.join(",")
+    file_list = tsv.collect{ "\"${it}\"" }.join(",")
+    """
+    #!/usr/bin/env Rscript
+
+    library("data.table")
+    library("plyr")
+    
+    f.list <- c(${file_list})
+    names(f.list) <- c(${name_list})
+
+    dt.coverage <- as.data.table(ldply(f.list, fread))
+    colnames(dt.coverage) <- c("sample","chromosome", "position", "depth")
+
+    # reduce amount of data points to be plottd
+    dt.coverage[, bin:=rep(seq(1, ceiling(length(position) / 100)), each = 100, length.out = length(position)), by = "sample"]
+    dt.coverage[, mid.bin:=seq(1,length(position)) %% 100, by = "sample"] # by samples is here also necessery
+    dt.coverage[, mean.cov:=mean(depth), by=c("sample", "bin")]
+
+    dt.output <- dt.coverage[, sum(depth > ${min_cov}), by = sample]
+    setnames(dt.output, "V1", "covered.bases")
+
+    dt.output\$genome.length <- dt.coverage[,length(depth), by = sample]\$V1
+    dt.output\$genome.coverage <- dt.output\$covered.bases / dt.output\$genome.length
+
+    dt.output\$DP.median <- dt.coverage[, median(depth), by = sample]\$V1
+    dt.output\$DP.mean <- dt.coverage[, mean(depth), by = sample]\$V1
+
+    write.csv( x=dt.coverage, 
+            row.names = FALSE, 
+            file = file.path("coverage_table.csv"))
+    # positve and negative tables as by consideration of cleanplex quality measures (95% reference genome coverage)
+    write.csv( x=dt.output[dt.output\$genome.coverage >= 0.95], 
+            row.names = FALSE, 
+            file = file.path("positive_samples.csv"))
+    write.csv( x=dt.output[dt.output\$genome.coverage < 0.95], 
+            row.names = FALSE, 
+            file = file.path("negative_samples.csv"))
+    # complete table output
+    write.csv( x=dt.output, 
+            row.names = FALSE, 
+            file = file.path("coverage_samples.csv"))
+    """
+}
 
 process multiqc_report {
     label 'multiqc'
