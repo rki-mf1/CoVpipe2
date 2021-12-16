@@ -1,0 +1,84 @@
+---
+title: "sample report for SARS-CoV-2 minipipeline"
+output: 
+  html_document:
+    toc: true
+params:
+  desh_results: "none"
+  fastp_table_stats: "none"
+  fastp_table_stats_filter: "none"
+  kraken_table: "none"
+  flagstat_table: "none"
+  fragment_size_table: "none"
+  coverage_table: "none"
+  positive: "none"
+  negative: "none"
+  sample_cov: "none"
+  president_results: "none"
+  pangolin_results: "none"
+  vois_results: "none"
+---
+
+<style>
+  .superwideimage{
+      overflow-x:scroll;
+      white-space: nowrap;
+  }
+
+  .superwideimage img{
+    max-width: none;
+  }
+  
+</style>
+
+<style>
+  .superhighimage{
+      overflow:auto;
+      height: 500px;
+      width: 100%;
+      margin-top: 10px;
+      margin-bottom: 
+  }
+
+</style>
+
+<style>
+    div.scroll {
+        width: 100%;
+        height: 300px;
+        overflow-x: hidden;
+        overflow-y: auto;
+        text-align: center;
+        padding: 20px;
+    }
+</style>
+
+</style>
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE, error = FALSE)
+
+library("data.table")
+library("formattable")
+library("ggplot2")
+library("kableExtra")
+library("plyr")
+library("rjson")
+library("dplyr")
+```
+
+```{r get_cmd_line_parameters}
+dt.desh <- as.data.table(ldply(params$desh, fread))
+```
+
+## DESH quality statistics
+
+```{r desh_qc}
+kbl(dt.desh[,c("sample", "#n", "#iupac", "#lowcov")], 
+        digits = 2, 
+        col.names = c("sample", "N [bp]", "IUPAC [bp]", "low coverage [bp]"), 
+        caption = paste0("Quality criteria of reconstructed genome sequences according to DESH, see [here](https://www.rki.de/DE/Content/InfAZ/N/Neuartiges_Coronavirus/DESH/Qualitaetskriterien.pdf?__blob=publicationFile) [pdf]. All criteria refer to the IUPAC consensus genome. At least all positions covered by less than ", toString(42)," reads are masked with N. The threshold for the pipeline can be set with `--cns_min_cov`."),
+        escape = FALSE) %>%
+    kable_styling(bootstrap_options = c("striped", "hover"), fixed_thead = T) %>% 
+    scroll_box(height = "400px")
+```

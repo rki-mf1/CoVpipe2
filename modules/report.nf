@@ -2,8 +2,7 @@ process desh_qc {
     label 'bcftools'
 
     input:
-    tuple val(name), path(consensus)
-    tuple val(name), path(coverage)
+    tuple val(name), path(consensus), path(coverage)
     val(min_cov)
 
     output: 
@@ -214,6 +213,7 @@ process fragment_size_table {
     path(tsv)
 
     output:
+    path("fragment_sizes.csv")
 
     script:
     name_list = tsv.collect{ "\"${it.getSimpleName()}\"" }.join(",")
@@ -262,7 +262,7 @@ process coverage_table {
     path("coverage_table.csv"), emit: coverage_table
     path("positive_samples.csv"), emit: positive
     path("negative_samples.csv"), emit: negative
-    path("coverage_samples.csv"), emit:sample_cov
+    path("coverage_samples.csv"), emit: sample_cov
 
     script:
     name_list = tsv.collect{ "\"${it.getSimpleName()}\"" }.join(",")
@@ -314,6 +314,8 @@ process multiqc_report {
     label 'multiqc'
     label 'smallTask'
 
+    publishDir "${params.output}/${params.report_dir}/", mode: params.publish_dir_mode
+
     input:
     path(fastp)
     path(kraken)
@@ -329,15 +331,35 @@ process multiqc_report {
     """
 }
 
-// process rmarkdown_report {
-    // label 'r'
-    // label 'smallTask'
+process rmarkdown_report {
+    // rmarkdown::render does not respect symlinks https://github.com/rstudio/rmarkdown/issues/1508
+    label 'r'
 
-    // input:
+    publishDir "${params.output}/${params.report_dir}/", mode: params.publish_dir_mode
+    // stageInMode: 'copy' # would copy every input file, not so nice
 
-    // output:
+    input:
+    path(rmd) 
+    path(desh_results)
+    path(fastp_table_stats)
+    path(fastp_table_stats_filter)
+    path(kraken_table)
+    path(flagstat_table)
+    path(fragment_size_table)
+    path(coverage_table)
+    path(positive)
+    path(negative)
+    path(sample_cov)
+    path(president_results)
+    path(pangolin_results)
+    path(vois_results)
 
-    // script:
-    // """
-    // """
-// }
+    output:
+    path("report.html")
+
+    script:
+    """
+    cp -L ${rmd} report.Rmd
+    Rscript -e "rmarkdown::render('report.Rmd', params=list(desh_results='${desh_results}', fastp_table_stats='${fastp_table_stats}', fastp_table_stats_filter='${fastp_table_stats_filter}', kraken_table='${kraken_table}', flagstat_table='${flagstat_table}', fragment_size_table='${fragment_size_table}', coverage_table='${coverage_table}', positive='${positive}', negative='${negative}', sample_cov='${sample_cov}', president_results='${president_results}', pangolin_results='${pangolin_results}', vois_results='${vois_results}'), output_file='report.html', output_dir = getwd())"
+    """
+}
