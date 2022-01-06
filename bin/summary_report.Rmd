@@ -10,6 +10,7 @@ params:
   kraken_table: "none"
   flagstat_table: "none"
   fragment_size_table: "none"
+  fragment_size_median_table: "none"
   coverage_table: "none"
   positive: "none"
   negative: "none"
@@ -17,6 +18,8 @@ params:
   president_results: "none"
   pangolin_results: "none"
   vois_results: "none"
+  cns_min_cov: "none"
+  run_id: "none"
 ---
 
 <style>
@@ -69,6 +72,357 @@ library("dplyr")
 
 ```{r get_cmd_line_parameters}
 dt.desh <- as.data.table(ldply(params$desh, fread))
+dt.fastp_table_stats <- as.data.table(ldply(params$fastp_table_stats, fread))
+dt.fastp_table_stats_filter <- as.data.table(ldply(params$fastp_table_stats_filter, fread))
+if(params$kraken_table != 'none'){
+  dt.kraken_table <- as.data.table(ldply(params$kraken_table, fread))
+} else {
+  print("No Kraken2 run.")
+}
+dt.flagstat_table <- as.data.table(ldply(params$flagstat_table, fread))
+dt.fragment_size_table <- as.data.table(ldply(params$fragment_size_table, fread))
+dt.fragment_size_median_table <- as.data.table(ldply(params$fragment_size_median_table, fread))
+dt.coverage_table <- as.data.table(ldply(params$coverage_table, fread))
+dt.positive <- as.data.table(ldply(params$positive, fread))
+dt.negative <- as.data.table(ldply(params$negative, fread))
+dt.sample_cov <- as.data.table(ldply(params$sample_cov, fread))
+dt.president_results <- as.data.table(ldply(params$president_results, fread, sep='\t'))
+dt.pangolin_results <- as.data.table(ldply(params$pangolin_results, fread))
+if(params$vois_results != 'none'){
+  dt.vois_results <- as.data.table(ldply(params$vois_results, fread))
+}
+```
+
+```{r set_plot_width}
+sample.count <- length(unique(dt.fastp_table_stats$sample))
+# limit plot size to avoid oversized plots beyond limits of png size
+if (sample.count > 100) {
+  plot.width <- 50
+} else if (sample.count < 10) {
+  plot.width <- 10  
+} else {
+  plot.width <- sample.count * 0.5
+}
+```
+
+```{r set_plot_height}
+height <- ceiling(sample.count/3)
+plot.height <- height * 1.9
+
+# limit plot size to avoid oversized plots beyond limits of png size
+if (plot.height > 50) {
+  plot.height <- 50
+}
+```
+
+```{r def_functions}
+# modified color_bar to fix direction from "rtl" to "ltr"
+f.color_bar <- function (color = "lightgray", fun = "proportion", 
+    ...) 
+{
+    fun <- match.fun(fun)
+    formattable::formatter("span", style = function(x) style(display = "inline-block", 
+        direction = "ltr", `border-radius` = "4px", 
+        `padding-right` = "2px", `background-color` = csscolor(color), 
+        width = percent(fun(as.numeric(x), ...))))
+}
+```
+
+## Sequencing run
+
+```{r conditional_sentence, results='asis'}
+if (params$run_id != 'none') {
+  cat(paste0("Sequencing was performed in run: ", params$run_id, "\n"))
+} else {
+  cat(paste0("No ID for a sequencing run was submitted. \n"))
+}
+```
+
+```{r conditional_warning, results='asis'}
+dt.sample_cov_negative <- dt.sample_cov[grepl("NK|Empty", dt.sample_cov$sample, ignore.case = TRUE) & dt.sample_cov$genome.coverage >= 0.2, ]
+
+if (nrow(dt.sample_cov_negative) > 0) {
+    
+    cat("## WARNING \n")
+    cat("Samples identified automatically as negative controls show unusual large coverage of the reference genome (more than 20%). Please check the following table, if this is expected for the samples. \n")
+}
+```
+
+```{r conditional_table}
+if (nrow(dt.sample_cov_negative) > 0) {
+    dt.sample_cov_tmp <- dt.sample_cov
+    dt.sample_cov_tmp$genome.coverage <- round(dt.sample_cov_tmp$genome.coverage, 2)
+
+    # add a row with all 0 and 1 to make colour scaling reproducible
+    df.tmp <- data.frame("sample" = c(0,1), 
+                         "genome.length" = c(0,1),
+                         "covered.bases" = c(0,1), 
+                         "genome.coverage" = c(0,1)
+                         )
+    dt.sample_cov_tmp <- rbind(dt.sample_cov_tmp, df.tmp)
+    rm(df.tmp)
+    # highlight important rows
+    dt.sample_cov_tmp$sample <- cell_spec(dt.sample_cov_tmp$sample, color = ifelse(dt.sample_cov_tmp$genome.coverage > 0.2, "red", "black"))
+    dt.sample_cov_tmp$genome.coverage <- color_tile("white", "orange")(dt.sample_cov_tmp$genome.coverage)
+    #remove added lines
+    dt.sample_cov_tmp <- head(dt.sample_cov_tmp, n = -2)
+    
+    kbl(dt.sample_cov_tmp[,c("sample", "covered.bases", "genome.coverage")], 
+        digits = 2, 
+        col.names = c("sample", "ref.coverage [bp]", "ref.coverage [fraction]"), 
+        caption = "Reference genome coverage in base pairs and as fraction of the total length. Bases with more than 10x sequencing depth are counted as covered. Negative control's names are highlighted in red if more than 20% of reference genome is covered, increasing coverage fraction is coloured orange (scaled from 0 to 1).",
+        escape = F) %>%
+        kable_styling(bootstrap_options = c("striped", "hover"), fixed_thead = T) %>% 
+        scroll_box(height = "400px")
+
+    rm(dt.sample_cov_tmp)
+}
+```
+
+## Trimming statistics
+
+Trimming and clipping is performed using fastp.
+
+### Read counts
+
+Raw reads were subjected to adapter clipping.
+
+```{r table_trimming, fig.cap="Counts of reads before and after clipping as well as base count of >=Q30."}
+dt.table <- dt.fastp_table_stats
+
+# add coloured bar charts to table
+dt.table$reads.before.clip <- f.color_bar("lightgreen")(dt.table$reads.before.clip)
+dt.table$reads.after.clip <- f.color_bar("lightgreen")(dt.table$reads.after.clip)
+
+kbl(x = dt.table,
+    col.names = c("sample", "reads before clip", "reads after clip", "ratio passed", "Q30 before clip", "Q30 after clip"),
+    digits = 2,
+    caption = "Counts of reads before and after clipping as well as base count of >=Q30. Read counts before and after clipping augmented with bar chart for visual aid.",
+    escape = F) %>%
+  kable_styling(bootstrap_options = c("striped", "hover"), fixed_thead = T) %>% 
+  scroll_box(height = "400px")
+
+rm(dt.table)
+```
+
+<div class="superwideimage">
+
+```{r plot_trimming, fig.width=plot.width, fig.cap="Read count before and past adapter clipping."}
+df.plot <- melt(dt.fastp_table_stats,
+                id.vars = "sample",
+                measure.vars = c("reads.before.clip", "reads.after.clip"))
+
+ggplot(data = df.plot,
+       aes(sample, value, fill = variable)) +
+    geom_bar(stat = "identity", position = "dodge") +
+    labs(title = "read counts before & after trimming",
+         x = "sample",
+         y = "count",
+         fill = "clipping") +
+    scale_fill_manual(values = c("#DD4444", "#4444DD"), labels = c("raw", "clipped")) +
+    theme(plot.title = element_text(hjust = 0.5), 
+          axis.text.x = element_text(angle = 45, hjust = 1),
+          legend.position = "bottom")
+  
+rm(df.plot)
+```
+
+</div>
+
+### Filtering details
+
+Reads were subjected to adapter clipping and quality trimming. 
+The latter includes low complexity filtering as well as classical Phred based quality filtering. 
+
+```{r table_filtering, fig.cap="Counts of reads after clipping and counts of reads removed by several filters."}
+
+dt.fastp_table_stats_filter$passed_filter <- f.color_bar("lightgreen")(dt.fastp_table_stats_filter$passed_filter)
+
+kbl(x = dt.fastp_table_stats_filter,
+    digits = 2,
+    caption = "Counts of reads after clipping and counts of reads removed by several filters. Passed filter read counts augmented with bar chart for visual aid.",
+    escape = FALSE) %>%
+  kable_styling(bootstrap_options = c("striped", "hover"), fixed_thead = T)  %>% 
+  scroll_box(height = "400px")
+```
+
+### Species filtering
+
+Reads can be filtered against a defined taxonomical ID predefined at the start of the pipeline run. 
+If this parameter was set and Kraken classification was successful, filtering data will be shown here.
+
+```{r table_kraken, fig.cap="Read counts after species binning using Kraken."}
+if (params$kraken_table != 'none') {
+  kbl(dt.kraken_table, 
+      caption = "Amount of reads assigned to selected species. Ratios are coloured to highlight high unclassified content (scaled 0-100%)", escape = F) %>%
+    kable_styling(bootstrap_options = c("striped", "hover"), fixed_thead = T) %>% 
+    scroll_box(height = "400px")
+} else {
+  print("not kraken")
+}
+```
+
+## Mapping statistics
+
+Species classification of the reads may have been performed.
+If this was done, reads assigned to the defined species were submitted to genome mapping. If classification was omitted reads after fastp filtering were used for mapping.
+
+Reads were mapped to the reference genome using BWA. 
+
+DNA fragments are counted twice, if paired end sequencing was employed.
+
+```{r table_flagstat}
+dt.flagstat_table$input <- f.color_bar("lightgreen")(dt.flagstat_table$input)
+dt.flagstat_table$mapped <- f.color_bar("lightgreen")(dt.flagstat_table$mapped)
+
+kbl(dt.flagstat_table, 
+    col.names = c("sample", "reads in", "reads mapped", "mapped ratio"), 
+    digits = 3,
+    caption = "Amount of reads subjected to reference genome mapping (after the optional Kraken filtering) and the respective numbers of mapped reads. In paired end sequencing each DNA fragment is counted twice. Input and mapped read counts augmented with bar chart for visual aid.",
+    escape = F) %>%
+  kable_styling(bootstrap_options = c("striped", "hover"), fixed_thead = T) %>% 
+  scroll_box(height = "400px")
+```
+
+## Fragment sizes
+
+Fragment sizes were determined by mapping reads reference genome and extracting the fragment size from the respective bam file.
+Data of forward and reverse mapping reads were used, which leads to a duplicated entry for each paired end mapping.
+The log value of the median is given for comparison with the values shown in the plots.
+
+
+### Fragment size table
+
+```{r table_fragsizes, fig.cap="Median fragment size determined by the distance of reads after mapping to reference genome."}
+
+# conditional formatting for fragsizes not between 90 and 110
+dt.fragment_size_median_table$median.fragsize <- ifelse(dt.fragment_size_median_table$median.fragsize >= 110 | dt.fragment_size_median_table$median.fragsize <= 90,
+                                              cell_spec(dt.fragment_size_median_table$median.fragsize, background = "orange", align = "right"),
+                                              dt.fragment_size_median_table$median.fragsize)
+
+kbl(x = dt.fragment_size_median_table,
+    col.names = c("sample", "fragment size (median)", "fragment size (stdev)"),
+    caption = "Median fragment size determined by the distance of reads after mapping to reference genome. Read distance not between 90 and 110 bp are highlighted in orange.",
+    digits = 0,
+    escape = FALSE) %>%
+  kable_styling(bootstrap_options = c("striped", "hover"), fixed_thead = T) %>% 
+  scroll_box(height = "400px")
+```
+
+### Fragment size plot
+
+Plotting the fragment sizes usually shows a distribution with multiple peaks. Ideally just one peak dominates the plot at around 100bp.
+
+<div class=superhighimage>
+
+```{r plot_fragsizes, fig.width=10, fig.height=plot.height, fig.cap="Fragment size distribution determined by the distance of reads after mapping to reference genome.", error=T}
+
+tryCatch({
+    ggplot(dt.fragment_size_table, aes(fragsize.abs, colour = sample, fill = sample)) +
+    geom_density() +
+    facet_wrap(~sample, ncol = 4, scales = "free_y") +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1),
+          legend.position = "none",
+          plot.title = element_text(hjust = 0.5)) +
+    scale_x_continuous(trans = "log10") +
+    labs(title = "Fragment size histogram",
+         x = "fragment size")
+    }, error = function(e) {
+        message("some error")
+    })
+
+```
+
+</div>
+
+## Coverage distribution
+
+### Sequence depth distribution on reference genome
+
+Sequence depth was calculated at each position and plotted. The aim for positive samples is an evenly distributed high sequence depth.
+
+<div class=superhighimage>
+
+```{r plot_coverage, fig.width=10, fig.height=plot.height, fig.cap="Sequence depth distribution on SARS-CoV-2 genome. Sequence depth is shown versus the position of the base in the genome. Please be aware of the varying y axis scaling."}
+
+if (sum(dt.coverage_table$depth)>0) {
+    # only apply log10 scaling, if any depth value is >0
+    ggplot(dt.coverage_table[dt.coverage_table$mid.bin == 50,], aes(position, depth, colour = sample)) +
+        geom_point(size = 0.1) +
+        labs(title = "coverage distribution") +
+        theme(plot.title = element_text(hjust = 0.5), 
+          axis.text.x = element_text(angle = 45, hjust = 0.5),
+          legend.position = "none") +
+        scale_y_continuous(trans = "log10") +
+        facet_wrap(~sample, ncol = 3, scales = "free_y")
+} else {
+    ggplot(dt.coverage_table[dt.coverage_table$mid.bin == 50,], aes(position, depth, colour = sample)) +
+        geom_point(size = 0.1) +
+        labs(title = "coverage distribution") +
+        theme(plot.title = element_text(hjust = 0.5), 
+          axis.text.x = element_text(angle = 45, hjust = 0.5),
+          legend.position = "none") +
+        facet_wrap(~sample, ncol = 3, scales = "free_y")
+}
+```
+
+</div>
+
+### Accumulated sequence depth
+
+Sequence depth on the reference genome is visualised as histograms binning bases of identical coverage.
+
+<div class=scroll>
+
+```{r plot_coverage_histogram, fig.width=10, fig.height=plot.height*sample.count, fig.cap="Sequence depth distribution on SARS-CoV-2 genome. The amount of bases is shown dependend on the respective sequence depth. Please watch out for the different axis scaling.", attr.output='style="max-height: 50px;"'}
+
+ggplot(dt.coverage_table[dt.coverage_table$mid.bin == 50,], aes(depth, fill = sample)) +
+    geom_histogram(binwidth = 50) +
+    facet_wrap(~sample, ncol = 1, scales = "free") +  # ncol > 1 results in plots that are displayed incorrecty
+    labs(title = "coverage histogram") +
+    theme(plot.title = element_text(hjust = 0.5),
+          legend.position = "none",
+          axis.text.x = element_text(angle = 45, hjust = 0.5))
+```
+
+</div>
+
+### Tabular view of coverage distribution
+
+```{r table_coverage}
+df.tmp <- data.frame("sample" = c(0,1), 
+                     "genome.length" = c(0,1),
+                     "covered.bases" = c(0,1), 
+                     "genome.coverage" = c(0,1),
+                     "DP.median" = c(0,0),
+                     "DP.mean" = c(0,0)
+)
+dt.sample_cov_table <- rbind(dt.sample_cov, df.tmp)
+rm(df.tmp)
+
+# conditional formatting for reference coverage >95%
+dt.sample_cov_table$genome.coverage <- round(dt.sample_cov_table$genome.coverage, 2)
+dt.sample_cov_table$genome.coverage <- ifelse(dt.sample_cov_table$genome.coverage >= 0.95,
+                                    cell_spec(dt.sample_cov_table$genome.coverage, background = "lightgreen", align = "right"),
+                                    dt.sample_cov_table$genome.coverage)
+# coverage bar
+dt.sample_cov_table$genome.length <- f.color_bar("lightgreen")(dt.sample_cov_table$genome.length)
+
+# highlight negative controls
+dt.sample_cov_table$sample <- ifelse(grepl(pattern = "NK", dt.sample_cov_table$sample),
+                           cell_spec(dt.sample_cov_table$sample, color = "red"),
+                           dt.sample_cov_table$sample)
+
+#remove added lines
+dt.sample_cov_table <- head(dt.sample_cov_table, n = -2)
+kbl(dt.sample_cov_table[,c("sample", "covered.bases", "genome.coverage", "DP.median", "DP.mean")], 
+        digits = 2, 
+        col.names = c("sample", "coverage [bp]", "coverage [fraction]", "depth median", "depth mean"), 
+        caption = "Genome coverage values shown as coverage of the reference genome and sequencing depth. Bases with more than 10x sequencing depth are counted as covered. Sample names of negative controls are highlighted in red and reference genome coverage fraction >=95% is highlighted in green. Negative controls with more than 20% reference genome coverage could indicate contamination.",
+        escape = FALSE) %>%
+    kable_styling(bootstrap_options = c("striped", "hover"), fixed_thead = T) %>% 
+    scroll_box(height = "400px")
+rm(dt.sample_cov_table)
 ```
 
 ## DESH quality statistics
@@ -77,8 +431,53 @@ dt.desh <- as.data.table(ldply(params$desh, fread))
 kbl(dt.desh[,c("sample", "#n", "#iupac", "#lowcov")], 
         digits = 2, 
         col.names = c("sample", "N [bp]", "IUPAC [bp]", "low coverage [bp]"), 
-        caption = paste0("Quality criteria of reconstructed genome sequences according to DESH, see [here](https://www.rki.de/DE/Content/InfAZ/N/Neuartiges_Coronavirus/DESH/Qualitaetskriterien.pdf?__blob=publicationFile) [pdf]. All criteria refer to the IUPAC consensus genome. At least all positions covered by less than ", toString(42)," reads are masked with N. The threshold for the pipeline can be set with `--cns_min_cov`."),
+        caption = paste0("Quality criteria of reconstructed genome sequences according to DESH, see [here](https://www.rki.de/DE/Content/InfAZ/N/Neuartiges_Coronavirus/DESH/Qualitaetskriterien.pdf?__blob=publicationFile) [pdf]. All criteria refer to the IUPAC consensus genome. At least all positions covered by less than ", toString(params$cns_min_cov)," reads are masked with N. The threshold for the pipeline can be set with `--cns_min_cov`."),
         escape = FALSE) %>%
     kable_styling(bootstrap_options = c("striped", "hover"), fixed_thead = T) %>% 
     scroll_box(height = "400px")
 ```
+
+## President
+
+```{r president}
+kbl(dt.president_results, 
+      digits = 2, 
+      caption = "todo.",
+      escape = FALSE) %>%
+    kable_styling(bootstrap_options = c("striped", "hover"), fixed_thead = T) %>% 
+    scroll_box(height = "400px")
+```
+
+## Lineage overview
+
+Covpipe runs a preliminary lineage assignment with Pangolin (https://github.com/cov-lineages/pangolin). 
+Note that there are several lineage assignment schemes that need to get run in separate analyses steps.
+
+```{r lineage_assignment}
+kbl(dt.pangolin_results, 
+      digits = 2, 
+      caption = "Preliminary lineage assignment using Pangolin.",
+      escape = FALSE) %>%
+    kable_styling(bootstrap_options = c("striped", "hover"), fixed_thead = T) %>% 
+    scroll_box(height = "400px")
+```
+
+## Variation sites of interest
+
+Covpipe examines variation sites of interest. 
+
+```{r voi_table}
+if (params$vois_results != 'none') {
+  kbl(dt.vois_results[,!grepl("key",names(dt.voi))], 
+        caption = paste0("Variation sites of interest and their occurrence in the input samples. Low coverage is below ", toString(params$cns_min_cov), ". If a variant is found with an other ALT in the sample,this variation is stated."),
+        escape = FALSE) %>%
+    kable_styling(bootstrap_options = c("striped", "hover"), fixed_thead = T) %>% 
+    scroll_box(height = "400px")
+} else {
+  print("No variants of interest.")
+}
+```
+
+## Pipeline version
+todo
+This report was generated using covpipe pipeline version r params$version.
