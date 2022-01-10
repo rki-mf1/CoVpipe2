@@ -369,7 +369,7 @@ process rmarkdown_report {
     script:
     kraken_table_optional = kraken_table ? kraken_table : 'none'
     vois_results_optional = vois_results ? vois_results : 'none'
-    run_id = params.run_id ? params.run_id != '' : 'none'
+    run_id = params.run_id != '' ? params.run_id : 'none'
     pipeline_version = workflow.repository != null ? "$workflow.repository - $workflow.revision [$workflow.commitId]" : 'none'
     """
     cp -L ${rmd} report.Rmd
