@@ -85,7 +85,7 @@ nextflow pull RKIBioinformaticsPipelines/covpipenext -hub gitlab -r <RELEASE>
     Illumina read data:
     --fastq                  e.g.: 'sample{1,2}.fastq' or '*.fastq.gz' or '*/*.fastq.gz'
     --list                   This flag activates csv input for the above flags [default: false]
-                                 style of the csv is: samplename,path_r1,path_r2
+                                 style and header of the csv is: samplename,path_r1,path_r2
     --mode                          Switch between 'paired'- and 'single'-end FASTQ [default: paired]
     --run_id                 Run ID [default: ]
 

@@ -78,15 +78,15 @@ if ( params.reference ) {
 if (params.mode == 'paired') {
     if (params.fastq && params.list) { fastqInputChannel = Channel
         .fromPath( params.fastq, checkIfExists: true )
-        .splitCsv()
-        .map { row -> [row[0], [file(row[1], checkIfExists: true), file(row[2], checkIfExists: true)]] }}
-    else if (params.fastq) { fastqInputChannel = Channel
+        .splitCsv(header: true, sep: ',')
+        .map { row -> [row.sample, [file(row.fastq_1, checkIfExists: true), file(row.fastq_2, checkIfExists: true)]] }
+    } else if (params.fastq) { fastqInputChannel = Channel
         .fromFilePairs( params.fastq, checkIfExists: true )}
 } else {
     if (params.fastq && params.list) { fastqInputChannel = Channel
         .fromPath( params.fastq, checkIfExists: true )
-        .splitCsv()
-        .map { row -> [row[0], [file(row[1], checkIfExists: true)]] }}
+        .splitCsv(header: true, sep: ',')
+        .map { row -> [row.sample, [file(row.fastq, checkIfExists: true)]] }}
     else if (params.fastq) { fastqInputChannel = Channel
         .fromPath( params.fastq, checkIfExists: true )
         .map { file -> [file.simpleName, [file]]}}
@@ -223,7 +223,7 @@ def helpMSG() {
     Illumina read data:${c_reset}
     ${c_green}--fastq ${c_reset}                 e.g.: 'sample{1,2}.fastq' or '*.fastq.gz' or '*/*.fastq.gz'
     --list                   This flag activates csv input for the above flags [default: false]
-                                 ${c_dim}style of the csv is: samplename,path_r1,path_r2${c_reset}
+                                 ${c_dim}style and header of the csv is: sample,fastq_1,fastq_2${c_reset}
     --mode                          Switch between 'paired'- and 'single'-end FASTQ [default: $params.mode]
     --run_id                 Run ID [default: $params.run_id]
 
