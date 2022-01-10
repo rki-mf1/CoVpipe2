@@ -4,13 +4,14 @@ process adjust_gt {
 
     input:
     tuple val(name), path(vcf)
+    val(cns_gt_adjust)
 
     output:
     tuple val(name), path("${name}.filtered.gt_adjust.vcf")
 
     script:
     """
-    adjust_gt.py --vf ${params.cns_gt_adjust} --gz ${vcf} -o ${name}.filtered.gt_adjust.vcf
+    adjust_gt.py --vf ${cns_gt_adjust} --gz ${vcf} -o ${name}.filtered.gt_adjust.vcf
     """
 }
 

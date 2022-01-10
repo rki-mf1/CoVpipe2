@@ -11,21 +11,16 @@ process kraken_db {
     // label just some environment or container where we are sure that wget and tar are available
     label 'dos2unix'
 
-    if (params.cloudProcess) { publishDir "${params.databases}/kraken", mode: 'copy', pattern: "GRCh38.p13_GBcovid19-2020-05-22" }
+    if (params.cloudProcess) { publishDir "${params.databases}/kraken", mode: 'copy', pattern: "GRCh38.p13_SC2_2021-02-08" }
     else { storeDir "${params.databases}/kraken" }  
 
     output:
-    path("GRCh38.p13_GBcovid19-2020-05-22", type: 'dir')
+    path("GRCh38.p13_SC2_2021-02-08", type: 'dir')
 
     script:
     """
-    wget https://zenodo.org/record/3854856/files/GRCh38.p13_GBcovid19-2020-05-22.tar.gz?download=1 -O GRCh38.p13_GBcovid19-2020-05-22.tar.gz
-    tar zxvf GRCh38.p13_GBcovid19-2020-05-22.tar.gz
-
-    # the currently uploaded .tar.gz has a typo: GRC28.* instead of GRC38.*
-    if [ -d "GRCh28.p13_GBcovid19-2020-05-22" ]; then
-        mv GRCh28.p13_GBcovid19-2020-05-22 GRCh38.p13_GBcovid19-2020-05-22
-    fi
+    wget https://zenodo.org/record/4534746/files/GRCh38.p13_SC2_2021-02-08.tar.gz?download=1 -O GRCh38.p13_SC2_2021-02-08.tar.gz
+    tar zxvf GRCh38.p13_SC2_2021-02-08.tar.gz
     """
 }
 
