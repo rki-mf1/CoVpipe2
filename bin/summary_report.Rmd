@@ -1,5 +1,5 @@
 ---
-title: "sample report for SARS-CoV-2 minipipeline"
+title: "Sample report for SARS-CoV-2 minipipeline"
 output: 
   html_document:
     toc: true
@@ -20,6 +20,7 @@ params:
   vois_results: "none"
   cns_min_cov: "none"
   run_id: "none"
+  pipeline_version: "none"
 ---
 
 <style>
@@ -249,16 +250,16 @@ kbl(x = dt.fastp_table_stats_filter,
 ### Species filtering
 
 Reads can be filtered against a defined taxonomical ID predefined at the start of the pipeline run. 
-If this parameter was set and Kraken classification was successful, filtering data will be shown here.
+If this parameter was set and Kraken2 classification was successful, filtering data will be shown here.
 
-```{r table_kraken, fig.cap="Read counts after species binning using Kraken."}
+```{r table_kraken, fig.cap="Read counts after species binning using Kraken2."}
 if (params$kraken_table != 'none') {
   kbl(dt.kraken_table, 
       caption = "Amount of reads assigned to selected species. Ratios are coloured to highlight high unclassified content (scaled 0-100%)", escape = F) %>%
     kable_styling(bootstrap_options = c("striped", "hover"), fixed_thead = T) %>% 
     scroll_box(height = "400px")
 } else {
-  print("not kraken")
+  print("No Kraken2 run.")
 }
 ```
 
@@ -442,7 +443,7 @@ kbl(dt.desh[,c("sample", "#n", "#iupac", "#lowcov")],
 ```{r president}
 kbl(dt.president_results, 
       digits = 2, 
-      caption = "todo.",
+      caption = "Quality statistics by [PRESIDENT](https://gitlab.com/RKIBioinformaticsPipelines/president) (PaiRwisE Sequence IDENtiTy) with identity of ACGT bases of 90% and maximal 5% Ns in the query/sample compared to the reference genome.",
       escape = FALSE) %>%
     kable_styling(bootstrap_options = c("striped", "hover"), fixed_thead = T) %>% 
     scroll_box(height = "400px")
@@ -479,5 +480,10 @@ if (params$vois_results != 'none') {
 ```
 
 ## Pipeline version
-todo
-This report was generated using covpipe pipeline version r params$version.
+```{r conditional_sentence_pipeline_version, results='asis'}
+if (params$pipeline_version != 'none') {
+   cat(paste0("This report was generated using covpipe pipeline version", params$pipeline_version, ".\n"))
+} else {
+   cat("No version available - local execution.\n")
+}
+```
