@@ -222,7 +222,8 @@ def helpMSG() {
     ${c_green}--fastq ${c_reset}                 e.g.: 'sample{1,2}.fastq' or '*.fastq.gz' or '*/*.fastq.gz'
     --list                   This flag activates csv input for the above flags [default: false]
                                  ${c_dim}style of the csv is: samplename,path_r1,path_r2${c_reset}
-    --mode                          Switch between 'paired'- and 'single'-end FASTQ 
+    --mode                          Switch between 'paired'- and 'single'-end FASTQ [default: $params.mode]
+    --run_id                 Run ID [default: $params.run_id]
 
     ${c_yellow}Reference:${c_reset}
     ${c_green}--reference ${c_reset}             Currently supported: 'sars-cov2' (NC_045512)
@@ -234,7 +235,7 @@ def helpMSG() {
      --adapter               Define the path of a FASTA file containing the adapter sequences to be clipped. [default: $params.adapter]
 
     ${c_yellow}Trimming and QC:${c_reset}
-    --fastp_additional_parameters      Additional parameters for FeatureCounts [default: $params.featurecounts_additional_params]
+    --fastp_additional_parameters      Additional parameters for FeatureCounts [default: $params.fastp_additional_parameters]
     
     ${c_yellow}Taxonomic read filter:${c_reset}
     --kraken                 Activate taxonomic read filtering to exclude reads not classified as SARS-COV-2 (NCBI taxonomy ID 2697049) 
@@ -252,6 +253,7 @@ def helpMSG() {
     --cov                    Minimum number of supporting reads which are required to call a variant. [default: $params.cov]
     --frac                   Minimum percentage of supporting reads at the respective position required to call a variant. 
                                  In turn, variants supported by (1 - frac)*100% reads will be explicitly called. [default: $params.frac]
+    --vois                   Compare called variants to a VCF file with you variants of interest [default: $params.vois]
 
     ${c_yellow}Variant hard filtering:${c_reset}
     --var_mqm                Minimal mean mapping quality of observed alternate alleles (MQM). The mapping quality (MQ) 
@@ -269,6 +271,9 @@ def helpMSG() {
     --cns_gt_adjust          Minimum fraction of reads supporting a variant which leads to an explicit call of this 
                                  variant (genotype adjustment). The value has to be greater than 0.5 but not greater than 1. 
                                  To turn genotype adjustment off, set the value to 0. [default: $params.cns_gt_adjust]
+
+    ${c_yellow}Linage assignment:${c_reset}
+    --update_pangolin        Update pangolin environment to get the latest version that is available from bioconda.
 
     ${c_yellow}Computing options:${c_reset}
     --cores                  Max cores per process for local use [default: $params.cores]
@@ -288,10 +293,16 @@ def helpMSG() {
     
     ${c_green}Executer${c_reset} (choose one):
       local
+      slurm
     
     ${c_blue}Engines${c_reset} (choose one):
       conda
-    
+
+    ${c_dim}Misc:
+      cluster                Loads resource configs more suitable for cluster execution.
+                             Has to be combine with an engine and an executor.
+    ${c_reset}
+
     Per default: -profile local,conda is executed. 
     """
 }

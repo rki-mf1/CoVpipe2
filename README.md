@@ -86,7 +86,8 @@ nextflow pull RKIBioinformaticsPipelines/covpipenext -hub gitlab -r <RELEASE>
     --fastq                  e.g.: 'sample{1,2}.fastq' or '*.fastq.gz' or '*/*.fastq.gz'
     --list                   This flag activates csv input for the above flags [default: false]
                                  style of the csv is: samplename,path_r1,path_r2
-    --mode                          Switch between 'paired'- and 'single'-end FASTQ 
+    --mode                          Switch between 'paired'- and 'single'-end FASTQ [default: paired]
+    --run_id                 Run ID [default: ]
 
     Reference:
     --reference              Currently supported: 'sars-cov2' (NC_045512)
@@ -98,12 +99,12 @@ nextflow pull RKIBioinformaticsPipelines/covpipenext -hub gitlab -r <RELEASE>
      --adapter               Define the path of a FASTA file containing the adapter sequences to be clipped. [default: false]
 
     Trimming and QC:
-    --fastp_additional_parameters      Additional parameters for FeatureCounts [default: null]
+    --fastp_additional_parameters      Additional parameters for FeatureCounts [default: --qualified_quality_phred 20 --length_required 50]
     
     Taxonomic read filter:
     --kraken                 Activate taxonomic read filtering to exclude reads not classified as SARS-COV-2 (NCBI taxonomy ID 2697049) 
                                  from read mapping. A pre-processed kraken2 database will be automatically downloaded from 
-                                 https://zenodo.org/record/3854856 and stored locally [default: true]
+                                 https://zenodo.org/record/3854856 and stored locally [default: false]
     --taxid                  Taxonomic ID used together with the kraken2 database for read filtering [default: 2697049]
 
     Primer detection: 
@@ -116,6 +117,7 @@ nextflow pull RKIBioinformaticsPipelines/covpipenext -hub gitlab -r <RELEASE>
     --cov                    Minimum number of supporting reads which are required to call a variant. [default: 20]
     --frac                   Minimum percentage of supporting reads at the respective position required to call a variant. 
                                  In turn, variants supported by (1 - frac)*100% reads will be explicitly called. [default: 0.1]
+    --vois                   Compare called variants to a VCF file with you variants of interest [default: false]
 
     Variant hard filtering:
     --var_mqm                Minimal mean mapping quality of observed alternate alleles (MQM). The mapping quality (MQ) 
@@ -133,6 +135,9 @@ nextflow pull RKIBioinformaticsPipelines/covpipenext -hub gitlab -r <RELEASE>
     --cns_gt_adjust          Minimum fraction of reads supporting a variant which leads to an explicit call of this 
                                  variant (genotype adjustment). The value has to be greater than 0.5 but not greater than 1. 
                                  To turn genotype adjustment off, set the value to 0. [default: 0.9]
+
+    Linage assignment:
+    --update_pangolin        Update pangolin environment to get the latest version that is available from bioconda.
 
     Computing options:
     --cores                  Max cores per process for local use [default: 4]
@@ -152,10 +157,16 @@ nextflow pull RKIBioinformaticsPipelines/covpipenext -hub gitlab -r <RELEASE>
     
     Executer (choose one):
       local
+      slurm
     
     Engines (choose one):
       conda
+
+    Misc:
+      cluster                Loads resource configs more suitable for cluster execution.
+                             Has to be combine with an engine and an executor.
     
+
     Per default: -profile local,conda is executed. 
 ```
 
