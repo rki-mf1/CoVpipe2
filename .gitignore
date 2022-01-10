@@ -1,5 +1,5 @@
 work/
-results/
+results*/
 conda/
 .nextflow/
 .nextflow.log*
