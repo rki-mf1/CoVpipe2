@@ -1,23 +1,3 @@
-process desh_qc {
-    label 'bcftools'
-
-    input:
-    tuple val(name), path(consensus), path(coverage)
-    val(min_cov)
-
-    output: 
-    tuple val(name), path("${name}_desh.tsv")
-
-    script:
-    """
-    echo 'sample,#n,#iupac,#lowcov' > ${name}_desh.tsv
-    N=\$(tail -n +2 ${consensus} | tr -cd "N" | wc -c)
-    IUPAC=\$(tail -n +2 ${consensus} | tr -cd "RYSWKMBDHVN" | wc -c)
-    COVTH=\$(awk -F "\t" '{{COV=\$3; if (COV < ${min_cov}) {{ print COV }} }}' ${coverage} | wc -l)
-    echo ${name},\$N,\$IUPAC,\$COVTH >> ${name}_desh.tsv
-    """
-}
-
 process fastp_table {
     label 'r'
 
@@ -347,8 +327,7 @@ process rmarkdown_report {
     // stageInMode: 'copy' # would copy every input file, not so nice
 
     input:
-    path(rmd) 
-    path(desh_results)
+    path(rmd)
     path(fastp_table_stats)
     path(fastp_table_stats_filter)
     path(kraken_table)
@@ -373,6 +352,6 @@ process rmarkdown_report {
     pipeline_version = workflow.repository != null ? "$workflow.repository - $workflow.revision [$workflow.commitId]" : 'none'
     """
     cp -L ${rmd} report.Rmd
-    Rscript -e "rmarkdown::render('report.Rmd', params=list(desh_results='${desh_results}', fastp_table_stats='${fastp_table_stats}', fastp_table_stats_filter='${fastp_table_stats_filter}', kraken_table='${kraken_table_optional}', flagstat_table='${flagstat_table}', fragment_size_table='${fragment_size_table}', fragment_size_median_table='${fragment_size_median_table}', coverage_table='${coverage_table}', positive='${positive}', negative='${negative}', sample_cov='${sample_cov}', president_results='${president_results}', pangolin_results='${pangolin_results}', vois_results='${vois_results_optional}', cns_min_cov='${params.cns_min_cov}', run_id='${run_id}', pipeline_version='${pipeline_version}'), output_file='report.html')"
+    Rscript -e "rmarkdown::render('report.Rmd', params=list(fastp_table_stats='${fastp_table_stats}', fastp_table_stats_filter='${fastp_table_stats_filter}', kraken_table='${kraken_table_optional}', flagstat_table='${flagstat_table}', fragment_size_table='${fragment_size_table}', fragment_size_median_table='${fragment_size_median_table}', coverage_table='${coverage_table}', positive='${positive}', negative='${negative}', sample_cov='${sample_cov}', president_results='${president_results}', pangolin_results='${pangolin_results}', vois_results='${vois_results_optional}', cns_min_cov='${params.cns_min_cov}', run_id='${run_id}', pipeline_version='${pipeline_version}'), output_file='report.html')"
     """
 }
