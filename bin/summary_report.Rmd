@@ -379,7 +379,7 @@ Sequence depth on the reference genome is visualised as histograms binning bases
 
 ggplot(dt.coverage_table[dt.coverage_table$mid.bin == 50,], aes(depth, fill = sample)) +
     geom_histogram(binwidth = 50) +
-    facet_wrap(~sample, ncol = 1, scales = "free") +  # ncol > 1 results in plots that are displayed incorrecty
+    facet_wrap(~sample, ncol = 1, scales = "free") +  # ncol > 1 results in plots that are displayed incorrectly
     labs(title = "coverage histogram") +
     theme(plot.title = element_text(hjust = 0.5),
           legend.position = "none",
