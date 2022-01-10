@@ -154,6 +154,8 @@ workflow {
     if (params.kraken) {
         classify_reads(reads_qc_ch, download_kraken_db())
         kraken_reports = classify_reads.out.report
+    } else {
+        kraken_reports = Channel.empty()
     }
     reads_qc_cl_ch = params.kraken ? classify_reads.out.reads : reads_qc_ch
 
