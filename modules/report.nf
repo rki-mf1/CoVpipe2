@@ -267,12 +267,12 @@ process coverage_table {
     dt.coverage <- as.data.table(ldply(f.list, fread))
     colnames(dt.coverage) <- c("sample","chromosome", "position", "depth")
 
-    # reduce amount of data points to be plottd
+    # reduce amount of data points to be plotted
     dt.coverage[, bin:=rep(seq(1, ceiling(length(position) / 100)), each = 100, length.out = length(position)), by = "sample"]
-    dt.coverage[, mid.bin:=seq(1,length(position)) %% 100, by = "sample"] # by samples is here also necessery
+    dt.coverage[, mid.bin:=seq(1,length(position)) %% 100, by = "sample"] # by samples is here also necessary
     dt.coverage[, mean.cov:=mean(depth), by=c("sample", "bin")]
 
-    dt.output <- dt.coverage[, sum(depth > ${min_cov}), by = sample]
+    dt.output <- dt.coverage[, sum(depth > ${min_cov}), by = sample] #
     setnames(dt.output, "V1", "covered.bases")
 
     dt.output\$genome.length <- dt.coverage[,length(depth), by = sample]\$V1
@@ -352,6 +352,6 @@ process rmarkdown_report {
     pipeline_version = workflow.repository != null ? "$workflow.repository - $workflow.revision [$workflow.commitId]" : 'none'
     """
     cp -L ${rmd} report.Rmd
-    Rscript -e "rmarkdown::render('report.Rmd', params=list(fastp_table_stats='${fastp_table_stats}', fastp_table_stats_filter='${fastp_table_stats_filter}', kraken_table='${kraken_table_optional}', flagstat_table='${flagstat_table}', fragment_size_table='${fragment_size_table}', fragment_size_median_table='${fragment_size_median_table}', coverage_table='${coverage_table}', positive='${positive}', negative='${negative}', sample_cov='${sample_cov}', president_results='${president_results}', pangolin_results='${pangolin_results}', vois_results='${vois_results_optional}', cns_min_cov='${params.cns_min_cov}', run_id='${run_id}', pipeline_version='${pipeline_version}'), output_file='report.html')"
+    Rscript -e "rmarkdown::render('report.Rmd', params=list(fastp_table_stats='${fastp_table_stats}', fastp_table_stats_filter='${fastp_table_stats_filter}', kraken_table='${kraken_table_optional}', flagstat_table='${flagstat_table}', fragment_size_table='${fragment_size_table}', fragment_size_median_table='${fragment_size_median_table}', coverage_table='${coverage_table}', positive='${positive}', negative='${negative}', sample_cov='${sample_cov}', president_results='${president_results}', pangolin_results='${pangolin_results}', vois_results='${vois_results_optional}', cov='${params.cov}', run_id='${run_id}', pipeline_version='${pipeline_version}'), output_file='report.html')"
     """
 }
