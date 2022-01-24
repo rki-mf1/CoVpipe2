@@ -1,5 +1,7 @@
 # CoVpipeNext
 
+CoVpipeNext is a Nextflow pipeline for reference-based genome reconstruction of SARS-CoV-2 from NGS data. In principle it can be used also for other viruses.
+
 ## Quick installation
 
 The pipeline is written in [`Nextflow`](https://nf-co.re/usage/installation), which can be used on any POSIX compatible system (Linux, OS X, etc). Windows system is supported through [WSL](https://en.wikipedia.org/wiki/Windows_Subsystem_for_Linux). You need `Nextflow` installed and either `conda` to run the steps of the pipeline:
