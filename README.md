@@ -171,3 +171,20 @@ nextflow pull RKIBioinformaticsPipelines/covpipenext -hub gitlab -r <RELEASE>
 ```
 
 </details>
+
+## Workflow
+
+Workflow overview:
+![workflow](/data/figures/covpipenext_steps.png)
+
+<details><summary>More detailed overview with process names:</summary>
+
+![workflow](/data/figures/covpipenext_processes.png)
+
+</details>
+
+<details><summary>Even more detailed overview with process names and parameters:</summary>
+
+![workflow](/data/figures/covpipenext_processes_params.png)
+
+</details>
