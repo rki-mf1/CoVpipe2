@@ -34,22 +34,7 @@ process filter_variants_hard {
     """
 }
 
-process create_low_coverage_mask {
-    label 'bedtools'
 
-    publishDir "${params.output}/${params.consensus_dir}/${name}", mode: params.publish_dir_mode
-
-    input:
-    tuple val(name), file(bam)
-
-    output:
-    tuple val(name), file("${name}.lowcov.bed")
-
-    script:
-    """
-    bedtools genomecov -bga -ibam ${bam} | awk '\$4 < ${params.cns_min_cov}' | bedtools merge  > ${name}.lowcov.bed
-    """
-}
 
 process consensus_ambiguous {
     label 'bcftools'
