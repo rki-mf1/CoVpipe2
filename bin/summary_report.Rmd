@@ -254,8 +254,9 @@ if (params$kraken_table != 'none') {
   datatable(dt.kraken_table, 
       rownames = FALSE,
       caption = "Amount of reads assigned to selected species. Ratios are coloured to highlight high unclassified content (scaled 0-100%)", escape = F,
-      options = list(order = list(list(0, 'asc')))) %>%
-      formatRound(columns=c("Homo sapiens (ratio)","Severe acute respiratory syndrome coronavirus 2 (ratio)","unclassified (ratio)"), digits=2)
+      options = list(order = list(list(0, 'asc')), columnDefs = list(list(targets="_all", render = JS("function(data, type, row, meta) {return data === 'NA' ? '0' : data;}")))))
+      #  %>%
+      # formatRound(columns=c("Homo sapiens (ratio)","Severe acute respiratory syndrome coronavirus 2 (ratio)","unclassified (ratio)"), digits=2)
 } else {
   print("No Kraken2 run.")
 }
@@ -417,7 +418,7 @@ dt.sample_cov_table <- head(dt.sample_cov_table, n = -2)
 datatable(dt.sample_cov_table[,c("sample", "covered.bases", "genome.coverage", "DP.median", "DP.mean")], 
         rownames = FALSE,
         colnames = c("sample", "coverage [bp]", "coverage [fraction]", "depth median", "depth mean"), 
-        caption = "Genome coverage values shown as coverage of the reference genome and sequencing depth. Bases with more than 10x sequencing depth are counted as covered. Sample names of negative controls are highlighted in red and reference genome coverage fraction >=95% is highlighted in green. Negative controls with more than 20% reference genome coverage could indicate contamination.",
+        caption = paste0("Genome coverage values shown as coverage of the reference genome and sequencing depth. Bases with more than ", toString(params$cns_min_cov),"x sequencing depth are counted as covered. Sample names of negative controls are highlighted in red and reference genome coverage fraction >=95% is highlighted in green. Negative controls with more than 20% reference genome coverage could indicate contamination."),
         options = list(order = list(list(0, 'asc'))),
         escape = FALSE) %>%
     formatRound(columns=c("DP.mean"), digits=2)
@@ -426,11 +427,17 @@ rm(dt.sample_cov_table)
 
 ## Genome quality
 
+Quality statistics by [PRESIDENT](https://gitlab.com/RKIBioinformaticsPipelines/president) (PaiRwisE Sequence IDENtiTy) with identity of ACGT bases of 90% and maximal 5% Ns in the query/sample compared to the reference genome.
+
 ```{r president}
-datatable(dt.president_results[,c("query_name","ACGT Nucleotide identity","ACGT Nucleotide identity (ignoring Ns)","ACGT Nucleotide identity (ignoring non-ACGTNs)","qc_all_valid","qc_is_empty_query","qc_post_align_pass_threshold","qc_post_aligned","qc_post_aligned_all_valid","qc_valid_length","qc_valid_nucleotides","qc_valid_pass_nthreshold","acgt_bases","iupac_bases","non_iupac_bases","N_bases","length_query","length_reference","LongestNGap","Matches","Mismatches")], 
+dt.president_results$query_name <-  unlist(lapply(strsplit(dt.president_results$query_name, '_iupac_consensus_unknown_version'), function(e){
+    return(e[1])
+  }))
+dt.president_results <- dt.president_results[,c("query_name","ACGT Nucleotide identity","ACGT Nucleotide identity (ignoring Ns)","ACGT Nucleotide identity (ignoring non-ACGTNs)","qc_all_valid","qc_is_empty_query","qc_post_align_pass_threshold","qc_post_aligned","qc_post_aligned_all_valid","qc_valid_length","qc_valid_nucleotides","qc_valid_pass_nthreshold","acgt_bases","iupac_bases","non_iupac_bases","N_bases","length_query","length_reference","LongestNGap","Matches","Mismatches")]
+datatable(dt.president_results, 
       rownames = FALSE,
-      caption = "Quality statistics by [PRESIDENT](https://gitlab.com/RKIBioinformaticsPipelines/president) (PaiRwisE Sequence IDENtiTy) with identity of ACGT bases of 90% and maximal 5% Ns in the query/sample compared to the reference genome.",
-      options = list(scrollX = TRUE, order = list(list(0, 'asc'))),
+      caption = "Quality statistics by PRESIDENT.",
+      options = list(scrollX = TRUE, order = list(list(0, 'asc')), columnDefs = list(list(targets="_all", render = JS("function(data, type, row, meta) {return data === null ? 'NA' : data;}")))),
       escape = FALSE)
 ```
 
@@ -440,10 +447,13 @@ Covpipe runs a preliminary lineage assignment with Pangolin (https://github.com/
 Note that there are several lineage assignment schemes that need to get run in separate analyses steps.
 
 ```{r lineage_assignment}
+dt.pangolin_results$taxon <-  unlist(lapply(strsplit(dt.pangolin_results$taxon, '_iupac_consensus_unknown_version'), function(e){
+    return(e[1])
+  }))
 datatable(dt.pangolin_results, 
       rownames = FALSE,
       caption = "Preliminary lineage assignment using Pangolin.",
-      options = list(scrollX = TRUE, order = list(list(0, 'asc'))),
+      options = list(scrollX = TRUE, order = list(list(0, 'asc')),columnDefs = list(list(targets="_all", render = JS("function(data, type, row, meta) {return data === null ? 'NA' : data;}")))),
       escape = FALSE)
 ```
 
@@ -455,7 +465,7 @@ Covpipe examines variation sites of interest.
 if (params$vois_results != 'none') {
   datatable(dt.vois_results[,!grepl("key",names(dt.voi))], 
         rownames = FALSE,
-        caption = paste0("Variation sites of interest and their occurrence in the input samples. Low coverage is below ", toString(params$cns_min_cov), ". If a variant is found with an other ALT in the sample,this variation is stated."),
+        caption = paste0("Variation sites of interest and their occurrence in the input samples. Low coverage is below ", toString(params$cns_min_cov), ". If a variant is found with an other ALT in the sample, this variation is stated."),
         escape = FALSE)
 } else {
   print("No variants of interest.")
