@@ -69,7 +69,7 @@ We recommend to use a of the pipeline:
 nextflow pull RKIBioinformaticsPipelines/covpipenext -hub gitlab -r <RELEASE>
 ```
 
-## Help message
+## Manual aka help message
 
 <details><summary>click here to see the complete help message</summary>
 
@@ -173,6 +173,20 @@ nextflow pull RKIBioinformaticsPipelines/covpipenext -hub gitlab -r <RELEASE>
 ```
 
 </details>
+
+### Example sample sheet
+
+`CoVpipeNext` accepts a samplesheet in `CSV` format as input and should look like this:
+
+```
+sample,fastq_1,fastq_2
+sample1,/path/to/reads/id1_1.fastq.gz,/path/to/reads/id1_2.fastq.gz
+sample2,/path/to/reads/id2_1.fastq.gz,/path/to/reads/id2_2.fastq.gz
+sample3,/path/to/reads/id3_1.fastq.gz,/path/to/reads/id3_2.fastq.gz
+sample4,/path/to/reads/id4_1.fastq.gz,/path/to/reads/id4_2.fastq.gz
+```
+
+The header is required. Pay attention the set unique sample names!
 
 ## Workflow
 
