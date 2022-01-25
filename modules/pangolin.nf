@@ -5,14 +5,15 @@ process pangolin {
     
     input:
     tuple val(name), path(fasta)
-    val(pangolin_version)
 
     output:
-    tuple val(name), path("${name}_lineage_report.csv")
+    tuple val(name), path("${name}_lineage_report.csv"), emit: report
+    env(pangolin_version), emit: version
 
     script:
     """
     pangolin --outfile ${name}_lineage_report.csv --tempdir . --threads ${task.cpus} ${fasta}
+    pangolin_version=\$(pangolin --version)
     """
 }
 
@@ -23,12 +24,8 @@ process update_pangolin {
     cpus 1
     cache false
 
-    output:
-    env(pangolin_version)
-
     script:
     """
     conda update pangolin
-    pangolin_version=\$(pangolin --version)
     """
 }
