@@ -152,7 +152,7 @@ workflow {
 
     // 3: taxonomic read classification [optional]
     if (params.kraken) {
-        classify_reads(reads_qc_ch)
+        classify_reads(reads_qc_ch, download_kraken_db())
         kraken_reports = classify_reads.out.report
     } else {
         kraken_reports = Channel.empty()
