@@ -67,7 +67,7 @@ if ( params.reference ) {
     }
 } else {
     if ( params.ref_genome ) {
-        reference_file = file( params.ref_genome, checkIfExists: true )
+        ref_genome_file = file( params.ref_genome, checkIfExists: true )
     }
     if ( params.ref_annotation ) {
         ref_annotation_file = file( params.ref_annotation, checkIfExists: true )
