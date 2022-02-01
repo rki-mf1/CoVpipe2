@@ -96,7 +96,20 @@ if (params.mode == 'paired') {
 adapter_file = params.adapter ? file(params.adapter, checkIfExists: true) : file('NO_ADAPTERS')
 
 // load primers [optional]
-if( params.primer ){ primer_file = file(params.primer, checkIfExists: true) }
+if( params.primer ){ 
+    primer_file = file(params.primer, checkIfExists: true)
+
+    // check if fasta header matches with primer chrom
+    // if not exit, because it does not do what the user expects
+    // will fail for multi fastas!
+    primer_file.withReader { line = it.readLine() } // read only first line
+    primer_id = line.split()[0] // extract id
+
+    ref_genome_file.withReader { line = it.readLine() }  // read only first line
+    ref_id = line.split()[0].replaceAll("^>", "") // extract id
+
+    assert ref_id == primer_id: "Faster header ($ref_id) and primer chrom ($primer_id) don't match. Provide a matching primer BEDPE file or don't set --primer"
+}
 
 // load vois [optional]
 if( params.vois ){ vois_file = file(params.vois, checkIfExists: true) }
