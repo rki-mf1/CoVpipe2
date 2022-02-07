@@ -1,7 +1,7 @@
 process freebayes {
     label 'freebayes' 
 
-    publishDir "${params.output}/${params.variant_calling_dir}/${name}/", mode: params.publish_dir_mode
+    // publishDir "${params.output}/${params.variant_calling_dir}/${name}/", mode: params.publish_dir_mode
 
     input:
     path(reference_fasta)
