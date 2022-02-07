@@ -23,6 +23,12 @@ params:
   pipeline_version: "none"
 ---
 
+<style type="text/css">
+.main-container {
+max-width: 75%;
+}
+</style>
+
 <style>
   .superwideimage{
       overflow-x:scroll;
@@ -57,7 +63,6 @@ params:
     }
 </style>
 
-</style>
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE, error = FALSE)
