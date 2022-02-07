@@ -1,7 +1,8 @@
 process nextclade {
     label 'nextclade'
 
-    // publishDir "${params.output}/${params.lineagedir}/${name}/", mode: 'copy', pattern: "${name}_clade.tsv"
+    publishDir "${params.output}/${params.variant_calling_dir}/${name}/", mode: params.publish_dir_mode
+
     input:
     tuple val(name), path(consensus)
     val(nextclade_version)
