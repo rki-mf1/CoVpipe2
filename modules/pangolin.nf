@@ -18,7 +18,7 @@ process pangolin {
 }
 
 process update_pangolin {
-    // execute this loccaly - would most likely fail on custer systems
+    // execute this locally - would most likely fail on custer systems
     label 'pangolin'
     executor 'local'
     cpus 1
