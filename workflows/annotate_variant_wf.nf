@@ -1,10 +1,12 @@
 include { snpeff }         from '../modules/snpeff'
+include { nextclade; update_nextclade }      from '../modules/nextclade'
 include { bgzip_compress } from '../modules/utils'         addParams ( publish_dir: "${params.output}/${params.variant_calling_dir}/" )
 include { index_vcf }      from '../modules/bcftools'      addParams ( publish_dir: "${params.output}/${params.variant_calling_dir}/" )
 
 workflow annotate_variant {    
     take:
         vcf
+        consensus
         reference
 
     main:
@@ -12,6 +14,14 @@ workflow annotate_variant {
 
         bgzip_compress(snpeff.out.vcf) \
             | index_vcf
+
+        if (params.update_nextclade) {
+            update_nextclade()
+            version = update_nextclade.out
+        } else {
+            version = ''
+        }
+        nextclade(consensus, version)
 
     emit:
         html = snpeff.out.html

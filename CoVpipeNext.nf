@@ -6,7 +6,7 @@ nextflow.enable.dsl=2
 if (params.help) { exit 0, helpMSG() }
 
 // parameter sanity check
-Set valid_params = ['cores', 'max_cores', 'memory', 'help', 'profile', 'workdir', 'fastq', 'list', 'mode', 'run_id', 'reference', 'ref_genome', 'ref_annotation', 'adapter', 'fastp_additional_parameters', 'kraken', 'taxid', 'primer', 'vcount', 'frac', 'cov', 'vois', 'var_mqm', 'var_sap', 'var_qual', 'cns_min_cov', 'cns_gt_adjust', 'update_pangolin', 'output', 'genome_dir', 'read_dir', 'mapping_dir', 'variant_calling_dir', 'consensus_dir', 'linage_dir', 'report_dir', 'runinfo_dir', 'singularity_cache_dir', 'conda_cache_dir', 'databases', 'publish_dir_mode', 'cloudProcess', 'cloud-process']
+Set valid_params = ['cores', 'max_cores', 'memory', 'help', 'profile', 'workdir', 'fastq', 'list', 'mode', 'run_id', 'reference', 'ref_genome', 'ref_annotation', 'adapter', 'fastp_additional_parameters', 'kraken', 'taxid', 'primer', 'vcount', 'frac', 'cov', 'vois', 'var_mqm', 'var_sap', 'var_qual', 'cns_min_cov', 'cns_gt_adjust', 'update_pangolin', 'update_nextclade', 'output', 'genome_dir', 'read_dir', 'mapping_dir', 'variant_calling_dir', 'consensus_dir', 'linage_dir', 'report_dir', 'runinfo_dir', 'singularity_cache_dir', 'conda_cache_dir', 'databases', 'publish_dir_mode', 'cloudProcess', 'cloud-process']
 def parameter_diff = params.keySet() - valid_params
 if (parameter_diff.size() != 0){
     exit 1, "ERROR: Parameter(s) $parameter_diff is/are not valid in the pipeline!\n"
@@ -189,9 +189,8 @@ workflow {
     }
     mapping_ch = params.primer ? clip_primer.out : mapping.out.bam_bai
 
-    // 6: variant calling and annotation
+    // 6: variant calling
     variant_calling(reference_ch, reference_preprocessing.out.fai, mapping_ch)
-    annotate_variant(variant_calling.out.vcf, reference_ch)
 
     // 7: generate consensus
     generate_consensus(variant_calling.out.vcf, reference_ch, mapping_ch.map{ it[0,1]})
@@ -201,7 +200,10 @@ workflow {
         annotate_consensus(generate_consensus.out.consensus_ambiguous, reference_ch, ref_annotation_file)
     }
 
-    // 9: compare with variants of interest [optional]
+    // 9: annotate mutations
+    annotate_variant(variant_calling.out.vcf, generate_consensus.out.consensus_ambiguous, reference_ch)
+
+    // 10: compare with variants/mutations of interest [optional]
     if ( params.vois ) {
         inspect_vois(vois_file, variant_calling.out.vcf_csi, generate_consensus.out.low_coverage_bed)
         vois = inspect_vois.out
@@ -209,11 +211,11 @@ workflow {
         vois = Channel.empty()
     }
 
-    // 10: linage assignment, genome quality
+    // 11: linage assignment, genome quality
     assign_linages(generate_consensus.out.consensus_ambiguous)
     genome_quality(generate_consensus.out.consensus_ambiguous, reference_ch)
 
-    // 11: report
+    // 12: report
     summary_report(generate_consensus.out.consensus_ambiguous, read_qc.out.fastp_json, kraken_reports.ifEmpty([]), mapping.out.flagstat, mapping.out.flagstat_csv, mapping.out.fragment_size, mapping.out.coverage, genome_quality.out, assign_linages.out.report, assign_linages.out.version, vois.ifEmpty([]) )
     
 }
@@ -296,7 +298,10 @@ def helpMSG() {
                                  To turn genotype adjustment off, set the value to 0. [default: $params.cns_gt_adjust]
 
     ${c_yellow}Linage assignment:${c_reset}
-    --update_pangolin        Update pangolin environment to get the latest version that is available from bioconda.
+    --update_pangolin        Update pangolin environment to get the latest version that is available from bioconda. [default: $params.update_pangolin]
+
+    ${c_yellow}Mutation calling:${c_reset}
+    --update_nextclade       Update nextclade environment to get the latest version that is available from bioconda. [default: $params.update_nextclade]
 
     ${c_yellow}Computing options:${c_reset}
     --cores                  Max cores per process for local use [default: $params.cores]

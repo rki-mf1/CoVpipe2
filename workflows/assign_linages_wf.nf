@@ -6,8 +6,11 @@ workflow assign_linages {
     main:
         if (params.update_pangolin) {
             update_pangolin()
+            version = update_pangolin.out
+        } else {
+            version = ''
         }
-        pangolin(fasta)
+        pangolin(fasta, version)
     emit:
         report = pangolin.out.report
         version = pangolin.out.version
