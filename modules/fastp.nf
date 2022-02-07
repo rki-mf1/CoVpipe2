@@ -28,4 +28,8 @@ process fastp {
         --thread ${task.cpus} \
         ${params.fastp_additional_parameters}
     """
+    stub:
+    """
+    touch ${name}.R{1,2}.fastq.gz ${name}.fastp.json ${name}.fastp.html
+    """
 }
