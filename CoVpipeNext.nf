@@ -112,7 +112,15 @@ if( params.primer ){
 }
 
 // load vois [optional]
-if( params.vois ){ vois_file = file(params.vois, checkIfExists: true) }
+if( params.vois ){ 
+    vois_file = file(params.vois, checkIfExists: true) 
+
+    primer_file.withReader { line = it.readLine() } // read only first line
+    primer_id = line.split()[0] // extract id
+
+    voi_id=vois_file.withReader {  r-> r.eachLine {it} }.split()[0]
+    assert ref_id == voi_id: "Faster header ($ref_id) and VOI VCF file chrom ($voi_id) don't match. Provide a matching VCF file or don't set --vois"
+}
 
 /************************** 
 * MODULES
