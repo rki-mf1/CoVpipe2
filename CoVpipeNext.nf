@@ -298,7 +298,10 @@ def helpMSG() {
                                  To turn genotype adjustment off, set the value to 0. [default: $params.cns_gt_adjust]
 
     ${c_yellow}Linage assignment:${c_reset}
-    --update_pangolin        Update pangolin environment to get the latest version that is available from bioconda.
+    --update_pangolin        Update pangolin environment to get the latest version that is available from bioconda. [default: $params.update_pangolin]
+
+    ${c_yellow}Mutation calling:${c_reset}
+    --update_nextclade       Update nextclade environment to get the latest version that is available from bioconda. [default: $params.update_nextclade]
 
     ${c_yellow}Computing options:${c_reset}
     --cores                  Max cores per process for local use [default: $params.cores]

@@ -139,7 +139,10 @@ nextflow pull RKIBioinformaticsPipelines/covpipenext -hub gitlab -r <RELEASE>
                                  To turn genotype adjustment off, set the value to 0. [default: 0.9]
 
     Linage assignment:
-    --update_pangolin        Update pangolin environment to get the latest version that is available from bioconda.
+    --update_pangolin        Update pangolin environment to get the latest version that is available from bioconda. [default: false]
+
+    Mutation calling:
+    --update_nextclade       Update nextclade environment to get the latest version that is available from bioconda. [default: false]
 
     Computing options:
     --cores                  Max cores per process for local use [default: 4]
