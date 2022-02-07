@@ -189,9 +189,8 @@ workflow {
     }
     mapping_ch = params.primer ? clip_primer.out : mapping.out.bam_bai
 
-    // 6: variant calling and annotation
+    // 6: variant calling
     variant_calling(reference_ch, reference_preprocessing.out.fai, mapping_ch)
-    annotate_variant(variant_calling.out.vcf, reference_ch)
 
     // 7: generate consensus
     generate_consensus(variant_calling.out.vcf, reference_ch, mapping_ch.map{ it[0,1]})
@@ -201,7 +200,10 @@ workflow {
         annotate_consensus(generate_consensus.out.consensus_ambiguous, reference_ch, ref_annotation_file)
     }
 
-    // 9: compare with variants of interest [optional]
+    // 9: annotate mutations
+    annotate_variant(variant_calling.out.vcf, generate_consensus.out.consensus_ambiguous, reference_ch)
+
+    // 10: compare with variants/mutations of interest [optional]
     if ( params.vois ) {
         inspect_vois(vois_file, variant_calling.out.vcf_csi, generate_consensus.out.low_coverage_bed)
         vois = inspect_vois.out
@@ -209,11 +211,11 @@ workflow {
         vois = Channel.empty()
     }
 
-    // 10: linage assignment, genome quality
+    // 11: linage assignment, genome quality
     assign_linages(generate_consensus.out.consensus_ambiguous)
     genome_quality(generate_consensus.out.consensus_ambiguous, reference_ch)
 
-    // 11: report
+    // 12: report
     summary_report(generate_consensus.out.consensus_ambiguous, read_qc.out.fastp_json, kraken_reports.ifEmpty([]), mapping.out.flagstat, mapping.out.flagstat_csv, mapping.out.fragment_size, mapping.out.coverage, genome_quality.out, assign_linages.out.report, assign_linages.out.version, vois.ifEmpty([]) )
     
 }
