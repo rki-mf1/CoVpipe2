@@ -20,6 +20,7 @@ cache:
 
 before_script:
   - micromamba install -y -c bioconda -n base nextflow
+  - micromamba install -y -c conda-forge -n base wget
 
 
 stages:          # List of stages for jobs, and their order of execution
