@@ -12,15 +12,17 @@
 # Stages run in sequential order, but jobs within stages run in parallel.
 #
 # For more information, see: https://docs.gitlab.com/ee/ci/yaml/index.html#stages
-image: mambaorg/micromamba:latest
+image: nextflow/nextflow:21.12.1-edge
 
 cache:
   paths:
     - $CI_PROJECT_DIR/.conda_cache
 
 before_script:
-  - micromamba install -y -c conda-forge -n base curl=7.81.0
-  - curl -s https://get.nextflow.io | bash
+  - curl -o Miniconda3-latest-Linux-x86_64.sh https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
+  - bash Miniconda3-latest-Linux-x86_64.sh -b
+  - conda install -y -c conda-forge -n base mamba
+  - mamba install -y -c bioconda -n base nextflow
   
 
 
