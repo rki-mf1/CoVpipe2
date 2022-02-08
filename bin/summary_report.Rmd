@@ -23,6 +23,12 @@ params:
   pipeline_version: "none"
 ---
 
+<style type="text/css">
+.main-container {
+max-width: 75%;
+}
+</style>
+
 <style>
   .superwideimage{
       overflow-x:scroll;
@@ -57,7 +63,6 @@ params:
     }
 </style>
 
-</style>
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE, error = FALSE)
@@ -472,7 +477,7 @@ Covpipe examines variation sites of interest.
 
 ```{r voi_table}
 if (params$vois_results != 'none') {
-  datatable(dt.vois_results[,!grepl("key",names(dt.voi))], 
+  datatable(dt.vois_results, 
         rownames = FALSE,
         caption = paste0("Variation sites of interest and their occurrence in the input samples. Low coverage is below ", toString(params$cns_min_cov), ". If a variant is found with an other ALT in the sample, this variation is stated."),
         escape = FALSE)

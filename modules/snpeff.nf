@@ -1,7 +1,7 @@
 process snpeff {
     label 'snpeff'
 
-    publishDir "${params.output}/${params.variant_calling_dir}/${name}/", mode: params.publish_dir_mode
+    // publishDir "${params.output}/${params.variant_calling_dir}/${name}/", mode: params.publish_dir_mode
 
     input:
         tuple val(name), path(vcf)
@@ -21,5 +21,9 @@ process snpeff {
         -stats ${vcf.baseName}.annotation.html \
         \$genome_name \
         ${vcf} 1> ${vcf.baseName}.annotation.covered.af.vcf
+    """
+    stub:
+    """
+    touch ${vcf.baseName}.annotation.html ${vcf.baseName}.annotation.covered.af.vcf
     """
 }

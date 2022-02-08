@@ -18,4 +18,8 @@ process liftoff {
             -u ${consensus.baseName}_unmapped_features.txt -g ${reference_annotation} \
             ${consensus} ${reference_genome}
     """
+    stub:
+    """
+    touch ${consensus.baseName}.gff ${consensus.baseName}_unmapped_features.txt
+    """
 } 

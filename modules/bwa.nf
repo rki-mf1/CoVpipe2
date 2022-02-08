@@ -11,6 +11,10 @@ process index_bwa {
     """
     bwa index ${reference} &> /dev/null
     """
+    stub:
+    """
+    touch ${reference}.amb ${reference}.ann ${reference}.bwt ${reference}.pac ${reference}.sa
+    """
 }
 
 process bwa {
@@ -33,5 +37,9 @@ process bwa {
         ${reads} | \
         samtools view -Sb -@ ${task.cpus} | \
         samtools sort -@ ${task.cpus} > ${name}.bam
+    """
+    stub:
+    """
+    touch ${name}.bam
     """
 }
