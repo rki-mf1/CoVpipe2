@@ -12,7 +12,7 @@
 # Stages run in sequential order, but jobs within stages run in parallel.
 #
 # For more information, see: https://docs.gitlab.com/ee/ci/yaml/index.html#stages
-image: nextflow/nextflow
+image: nextflow/nextflow:21.10.6
 
 stages:          # List of stages for jobs, and their order of execution
   - build
