@@ -19,7 +19,7 @@ cache:
     - $CI_PROJECT_DIR/.conda_cache
 
 before_script:
-  - micromamba install -y -c bioconda -n base nextflow
+  - micromamba install -y -c bioconda -n base nextflow=21.10.6
   - micromamba install -y -c conda-forge -n base wget
 
 
