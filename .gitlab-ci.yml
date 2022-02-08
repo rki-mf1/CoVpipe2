@@ -19,6 +19,7 @@ cache:
     - $CI_PROJECT_DIR/.conda_cache
 
 before_script:
+  - alias mamba='micromamba'
   - micromamba install -n base -c conda-forge -c bioconda openjdk=8.0.302 nextflow
   
 
