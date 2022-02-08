@@ -15,7 +15,7 @@
 image: continuumio/miniconda3:latest
 
 before_script:
-  - curl -s https://get.nextflow.io | bash
+  - wget -q https://get.nextflow.io | bash
 
 stages:          # List of stages for jobs, and their order of execution
   - build
