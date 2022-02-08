@@ -24,13 +24,13 @@ before_script:
 
 
 stages:          # List of stages for jobs, and their order of execution
-  - build
+  # - build
   - test
 
-build-job-help:       # This job runs in the build stage, which runs first.
-  stage: build
-  script:
-    - nextflow run CoVpipeNext.nf --help
+# build-job-help:       # This job runs in the build stage, which runs first.
+  # stage: build
+  # script:
+    # - nextflow run CoVpipeNext.nf --help
 
 dry-run1:   # This job runs in the test stage.
   stage: test    # It only starts when the job in the build stage completes successfully.
