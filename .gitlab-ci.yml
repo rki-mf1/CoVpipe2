@@ -12,11 +12,14 @@
 # Stages run in sequential order, but jobs within stages run in parallel.
 #
 # For more information, see: https://docs.gitlab.com/ee/ci/yaml/index.html#stages
-image: continuumio/miniconda3:latest
+image: nextflow/nextflow:21.10.6
+
+cache:
+  paths:
+    - $CI_PROJECT_DIR/.conda_cache
 
 before_script:
   - conda install -y -c conda-forge mamba
-  - mamba install -y -n base -c bioconda nextflow
 
 
 stages:          # List of stages for jobs, and their order of execution
@@ -32,4 +35,4 @@ dry-run1:   # This job runs in the test stage.
   stage: test    # It only starts when the job in the build stage completes successfully.
   script:
     - touch fuu_1.fastq fuu_2.fastq
-    - nextflow run CoVpipeNext.nf --fastq fuu_{1,2}.fastq --reference sars-cov2 -stub --cores 2 --max_cores 2
+    - nextflow run CoVpipeNext.nf --fastq fuu_{1,2}.fastq --reference sars-cov2 -stub --cores 2 --max_cores 2 --conda_cache_dir $CI_PROJECT_DIR/.conda_cache
