@@ -19,7 +19,7 @@ cache:
     - $CI_PROJECT_DIR/.conda_cache
 
 before_script:
-  - micromamba create -n base -c conda-forge -c bioconda openjdk=8.0.302 nextflow
+  - micromamba install -n base -c conda-forge -c bioconda openjdk=8.0.302 nextflow
   
 
 
