@@ -20,7 +20,7 @@ cache:
 
 before_script:
   - micromamba install -y -c conda-forge -n base curl=7.81.0
-  - micromamba install -y -c bioconda -c conda-forge -n base nextflow=21.10.6
+  - curl -s https://get.nextflow.io | bash
   
 
 
