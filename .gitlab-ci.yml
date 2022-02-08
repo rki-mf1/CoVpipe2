@@ -19,8 +19,8 @@ cache:
     - $CI_PROJECT_DIR/.conda_cache
 
 before_script:
-  - conda install -y -c conda-forge mamba
-  - mamba install -y -c bioconda nextflow
+  - conda install -y -c conda-forge -n base mamba
+  - mamba install -y -c bioconda -n base nextflow
 
 
 stages:          # List of stages for jobs, and their order of execution
