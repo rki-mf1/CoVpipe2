@@ -41,8 +41,9 @@ process update_pangolin {
     env(pangolin_version)
 
     script:
+    conda_mode = workflow.profile.contains('mamba') ? 'mamba' : 'conda'
     """
-    conda update pangolin
+    ${conda_mode} update pangolin
     pangolin_version=\$(pangolin --version)
     """
     stub:

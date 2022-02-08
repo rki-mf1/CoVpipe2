@@ -325,6 +325,7 @@ def helpMSG() {
     
     ${c_blue}Engines${c_reset} (choose one):
       conda
+      mamba
 
     ${c_dim}Misc:
       cluster                Loads resource configs more suitable for cluster execution.
@@ -347,8 +348,8 @@ def defaultMSG(){
     println "  $workflow.launchDir"
     println "Permanent cache directory:"
     println "  $params.databases"
-    if ( workflow.profile.contains('conda') || workflow.profile.contains('standard') ) { 
-        println "Conda cache directory:"
+    if ( workflow.profile.contains('conda') || workflow.profile.contains('mamba') || workflow.profile.contains('standard') ) { 
+        println "Conda/mamba cache directory:"
         println "  $params.conda_cache_dir"
     }
     println "Configuration files:"
