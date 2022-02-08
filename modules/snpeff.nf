@@ -22,4 +22,8 @@ process snpeff {
         \$genome_name \
         ${vcf} 1> ${vcf.baseName}.annotation.covered.af.vcf
     """
+    stub:
+    """
+    touch ${vcf.baseName}.annotation.html ${vcf.baseName}.annotation.covered.af.vcf
+    """
 }

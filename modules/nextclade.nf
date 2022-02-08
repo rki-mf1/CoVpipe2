@@ -44,4 +44,8 @@ process update_nextclade {
     conda update nextclade
     nextclade_version=\$(nextclade --version)
     """
+    stub:
+    """
+    nextclade_version=42
+    """
 }

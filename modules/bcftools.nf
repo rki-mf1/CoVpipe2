@@ -13,6 +13,10 @@ process index_vcf {
     """
     bcftools index -f ${vcf}
     """
+    stub:
+    """
+    touch "${vcf}.csi"
+    """
 }
 
 process filter_variants_hard {
@@ -31,6 +35,10 @@ process filter_variants_hard {
     bcftools filter -e \
                     "INFO/MQM < ${params.var_mqm} | INFO/SAP > ${params.var_sap} | QUAL < ${params.var_qual}" \
                     -o ${name}.filtered.vcf.gz -O z ${vcf}
+    """
+    stub:
+    """
+    touch ${name}.filtered.vcf.gz
     """
 }
 
@@ -55,6 +63,10 @@ process consensus_ambiguous {
                     -m ${mask_bed} \
                     --sample ${name} \
                     ${vcf}
+    """
+    stub:
+    """
+    touch ${vcf.baseName}.iupac_consensus.tmp
     """
 }
 
@@ -95,5 +107,9 @@ process isec_vois {
     bcftools index -f ${name}.voi_diff_voi.vcf.gz
     
     bcftools isec -c all -n=2 -w1 -o ${name}.voi_diff_sample.vcf ${vars} ${name}.voi_diff_voi.vcf.gz # voi with different ALT in vcf sample file
+    """
+    stub:
+    """
+    touch ${name}.voi_exact.vcf ${name}.voi_not_found.vcf ${name}.voi_low_coverage.vcf ${name}.voi_diff_voi.vcf ${name}.voi_diff_sample.vcf
     """
 }

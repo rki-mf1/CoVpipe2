@@ -82,6 +82,10 @@ process fastp_table {
             file = file.path("read_stats_filter.csv")
         )
     """
+    stub:
+    """
+    touch read_stats.csv read_stats_filter.csv
+    """
 }
 
 process kraken_table {
@@ -147,6 +151,10 @@ process kraken_table {
                 file = file.path("species_filtering.csv")
     )
     """
+    stub:
+    """
+    touch species_filtering.csv
+    """
 }
 
 process flagstat_table {
@@ -186,6 +194,10 @@ process flagstat_table {
 
     #df.output\$input <- f.color_bar("lightgreen")(df.output\$input)
     #df.output\$mapped <- f.color_bar("lightgreen")(df.output\$mapped)
+    """
+    stub:
+    """
+    touch mapping_stats.csv
     """
 }
 
@@ -236,6 +248,10 @@ process fragment_size_table {
             row.names = FALSE, 
             file = file.path("fragment_sizes.csv")
     )
+    """
+    stub:
+    """
+    touch fragment_sizes.csv fragment_sizes_median.csv
     """
 }
 
@@ -296,6 +312,10 @@ process coverage_table {
             row.names = FALSE, 
             file = file.path("coverage_samples.csv"))
     """
+    stub:
+    """
+    touch coverage_table.csv positive_samples.csv negative_samples.csv coverage_samples.csv
+    """
 }
 
 process multiqc_report {
@@ -316,6 +336,10 @@ process multiqc_report {
     script:
     """
     multiqc .
+    """
+    stub:
+    """
+    touch multiqc_report.html
     """
 }
 
@@ -354,5 +378,9 @@ process rmarkdown_report {
     """
     cp -L ${rmd} report.Rmd
     Rscript -e "rmarkdown::render('report.Rmd', params=list(fastp_table_stats='${fastp_table_stats}', fastp_table_stats_filter='${fastp_table_stats_filter}', kraken_table='${kraken_table_optional}', flagstat_table='${flagstat_table}', fragment_size_table='${fragment_size_table}', fragment_size_median_table='${fragment_size_median_table}', coverage_table='${coverage_table}', positive='${positive}', negative='${negative}', sample_cov='${sample_cov}', president_results='${president_results}', pangolin_results='${pangolin_results}', pangolin_version='${pangolin_version}', vois_results='${vois_results_optional}', cns_min_cov='${params.cns_min_cov}', run_id='${run_id}', pipeline_version='${pipeline_version}'), output_file='report.html')"
+    """
+    stub:
+    """
+    touch report.html
     """
 }

@@ -11,6 +11,10 @@ process compress_reads {
   """
   pigz -f -p ${task.cpus} ${reads}
   """
+  stub:
+  """
+  touch fuu.fastq.gz
+  """
 }
 
 process bgzip_compress {
@@ -27,6 +31,10 @@ process bgzip_compress {
   script:
   """
   bgzip -@ ${task.cpus} ${file}
+  """
+  stub:
+  """
+  touch ${file}.gz
   """
 }
 
@@ -46,6 +54,10 @@ process adapt_consensus_header {
       VERSION=${workflow.revision}
     fi
     sed "1 s/.*/>${name}_iupac_consensus_\${VERSION}/" ${fasta} 1> ${name}.iupac_consensus.fasta
+  """
+  stub:
+  """
+  touch ${name}.iupac_consensus.fasta
   """
   }
 
@@ -68,6 +80,10 @@ process mask_iupac {
       echo ">${name}_masked_consensus_\${VERSION}\" 1> ${name}.masked_consensus.fasta 2> ${name}_createMaskedConsensus.log
       tail -n +2 ${fasta} | tr "RYSWKMBDHVN" "N" 1>> ${name}.masked_consensus.fasta 2>> ${name}_createMaskedConsensus.log
     """
+  stub:
+  """
+  touch ${name}.masked_consensus.fasta
+  """
 }
 
 process make_voi_table {
@@ -112,5 +128,9 @@ process make_voi_table {
     dt.voi\$status <- case_when(dt.voi\$key %in% dt.voi_low_cov\$key ~ "low coverage", dt.voi\$key %in% dt.voi_not\$key ~ "not found", dt.voi\$key %in% dt.voi_exact\$key ~ "exact match", dt.voi\$key %in% dt.voi_diff_voi\$key ~ ifelse(is.null(dt.voi_diff_sample[dt.voi_diff_sample\$key2 == dt.voi_diff_voi\$key2]\$ALT), "na", dt.voi_diff_sample[dt.voi_diff_sample\$key2 == dt.voi_diff_voi\$key2]\$ALT))
     dt.voi <- cbind(sample = "${name}", dt.voi)
     write.csv(dt.voi[,!grepl("key",names(dt.voi))], quote = FALSE, row.names = FALSE, "${name}_vois.csv")
+    """
+    stub:
+    """
+    touch ${name}_vois.csv
     """
 }
