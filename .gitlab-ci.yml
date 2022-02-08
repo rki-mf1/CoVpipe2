@@ -19,7 +19,7 @@ cache:
     - $CI_PROJECT_DIR/.conda_cache
 
 before_script:
-  - curl https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
+  - curl https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -o Miniconda3-latest-Linux-x86_64.sh
   - bash Miniconda3-latest-Linux-x86_64.sh
   - conda install -y -c conda-forge mamba
 
