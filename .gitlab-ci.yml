@@ -1,0 +1,33 @@
+# This file is a template, and might need editing before it works on your project.
+# To contribute improvements to CI/CD templates, please follow the Development guide at:
+# https://docs.gitlab.com/ee/development/cicd/templates.html
+# This specific template is located at:
+# https://gitlab.com/gitlab-org/gitlab/-/blob/master/lib/gitlab/ci/templates/Getting-Started.gitlab-ci.yml
+
+# This is a sample GitLab CI/CD configuration file that should run without any modifications.
+# It demonstrates a basic 3 stage CI/CD pipeline. Instead of real tests or scripts,
+# it uses echo commands to simulate the pipeline execution.
+#
+# A pipeline is composed of independent jobs that run scripts, grouped into stages.
+# Stages run in sequential order, but jobs within stages run in parallel.
+#
+# For more information, see: https://docs.gitlab.com/ee/ci/yaml/index.html#stages
+image: continuumio/miniconda3:latest
+
+before_script:
+  - curl -s https://get.nextflow.io | bash
+
+stages:          # List of stages for jobs, and their order of execution
+  - build
+  - test
+
+build-job-help:       # This job runs in the build stage, which runs first.
+  stage: build
+  script:
+    - ./nextflow run CovPipeNext.nf --help
+
+dry-run1:   # This job runs in the test stage.
+  stage: test    # It only starts when the job in the build stage completes successfully.
+  script:
+    - touch fuu_1.fastq fuu_2.fastq
+    - ./nextflow run CovPipeNext.nf --fastq fuu_{1,2}.fastq --reference sars-cov -stub --cores 2 --max_cores 2
