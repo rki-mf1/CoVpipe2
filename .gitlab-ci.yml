@@ -20,7 +20,7 @@ cache:
 
 before_script:
   - conda install -y -c conda-forge mamba
-  - mamba install -y -c conda-forge nextflow
+  - mamba install -y -c bioconda nextflow
 
 
 stages:          # List of stages for jobs, and their order of execution
