@@ -36,4 +36,4 @@ dry-run1:   # This job runs in the test stage.
   stage: test    # It only starts when the job in the build stage completes successfully.
   script:
     - touch fuu_1.fastq fuu_2.fastq
-    - nextflow run CoVpipeNext.nf --fastq fuu_{1,2}.fastq --reference sars-cov2 -stub --cores 2 --max_cores 2 --conda_cache_dir $CI_PROJECT_DIR/.conda_cache
+    - nextflow run CoVpipeNext.nf --fastq fuu_{1,2}.fastq --reference sars-cov2 -stub --cores 2 --max_cores 2 --conda_cache_dir $CI_PROJECT_DIR/.conda_cache -profile local,mamba
