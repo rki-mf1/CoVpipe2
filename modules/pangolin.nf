@@ -23,6 +23,11 @@ process pangolin {
     pangolin --outfile ${name}_lineage_report.csv --tempdir . --threads ${task.cpus} ${fasta}
     used_pangolin_version=\$pangolin_version_curr
     """
+    stub:
+    """
+    touch ${name}_lineage_report.csv
+    used_pangolin_version=42
+    """
 }
 
 process update_pangolin {
@@ -39,5 +44,9 @@ process update_pangolin {
     """
     conda update pangolin
     pangolin_version=\$(pangolin --version)
+    """
+    stub:
+    """
+    pangolin_version=42 
     """
 }

@@ -14,6 +14,10 @@ process index_fasta {
     """
     samtools faidx ${reference}
     """
+    stub:
+    """
+    touch ${reference}.fai
+    """
 }
 
 process index_bam {
@@ -32,6 +36,10 @@ process index_bam {
     """
     samtools index ${bam}
     """
+    stub:
+    """
+    touch ${bam}.bai
+    """
 }
 
 process flagstat {
@@ -49,6 +57,10 @@ process flagstat {
     samtools flagstat ${bam} -@ ${task.cpus} > ${name}.flagstat
     cat ${name}.flagstat | sed -e 's/ + /;/' | sed -e 's/ /;/' 1> ${name}.flagstat.csv
     """
+    stub:
+    """
+    touch ${name}.flagstat ${name}.flagstat.csv
+    """
 }
 
 process get_fragment_size {
@@ -64,5 +76,9 @@ process get_fragment_size {
     """
     echo 0 1> ${name}_fragment_size.tsv
     samtools view -F 4 ${bam} -@ ${task.cpus} | cut -f9 1>> ${name}.fragment_size.tsv
+    """
+    stub:
+    """
+    touch ${name}.fragment_size.tsv
     """
 }

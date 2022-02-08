@@ -16,6 +16,10 @@ process get_genomecov {
     """
     bedtools genomecov -ibam ${bam} -d 1> ${name}.coverage.tsv
     """
+    stub:
+    """
+    touch ${name}.coverage.tsv
+    """
 }
 
 process create_low_coverage_mask {
@@ -32,5 +36,9 @@ process create_low_coverage_mask {
     script:
     """
     bedtools genomecov -bga -ibam ${bam} | awk '\$4 < ${params.cns_min_cov}' | bedtools merge  > ${name}.lowcov.bed
+    """
+    stub:
+    """
+    touch ${name}.lowcov.bed
     """
 }

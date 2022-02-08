@@ -14,4 +14,8 @@ process bamclipper {
     """
     bamclipper.sh -b ${bam} -p ${primer_bed} -n ${task.cpus}
     """
+    stub:
+    """
+    touch ${bam.simpleName}.primerclipped.bam ${bam.simpleName}.primerclipped.bam.bai
+    """
 }

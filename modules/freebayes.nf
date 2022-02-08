@@ -15,4 +15,8 @@ process freebayes {
     """
     freebayes -f ${reference_fasta} --min-alternate-count ${params.vcount} --min-alternate-fraction ${params.frac} --min-coverage ${params.cov} --pooled-continuous --haplotype-length -1 ${bam} | bcftools norm -f ${reference_fasta} -o ${bam.simpleName}.vcf
     """
+    stub:
+    """
+    touch ${bam.simpleName}.vcf
+    """
 }

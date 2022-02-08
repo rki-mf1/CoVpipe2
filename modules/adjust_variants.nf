@@ -13,6 +13,10 @@ process adjust_gt {
     """
     adjust_gt.py --vf ${cns_gt_adjust} --gz ${vcf} -o ${name}.filtered.gt_adjust.vcf
     """
+    stub:
+    """
+    touch ${name}.filtered.gt_adjust.vcf
+    """
 }
 
 process adjust_del {
@@ -28,5 +32,9 @@ process adjust_del {
     script:
     """
     adjust_gt.py --gz ${vcf} -o ${vcf.baseName}.del_adjusted.vcf
+    """
+    stub:
+    """
+    touch ${vcf.baseName}.del_adjusted.vcf
     """
 }

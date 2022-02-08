@@ -14,4 +14,8 @@ process dos2unix {
     dos2unix ${reference}
     mv ${reference} ${reference.simpleName}.prepared.fasta
     """
+    stub:
+    """
+    touch ${reference.simpleName}.prepared.fasta
+    """
 }

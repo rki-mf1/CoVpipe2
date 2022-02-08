@@ -22,6 +22,10 @@ process kraken_db {
     wget https://zenodo.org/record/4534746/files/GRCh38.p13_SC2_2021-02-08.tar.gz?download=1 -O GRCh38.p13_SC2_2021-02-08.tar.gz
     tar zxvf GRCh38.p13_SC2_2021-02-08.tar.gz
     """
+    stub:
+    """
+    touch GRCh38.p13_SC2_2021-02-08
+    """
 }
 
 process kraken {
@@ -50,6 +54,10 @@ process kraken {
         --gzip-compressed \
         ${reads[0]} ${reads[1]}
     """
+    stub:
+    """
+    touch ${name}.classified.R_{1,2}.fastq.gz ${name}.kraken.out.txt ${name}.kraken.report.txt
+    """
 }
 
 process filter_virus_reads {
@@ -70,5 +78,9 @@ process filter_virus_reads {
     set +o pipefail
     zgrep -A3 'kraken:taxid|${params.taxid}' ${reads[0]} | sed -e 's/^--\$//' | sed '/^\\s*\$/d' | gzip 1> ${name}.classified.R1.fastq.gz 2>> ${name}.extract.log
     zgrep -A3 'kraken:taxid|${params.taxid}' ${reads[1]} | sed -e 's/^--\$//' | sed '/^\\s*\$/d' | gzip 1> ${name}.classified.R2.fastq.gz 2>> ${name}.extract.log
+    """
+    stub:
+    """
+    touch ${name}.classified.R{1,2}.fastq.gz ${name}.extract.log
     """
 }
