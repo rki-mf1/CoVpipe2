@@ -40,8 +40,9 @@ process update_nextclade {
     env(nextclade_version)
 
     script:
+    conda_mode = workflow.profile.contains('mamba') ? 'mamba' : 'conda'
     """
-    conda update nextclade
+    ${conda_mode} update nextclade
     nextclade_version=\$(nextclade --version)
     """
     stub:

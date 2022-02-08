@@ -166,6 +166,7 @@ nextflow pull RKIBioinformaticsPipelines/covpipenext -hub gitlab -r <RELEASE>
     
     Engines (choose one):
       conda
+      mamba
 
     Misc:
       cluster                Loads resource configs more suitable for cluster execution.
