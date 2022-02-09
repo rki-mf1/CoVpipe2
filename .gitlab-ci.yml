@@ -14,15 +14,9 @@
 # For more information, see: https://docs.gitlab.com/ee/ci/yaml/index.html#stages
 image: continuumio/miniconda3:latest
 
-cache:
-  paths:
-    - $CI_PROJECT_DIR/.conda_cache
-
 before_script:
   - conda install -n base -c conda-forge mamba
   - mamba install -n base -c conda-forge -c bioconda openjdk=8.0.302 nextflow
-  
-
 
 stages:     # List of stages for jobs, and their order of execution
   - help
@@ -32,9 +26,27 @@ help:       # This job runs in the build stage, which runs first.
   stage: help
   script:
     - nextflow run CoVpipeNext.nf --help
+  variables:
+    CONDA_PKGS_DIRS: "$CI_PROJECT_DIR/.conda-pkgs-cache/"
+  cache:
+    key: conda-cache
+    paths:
+      - $CONDA_PKGS_DIRS/*.conda
+      - $CONDA_PKGS_DIRS/*.tar.bz2
+      - $CONDA_PKGS_DIRS/urls*
+      - $CONDA_PKGS_DIRS/cache
 
 dry-run1:   # This job runs in the test stage.
   stage: test    # It only starts when the job in the build stage completes successfully.
   script:
     - touch reads_1.fastq reads_2.fastq
     - nextflow run CoVpipeNext.nf --fastq reads_{1,2}.fastq --reference sars-cov2 --cores 2 --max_cores 2 -stub -profile stub
+  variables:
+    CONDA_PKGS_DIRS: "$CI_PROJECT_DIR/.conda-pkgs-cache/"
+  cache:
+    key: conda-cache
+    paths:
+      - $CONDA_PKGS_DIRS/*.conda
+      - $CONDA_PKGS_DIRS/*.tar.bz2
+      - $CONDA_PKGS_DIRS/urls*
+      - $CONDA_PKGS_DIRS/cache
