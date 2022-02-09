@@ -2,7 +2,7 @@ process index_fasta {
     label 'samtools'
     label 'smallTask'
 
-    publishDir "${params.output}/${params.genome_dir}", mode: params.publish_dir_mode
+    publishDir "${params.output}/${params.reference_dir}", mode: params.publish_dir_mode
 
     input:
     path(reference)
