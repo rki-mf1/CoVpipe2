@@ -31,10 +31,11 @@ stages:     # List of stages for jobs, and their order of execution
 help:       # This job runs in the build stage, which runs first.
   stage: help
   script:
-    - nextflow run CoVpipeNext.nf --help
+    - ls -lah
+    # - nextflow run CoVpipeNext.nf --help
 
-dry-run1:   # This job runs in the test stage.
-  stage: test    # It only starts when the job in the build stage completes successfully.
-  script:
-    - touch reads_1.fastq reads_2.fastq
-    - nextflow run CoVpipeNext.nf --fastq reads_{1,2}.fastq --reference sars-cov2 --cores 2 --max_cores 2 -stub -profile stub
+# dry-run1:   # This job runs in the test stage.
+#   stage: test    # It only starts when the job in the build stage completes successfully.
+#   script:
+#     - touch reads_1.fastq reads_2.fastq
+#     - nextflow run CoVpipeNext.nf --fastq reads_{1,2}.fastq --reference sars-cov2 --cores 2 --max_cores 2 -stub -profile stub
