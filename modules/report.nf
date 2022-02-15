@@ -318,31 +318,6 @@ process coverage_table {
     """
 }
 
-process multiqc_report {
-    label 'multiqc'
-    label 'smallTask'
-
-    publishDir "${params.output}/${params.report_dir}/", mode: params.publish_dir_mode
-
-    input:
-    path(fastp)
-    path(kraken)
-    path(flagstat)
-    path(pangolin)
-
-    output:
-    path ("multiqc_report.html")
-
-    script:
-    """
-    multiqc .
-    """
-    stub:
-    """
-    touch multiqc_report.html
-    """
-}
-
 process rmarkdown_report {
     // rmarkdown::render does not respect symlinks https://github.com/rstudio/rmarkdown/issues/1508
     label 'r'
