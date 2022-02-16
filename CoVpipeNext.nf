@@ -216,7 +216,7 @@ workflow {
     genome_quality(generate_consensus.out.consensus_ambiguous, reference_ch)
 
     // 12: report
-    summary_report(generate_consensus.out.consensus_ambiguous, read_qc.out.fastp_json, kraken_reports.ifEmpty([]), mapping.out.flagstat, mapping.out.flagstat_csv, mapping.out.fragment_size, mapping.out.coverage, genome_quality.out, assign_linages.out.report, assign_linages.out.version, vois.ifEmpty([]) )
+    summary_report(generate_consensus.out.consensus_ambiguous, read_qc.out.fastp_json, kraken_reports.ifEmpty([]), mapping.out.flagstat, mapping.out.flagstat_csv, mapping.out.fragment_size, mapping.out.coverage, genome_quality.out, assign_linages.out.report, assign_linages.out.version, annotate_variant.out.nextclade, vois.ifEmpty([]) )
     
 }
 

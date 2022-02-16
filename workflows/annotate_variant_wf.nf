@@ -26,4 +26,5 @@ workflow annotate_variant {
     emit:
         html = snpeff.out.html
         vcf = snpeff.out.vcf
+        nextclade = nextclade.out
 }

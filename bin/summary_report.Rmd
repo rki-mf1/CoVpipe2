@@ -17,6 +17,7 @@ params:
   president_results: "none"
   pangolin_results: "none"
   pangolin_version: "none"
+  nextclade_results: "none"
   vois_results: "none"
   cns_min_cov: "none"
   run_id: "none"
@@ -95,6 +96,7 @@ dt.negative <- as.data.table(ldply(params$negative, fread))
 dt.sample_cov <- as.data.table(ldply(params$sample_cov, fread))
 dt.president_results <- as.data.table(ldply(params$president_results, fread, sep='\t'))
 dt.pangolin_results <- as.data.table(ldply(params$pangolin_results, fread))
+dt.nextclade_results <- as.data.table(ldply(params$nextclade_results, fread, sep='\t'))
 if(params$vois_results != 'none'){
   dt.vois_results <- as.data.table(ldply(params$vois_results, fread))
 }
@@ -468,6 +470,20 @@ datatable(dt.pangolin_results[,c("taxon", "lineage", "conflict", "scorpio_call",
       rownames = FALSE,
       caption = "Preliminary lineage assignment using Pangolin.",
       options = list(scrollX = TRUE, order = list(list(0, 'asc')),columnDefs = list(list(targets="_all", render = JS("function(data, type, row, meta) {return data === null ? 'NA' : data;}")))),
+      escape = FALSE)
+```
+
+## Mutations
+
+```{r nextclade}
+# dt.nextclade_results$frameShifts <- ifelse(dt.sample_cov_table$genome.coverage >= 0.95,
+                                    # cell_spec(dt.sample_cov_table$genome.coverage, background = "lightgreen", align = "right"),
+                                    # dt.sample_cov_table$genome.coverage)
+datatable(dt.nextclade_results[,c("seqName", "aaSubstitutions", "aaDeletions", "aaInsertions", "frameShifts")], 
+      colnames = c("sample", "aaSubstitutions", "aaDeletions", "aaInsertions call", "frameShifts"),
+      rownames = FALSE,
+      caption = "Mutation profile",
+      options = list(scrollX = TRUE, order = list(list(0, 'asc'))),
       escape = FALSE)
 ```
 
