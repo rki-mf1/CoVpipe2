@@ -3,4 +3,3 @@ channels:
  - conda-forge
 dependencies:
  - bcftools=1.11
- - perl-vcftools-vcf=0.1.16
