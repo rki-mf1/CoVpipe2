@@ -476,9 +476,6 @@ datatable(dt.pangolin_results[,c("taxon", "lineage", "conflict", "scorpio_call",
 ## Mutations
 
 ```{r nextclade}
-dt.nextclade_results$frameShifts <- ifelse(! is.na(dt.nextclade_results$frameShifts),
-                                    cell_spec(dt.nextclade_results$frameShifts, background = "red", align = "right"),
-                                    dt.nextclade_results$frameShifts)
 dt.nextclade_results$seqName <-  unlist(lapply(strsplit(dt.nextclade_results$seqName, '_iupac_consensus_unknown_version'), function(e){
     return(e[1])
   }))
