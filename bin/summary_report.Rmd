@@ -476,14 +476,17 @@ datatable(dt.pangolin_results[,c("taxon", "lineage", "conflict", "scorpio_call",
 ## Mutations
 
 ```{r nextclade}
-# dt.nextclade_results$frameShifts <- ifelse(dt.sample_cov_table$genome.coverage >= 0.95,
-                                    # cell_spec(dt.sample_cov_table$genome.coverage, background = "lightgreen", align = "right"),
-                                    # dt.sample_cov_table$genome.coverage)
+dt.nextclade_results$frameShifts <- ifelse(! is.na(dt.nextclade_results$frameShifts),
+                                    cell_spec(dt.nextclade_results$frameShifts, background = "red", align = "right"),
+                                    dt.nextclade_results$frameShifts)
+dt.nextclade_results$seqName <-  unlist(lapply(strsplit(dt.nextclade_results$seqName, '_iupac_consensus_unknown_version'), function(e){
+    return(e[1])
+  }))
 datatable(dt.nextclade_results[,c("seqName", "aaSubstitutions", "aaDeletions", "aaInsertions", "frameShifts")], 
       colnames = c("sample", "aaSubstitutions", "aaDeletions", "aaInsertions call", "frameShifts"),
       rownames = FALSE,
       caption = "Mutation profile",
-      options = list(scrollX = TRUE, order = list(list(0, 'asc'))),
+      options = list(scrollX = TRUE, order = list(list(0, 'asc')), autoWidth = FALSE, columnDefs = list(list(targets="_all", render = JS("function(data, type, row, meta) {return data === null ? '-' : data;}")))),
       escape = FALSE)
 ```
 
