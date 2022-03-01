@@ -154,7 +154,7 @@ nextflow pull RKIBioinformaticsPipelines/covpipenext -hub gitlab -r <RELEASE>
     --databases                Location for auto-download data like databases [default: nextflow-autodownload-databases]
     --conda_cache_dir          Location for storing the conda environments [default: conda]
     --singularity_cache_dir    Location for storing the singularity images [default: singularity]
-    --publish_dir_mode       Mode of output publishing: 'copy', 'symlink' [default: copy]
+    --publish_dir_mode         Mode of output publishing: 'copy', 'symlink' [default: copy]
 
     
     Execution/Engine profiles:
@@ -167,6 +167,8 @@ nextflow pull RKIBioinformaticsPipelines/covpipenext -hub gitlab -r <RELEASE>
     Engines (choose one):
       conda
       mamba
+      docker
+      singularity
 
     Misc:
       cluster                Loads resource configs more suitable for cluster execution.

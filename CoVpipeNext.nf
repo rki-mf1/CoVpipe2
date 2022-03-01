@@ -313,7 +313,7 @@ def helpMSG() {
     --databases                Location for auto-download data like databases [default: $params.databases]
     --conda_cache_dir          Location for storing the conda environments [default: $params.conda_cache_dir]
     --singularity_cache_dir    Location for storing the singularity images [default: $params.singularity_cache_dir]
-    --publish_dir_mode       Mode of output publishing: 'copy', 'symlink' [default: $params.publish_dir_mode]
+    --publish_dir_mode         Mode of output publishing: 'copy', 'symlink' [default: $params.publish_dir_mode]
 
     
     ${c_yellow}Execution/Engine profiles:${c_reset}
@@ -326,6 +326,8 @@ def helpMSG() {
     ${c_blue}Engines${c_reset} (choose one):
       conda
       mamba
+      docker
+      singularity
 
     ${c_dim}Misc:
       cluster                Loads resource configs more suitable for cluster execution.
