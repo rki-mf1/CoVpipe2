@@ -12,7 +12,11 @@ workflow summary_report {
         president
         pangolin
         pangolin_version
+        scorpio_version
+        scorpio_constellations_version
         nextclade
+        nextclade_version
+        nextclade_dataset_version
         vois_tsv
         
     main:
@@ -35,6 +39,6 @@ workflow summary_report {
         vois_results = vois_tsv.map {it -> it[1]}.collectFile(name: 'vois_results.tsv', skip: 1, keepHeader: true)
 
         template = file("$baseDir/bin/summary_report.Rmd", checkIfExists: true)
-        rmarkdown_report(template, fastp_table.out.stats, fastp_table.out.stats_filter, kraken_table.out.ifEmpty([]), flagstat_table.out, fragment_size_table.out.size, fragment_size_table.out.median, coverage_table.out.coverage_table, coverage_table.out.positive, coverage_table.out.negative, coverage_table.out.sample_cov, president_results, pangolin_results, pangolin_version, nextclade_results, vois_results.ifEmpty([]))
+        rmarkdown_report(template, fastp_table.out.stats, fastp_table.out.stats_filter, kraken_table.out.ifEmpty([]), flagstat_table.out, fragment_size_table.out.size, fragment_size_table.out.median, coverage_table.out.coverage_table, coverage_table.out.positive, coverage_table.out.negative, coverage_table.out.sample_cov, president_results, pangolin_results, pangolin_version, scorpio_version, scorpio_constellations_version, nextclade_results, nextclade_version, nextclade_dataset_version, vois_results.ifEmpty([]))
 
 }

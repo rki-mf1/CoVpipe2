@@ -17,7 +17,11 @@ params:
   president_results: "none"
   pangolin_results: "none"
   pangolin_version: "none"
+  scorpio_version: "none"
+  scorpio_constellations_version: "none"
   nextclade_results: "none"
+  nextclade_version: "none"
+  nextclade_dataset_version: "none"
   vois_results: "none"
   cns_min_cov: "none"
   run_id: "none"
@@ -460,6 +464,7 @@ Versions:
 - `r params$pangolin_version`
 - pangoLEARN: `r dt.pangolin_results$pangoLEARN_version[1]`
 - pango: `r dt.pangolin_results$pango_version[1]`
+- scorpio: `r params$scorpio_version` with constellation `r params$scorpio_constellations_version`
 
 ```{r lineage_assignment}
 dt.pangolin_results$taxon <-  unlist(lapply(strsplit(dt.pangolin_results$taxon, '_iupac_consensus_unknown_version'), function(e){
@@ -474,7 +479,9 @@ datatable(dt.pangolin_results[,c("taxon", "lineage", "conflict", "scorpio_call",
 ```
 
 ## Mutations
+Clade, mutations, deletions, insertions and frameshifts were determined with Nextclade (https://clades.nextstrain.org/).
 
+Versions: nextclade `r params$nextclade_version` with `r params$nextclade_dataset_version`
 ```{r nextclade}
 dt.nextclade_results$seqName <-  unlist(lapply(strsplit(dt.nextclade_results$seqName, '_iupac_consensus_unknown_version'), function(e){
     return(e[1])
