@@ -8,7 +8,9 @@ process nextclade {
     val(nextclade_version)
 
     output:
-    tuple val(name), path("${name}_clade.tsv")
+    tuple val(name), path("${name}_clade.tsv"), emit: results
+    env(used_nextclade_version), emit: version
+    env(used_nextcladedataset_version), emit: dataset_version
 
     script:
     """
@@ -22,10 +24,15 @@ process nextclade {
     nextclade dataset get --name 'sars-cov-2' --output-dir 'data/sars-cov-2'
     nextclade run --input-fasta ${consensus} --input-dataset data/sars-cov-2 --output-tsv tmp.tsv
     cat tmp.tsv | tr -d "\r" > ${name}_clade.tsv
+
+    used_nextclade_version=\$nextclade_version_curr
+    used_nextcladedataset_version=\$(nextclade dataset list --name 'sars-cov-2' | grep 'Tag' | awk '{print \$3}')
     """
     stub:
     """
     touch ${name}_clade.tsv
+    used_nextclade_version=42
+    used_nextcladedataset_version=42
     """
 }
 

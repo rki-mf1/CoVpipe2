@@ -26,4 +26,7 @@ workflow annotate_variant {
     emit:
         html = snpeff.out.html
         vcf = snpeff.out.vcf
+        results = nextclade.out.results
+        nextclade_version = nextclade.out.version
+        nextclade_dataset_version = nextclade.out.dataset_version
 }

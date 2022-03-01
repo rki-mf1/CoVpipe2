@@ -340,6 +340,11 @@ process rmarkdown_report {
     path(president_results)
     path(pangolin_results)
     val(pangolin_version)
+    val(scorpio_version)
+    val(scorpio_constellations_version)
+    path(nextclade_results)
+    val(nextclade_version)
+    val(nextclade_dataset_version)
     path(vois_results)
 
     output:
@@ -352,7 +357,7 @@ process rmarkdown_report {
     pipeline_version = workflow.repository != null ? "$workflow.repository - $workflow.revision [$workflow.commitId]" : 'none'
     """
     cp -L ${rmd} report.Rmd
-    Rscript -e "rmarkdown::render('report.Rmd', params=list(fastp_table_stats='${fastp_table_stats}', fastp_table_stats_filter='${fastp_table_stats_filter}', kraken_table='${kraken_table_optional}', flagstat_table='${flagstat_table}', fragment_size_table='${fragment_size_table}', fragment_size_median_table='${fragment_size_median_table}', coverage_table='${coverage_table}', positive='${positive}', negative='${negative}', sample_cov='${sample_cov}', president_results='${president_results}', pangolin_results='${pangolin_results}', pangolin_version='${pangolin_version}', vois_results='${vois_results_optional}', cns_min_cov='${params.cns_min_cov}', run_id='${run_id}', pipeline_version='${pipeline_version}'), output_file='report.html')"
+    Rscript -e "rmarkdown::render('report.Rmd', params=list(fastp_table_stats='${fastp_table_stats}', fastp_table_stats_filter='${fastp_table_stats_filter}', kraken_table='${kraken_table_optional}', flagstat_table='${flagstat_table}', fragment_size_table='${fragment_size_table}', fragment_size_median_table='${fragment_size_median_table}', coverage_table='${coverage_table}', positive='${positive}', negative='${negative}', sample_cov='${sample_cov}', president_results='${president_results}', pangolin_results='${pangolin_results}', pangolin_version='${pangolin_version}', scorpio_version='${scorpio_version}',  scorpio_constellations_version='${scorpio_constellations_version}', nextclade_results='${nextclade_results}', nextclade_version='${nextclade_version}',  nextclade_dataset_version='${nextclade_dataset_version}', vois_results='${vois_results_optional}', cns_min_cov='${params.cns_min_cov}', run_id='${run_id}', pipeline_version='${pipeline_version}'), output_file='report.html')"
     """
     stub:
     """
