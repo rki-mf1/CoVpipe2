@@ -481,7 +481,7 @@ datatable(dt.pangolin_results[,c("taxon", "lineage", "conflict", "scorpio_call",
 ## Mutations
 Clade, mutations, deletions, insertions and frameshifts were determined with Nextclade (https://clades.nextstrain.org/).
 
-Versions: nextclade `r params$nextclade_version` with `r params$nextclade_dataset_version`
+Versions: nextclade `r params$nextclade_version` with dataset date `r params$nextclade_dataset_version`
 ```{r nextclade}
 dt.nextclade_results$seqName <-  unlist(lapply(strsplit(dt.nextclade_results$seqName, '_iupac_consensus_unknown_version'), function(e){
     return(e[1])
