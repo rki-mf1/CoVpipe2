@@ -10,6 +10,10 @@ process index_hisat2 {
     """
     hisat2-build -p ${task.cpus} ${reference} ${reference.baseName}
     """
+    stub:
+    """
+    touch ${reference.baseName}.1.ht2
+    """
 }
 
 process hisat2 {
@@ -36,4 +40,8 @@ process hisat2 {
     hisat2 --rg-id=ID:${name}_hisat2 --rg=PU:${name}_hisat2 --rg=SM:${name}_hisat2 --rg=PL:ILLUMINA --rg=LB:000 -x ${reference.baseName} -1 ${reads[0]} -2 ${reads[1]} -p ${task.cpus} --new-summary --summary-file ${name}_hisat2_summary.log | samtools view -bS | samtools sort -o ${name}_hisat2.bam -T tmp --threads ${task.cpus}
     """
     } 
+    stub:
+    """
+    touch ${name}_hisat2_summary.log ${name}_hisat2.bam
+    """
 }
