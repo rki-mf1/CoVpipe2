@@ -32,7 +32,7 @@ process bwa {
     script:
     """
     bwa mem -t ${task.cpus} \
-        -R '@RG\\tID:${name}\\tPU:${name}\\tSM:${name}\\tPL:ILLUMINA\\  tLB:000' \
+        -R '@RG\\tID:${name}\\tPU:${name}\\tSM:${name}\\tPL:ILLUMINA\\tLB:000' \
         ${reference} \
         ${reads} | \
         samtools view -Sb -@ ${task.cpus} | \
