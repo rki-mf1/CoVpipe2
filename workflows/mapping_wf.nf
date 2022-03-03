@@ -11,9 +11,6 @@ workflow mapping {
 
         index_bwa(reference_fasta)
         bwa(illumina_reads, index_bwa.out) 
-        // \
-            // | (index_bam & get_genomecov & flagstat & get_fragment_size)
-        // flagstat_output = flagstat.out
 
         index_hisat2(reference_fasta)
         hisat2(illumina_reads, index_hisat2.out)
