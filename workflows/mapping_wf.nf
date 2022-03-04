@@ -1,5 +1,6 @@
 include { index_bwa; bwa } from '../modules/bwa'
 include { index_hisat2; hisat2 } from '../modules/hisat2'
+include { index_bowtie2; bowtie2 } from '../modules/bowtie2'
 include { get_genomecov } from '../modules/bedtools'
 include { index_bam; flagstat; get_fragment_size } from '../modules/samtools'
 
@@ -15,7 +16,10 @@ workflow mapping {
         index_hisat2(reference_fasta)
         hisat2(illumina_reads, index_hisat2.out)
 
-        hisat2.out.bam.concat(bwa.out.bam) \
+        index_bowtie2(reference_fasta)
+        bowtie2(illumina_reads, index_bowtie2.out)
+
+        bwa.out.bam.concat(hisat2.out.bam).concat(bowtie2.out.bam) \
             | (index_bam & get_genomecov & flagstat & get_fragment_size)
         flagstat_output = flagstat.out
     emit:
