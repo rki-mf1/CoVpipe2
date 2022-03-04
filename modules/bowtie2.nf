@@ -6,7 +6,8 @@ process index_bowtie2 {
 
     output:
     tuple path(reference), path("${reference.baseName}*.bt2")
-
+    
+    script:
     """
     bowtie2-build -f ${reference} ${reference.baseName}
     """
