@@ -11,20 +11,20 @@ process kraken_db {
     // label just some environment or container where we are sure that wget and tar are available
     label 'dos2unix'
 
-    if (params.cloudProcess) { publishDir "${params.databases}/kraken", mode: 'copy', pattern: "GRCh38.p13_SC2_2021-02-08" }
+    if (params.cloudProcess) { publishDir "${params.databases}/kraken", mode: 'copy', pattern: "GRCh38.p13_SC2_2022-03-01" }
     else { storeDir "${params.databases}/kraken" }  
 
     output:
-    path("GRCh38.p13_SC2_2021-02-08", type: 'dir')
+    path("GRCh38.p13_SC2_2022-03-01", type: 'dir')
 
     script:
     """
-    wget https://zenodo.org/record/4534746/files/GRCh38.p13_SC2_2021-02-08.tar.gz?download=1 -O GRCh38.p13_SC2_2021-02-08.tar.gz
-    tar zxvf GRCh38.p13_SC2_2021-02-08.tar.gz
+    wget https://zenodo.org/record/6333909/files/GRCh38.p13_SC2_2022-03-01.tar.gz?download=1 -O GRCh38.p13_SC2_2022-03-01.tar.gz
+    tar zxvf GRCh38.p13_SC2_2022-03-01.tar.gz
     """
     stub:
     """
-    touch GRCh38.p13_SC2_2021-02-08
+    touch GRCh38.p13_SC2_2022-03-01
     """
 }
 
