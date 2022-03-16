@@ -160,6 +160,10 @@ include { genome_quality } from './workflows/genome_quality_wf'
 
 include { summary_report } from './workflows/report_wf'
 
+
+include { fastqc } from './modules/fastqc'
+include { multiqc } from './modules/multiqc'
+
 /************************** 
 * MAIN WORKFLOW
 **************************/
@@ -178,7 +182,7 @@ workflow {
     } else {
         kraken_reports = Channel.empty()
     }
-    reads_qc_cl_ch = params.kraken ? classify_reads.out.reads : reads_qc_ch
+    reads_qc_cl_ch = params.kraken ? classify_reads.out.reads.concat(classify_reads.out.un_reads) : reads_qc_ch
 
     // 4: read mapping
     mapping(reads_qc_cl_ch, reference_ch)
@@ -217,7 +221,10 @@ workflow {
 
     // 12: report
     summary_report(generate_consensus.out.consensus_ambiguous, read_qc.out.fastp_json, kraken_reports.ifEmpty([]), mapping.out.flagstat, mapping.out.flagstat_csv, mapping.out.fragment_size, mapping.out.coverage, genome_quality.out, assign_linages.out.report, assign_linages.out.version, assign_linages.out.scorpio_version, assign_linages.out.scorpio_constellations_version, annotate_variant.out.results, annotate_variant.out.nextclade_version, annotate_variant.out.nextclade_dataset_version, vois.ifEmpty([]) )
-    
+
+
+    fastqc(reads_qc_cl_ch)
+    multiqc(fastqc.out.map{ it -> it[1] }.collect(), kraken_reports.map{ it -> it[1] }.collect(), mapping.out.idxstats.map{ it -> it[1] }.collect())
 }
 
 /************************** 

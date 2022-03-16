@@ -42,6 +42,25 @@ process index_bam {
     """
 }
 
+process idxstats {
+    label 'samtools'
+    
+    input:
+    tuple val(name), path(bam)
+
+    output:
+    tuple val(name), path("${name}.idxstats"), emit: idxstats
+
+    script:
+    """
+    samtools idxstats ${bam} -@ ${task.cpus} > ${name}.idxstats
+    """
+    stub:
+    """
+    touch ${name}.idxstats
+    """
+}
+
 process flagstat {
     label 'samtools'
     
