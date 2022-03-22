@@ -7,7 +7,7 @@ workflow annotate_variant {
     take:
         vcf
         consensus
-        reference
+        nextclade_dataset_name
 
     main:
         snpeff(vcf, reference)
@@ -21,12 +21,12 @@ workflow annotate_variant {
         } else {
             version = ''
         }
-        nextclade(consensus, version)
+        nextclade(consensus, nextclade_dataset_name, version)
 
     emit:
         html = snpeff.out.html
         vcf = snpeff.out.vcf
-        results = nextclade.out.results
+        nextclade_results = nextclade.out.results
         nextclade_version = nextclade.out.version
         nextclade_dataset_version = nextclade.out.dataset_version
 }
