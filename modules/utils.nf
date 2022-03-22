@@ -134,3 +134,18 @@ process make_voi_table {
     touch ${name}_vois.csv
     """
 }
+
+process replace_in_file {
+  input:
+  tuple val(name), path(file)
+  val(from)
+  val(to)
+  
+  output:
+  tuple val(name), path("${file}.replaced")
+  
+  script:
+  """
+  sed 's/${from}/${to}/g' ${file} > ${file}.replaced
+  """
+}
