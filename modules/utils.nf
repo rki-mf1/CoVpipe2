@@ -150,6 +150,10 @@ process bed2bedpe {
   """
   primerbed2bedpe.py ${bed} --forward_identifier ${forward} --reverse_identifier ${reverse} -o "${name}.bedpe"
   """
+  stub:
+  """
+  touch "${name}.bedpe"
+  """
 }
 
 process replace_in_file {
@@ -164,5 +168,9 @@ process replace_in_file {
   script:
   """
   sed 's/${from}/${to}/g' ${file} > ${file}.replaced
+  """
+  stub:
+  """
+  touch "${file}.replaced"
   """
 }
