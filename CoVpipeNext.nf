@@ -120,6 +120,8 @@ if( params.primer_bedpe || params.primer_bed || params.primer_version ){
     ref_id = line.split()[0].replaceAll("^>", "") // extract id
 
     assert ref_id == primer_id: "Faster header ($ref_id) and primer chrom ($primer_id) don't match. Provide a matching primer BEDPE file or don't set --primer"
+
+    primer_file_ch = Channel.fromPath(primer_file, checkIfExists: true)
 }
 
 // load vois [optional]
@@ -201,10 +203,10 @@ workflow {
     if (params.primer_version || params.primer_bedpe || params.primer_bed) {
         if( params.primer_version || params.primer_bed ){
             new_basename = params.primer_version ? params.primer_version : primer_file.baseName
-            bed2bedpe(Channel.fromPath(primer_file).map{primer_scheme -> [new_basename, primer_scheme]}, '_LEFT', '_RIGHT')
-            primer_file = bed2bedpe.out
+            bed2bedpe(primer_file_ch.map{primer_scheme -> [new_basename, primer_scheme]}, '_LEFT', '_RIGHT')
+            primer_file_ch = bed2bedpe.out
         }
-        clip_primer(mapping.out.bam_bai, primer_file)
+        clip_primer(mapping.out.bam_bai, primer_file_ch)
     }
     mapping_ch = params.primer_version || params.primer_bedpe || params.primer_bed ? clip_primer.out : mapping.out.bam_bai
 
