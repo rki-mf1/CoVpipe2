@@ -110,9 +110,13 @@ nextflow pull RKIBioinformaticsPipelines/covpipenext -hub gitlab -r <RELEASE>
     --taxid                  Taxonomic ID used together with the kraken2 database for read filtering [default: 2697049]
 
     Primer detection: 
-    --primer                 Provide the path to the primer BEDPE file. [default: false]
+    --primer_bedpe           Provide the path to the primer BEDPE file. [default: false]
                                  TAB-delimited text file containing at least 6 fields, see here:
                                  https://bedtools.readthedocs.io/en/latest/content/general-usage.html#bedpe-format
+    OR
+    --primer_bed             Provide the path to the primer BED file. [default: false]
+    OR
+    --primer_version         Provide a primer version. Currently supported ARTIC versions: V1, V2, V3, V4, V4.1 [default: false]
 
     Variant calling:
     --vcount                 Minimum number of reads at a position to be considered for variant calling. [default: 10]

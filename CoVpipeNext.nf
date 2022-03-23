@@ -272,7 +272,7 @@ def helpMSG() {
     --run_id                 Run ID [default: $params.run_id]
 
     ${c_yellow}Reference:${c_reset}
-    ${c_green}--reference ${c_reset}             Currently supported: 'sars-cov2' (NC_045512)
+    ${c_green}--reference ${c_reset}             Currently supported: 'sars-cov-2' (MN908947.3)
     OR
     ${c_green}--ref_genome ${c_reset}            e.g.: 'ref.fasta'
     ${c_green}--ref_annotation ${c_reset}        e.g.: 'ref.gff'
@@ -290,9 +290,13 @@ def helpMSG() {
     --taxid                  Taxonomic ID used together with the kraken2 database for read filtering [default: $params.taxid]
 
     ${c_yellow}Primer detection: ${c_reset}
-    --primer                 Provide the path to the primer BEDPE file. [default: $params.primer]
+    --primer_bedpe           Provide the path to the primer BEDPE file. [default: $params.primer_bedpe]
                                  ${c_dim}TAB-delimited text file containing at least 6 fields, see here:
                                  https://bedtools.readthedocs.io/en/latest/content/general-usage.html#bedpe-format${c_reset}
+    OR
+    --primer_bed             Provide the path to the primer BED file. [default: $params.primer_bed]
+    OR
+    --primer_version         Provide a primer version. Currently supported ARTIC versions: V1, V2, V3, V4, V4.1 [default: $params.primer_version]
 
     ${c_yellow}Variant calling:${c_reset}
     --vcount                 Minimum number of reads at a position to be considered for variant calling. [default: $params.vcount]
