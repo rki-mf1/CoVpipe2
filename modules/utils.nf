@@ -134,3 +134,43 @@ process make_voi_table {
     touch ${name}_vois.csv
     """
 }
+
+process bed2bedpe {
+  label 'president'
+
+  input:
+  tuple val(name), path(bed)
+  val(forward)
+  val(reverse)
+
+  output:
+  path("${name}.bedpe")
+
+  script:
+  """
+  primerbed2bedpe.py ${bed} --forward_identifier ${forward} --reverse_identifier ${reverse} -o "${name}.bedpe"
+  """
+  stub:
+  """
+  touch "${name}.bedpe"
+  """
+}
+
+process replace_in_file {
+  input:
+  tuple val(name), path(file)
+  val(from)
+  val(to)
+  
+  output:
+  tuple val(name), path("${file}.replaced")
+  
+  script:
+  """
+  sed 's/${from}/${to}/g' ${file} > ${file}.replaced
+  """
+  stub:
+  """
+  touch "${file}.replaced"
+  """
+}

@@ -6,7 +6,7 @@ nextflow.enable.dsl=2
 if (params.help) { exit 0, helpMSG() }
 
 // parameter sanity check
-Set valid_params = ['cores', 'max_cores', 'memory', 'help', 'profile', 'workdir', 'fastq', 'list', 'mode', 'run_id', 'reference', 'ref_genome', 'ref_annotation', 'adapter', 'fastp_additional_parameters', 'kraken', 'taxid', 'primer', 'vcount', 'frac', 'cov', 'vois', 'var_mqm', 'var_sap', 'var_qual', 'cns_min_cov', 'cns_gt_adjust', 'update_pangolin', 'update_nextclade', 'output', 'reference_dir', 'read_dir', 'mapping_dir', 'variant_calling_dir', 'consensus_dir', 'linage_dir', 'report_dir', 'runinfo_dir', 'singularity_cache_dir', 'conda_cache_dir', 'databases', 'publish_dir_mode', 'cloudProcess', 'cloud-process']
+Set valid_params = ['cores', 'max_cores', 'memory', 'help', 'profile', 'workdir', 'fastq', 'list', 'mode', 'run_id', 'reference', 'ref_genome', 'ref_annotation', 'adapter', 'fastp_additional_parameters', 'kraken', 'taxid', 'primer_bed', 'primer_bedpe', 'primer_version', 'vcount', 'frac', 'cov', 'vois', 'var_mqm', 'var_sap', 'var_qual', 'cns_min_cov', 'cns_gt_adjust', 'update_pangolin', 'update_nextclade', 'output', 'reference_dir', 'read_dir', 'mapping_dir', 'variant_calling_dir', 'consensus_dir', 'linage_dir', 'report_dir', 'runinfo_dir', 'singularity_cache_dir', 'conda_cache_dir', 'databases', 'publish_dir_mode', 'cloudProcess', 'cloud-process']
 def parameter_diff = params.keySet() - valid_params
 if (parameter_diff.size() != 0){
     exit 1, "ERROR: Parameter(s) $parameter_diff is/are not valid in the pipeline!\n"
@@ -40,7 +40,7 @@ if ( !params.fastq ) {
     exit 1, "input missing, use [--fastq]"
 }
 
-Set reference = ['sars-cov2'] // can be extended later on
+Set reference = ['sars-cov-2'] // can be extended later on
 if ( !params.reference && !params.ref_genome && !params.ref_annotation ) {
     exit 1, "reference missing, use [--ref_genome] (and [--ref_annotation]) or choose of " + reference + " with [--reference]"
 }
@@ -61,9 +61,9 @@ if (params.kraken && ! params.taxid) {
 
 // load reference
 if ( params.reference ) {
-    if ( params.reference == 'sars-cov2' ) {
-        ref_genome_file = file( workflow.projectDir + '/data/reference_SARS-CoV2/NC_045512.2.fasta' , checkIfExists: true )
-        ref_annotation_file = file( workflow.projectDir + '/data/reference_SARS-CoV2/NC_045512.2.gff3' , checkIfExists: true )
+    if ( params.reference == 'sars-cov-2' ) {
+        ref_genome_file = file( workflow.projectDir + '/data/reference/SARS-CoV-2/MN908947.3.fasta' , checkIfExists: true )
+        ref_annotation_file = file( workflow.projectDir + '/data/reference/SARS-CoV-2/MN908947.3.gff3' , checkIfExists: true )
     }
 } else {
     if ( params.ref_genome ) {
@@ -96,8 +96,19 @@ if (params.mode == 'paired') {
 adapter_file = params.adapter ? file(params.adapter, checkIfExists: true) : file('NO_ADAPTERS')
 
 // load primers [optional]
-if( params.primer ){ 
-    primer_file = file(params.primer, checkIfExists: true)
+list = [params.primer_bedpe, params.primer_bed, params.primer_version]
+assert list.count(false) >= 2: "Choose either one of these tree parameters (--primer_bedpe, --primer_bed, --primer_version) or none of them."
+if( params.primer_bedpe || params.primer_bed || params.primer_version ){
+
+    if( params.primer_bedpe ){
+        primer_file = file(params.primer_bedpe, checkIfExists: true)
+    } else if ( params.primer_bed ){
+        primer_file = file(params.primer_bed, checkIfExists: true)
+    } else if ( params.primer_version ){
+        primer_file = file(workflow.projectDir + "/data/external_primer_schemes/SARS-CoV-2/${params.primer_version}/nCoV-2019.scheme.bed", checkIfExists: true)
+    } else {
+        println "No primer input."
+    }
 
     // check if fasta header matches with primer chrom
     // if not exit, because it does not do what the user expects
@@ -109,6 +120,8 @@ if( params.primer ){
     ref_id = line.split()[0].replaceAll("^>", "") // extract id
 
     assert ref_id == primer_id: "Faster header ($ref_id) and primer chrom ($primer_id) don't match. Provide a matching primer BEDPE file or don't set --primer"
+
+    primer_file_ch = Channel.fromPath(primer_file, checkIfExists: true)
 }
 
 // load vois [optional]
@@ -160,10 +173,13 @@ include { genome_quality } from './workflows/genome_quality_wf'
 
 include { summary_report } from './workflows/report_wf'
 
+include { bed2bedpe } from './modules/utils'
+
 /************************** 
 * MAIN WORKFLOW
 **************************/
 workflow {
+
     // 1: reference preprocessing
     reference_preprocessing(ref_genome_file)
     reference_ch = reference_preprocessing.out.ref
@@ -184,10 +200,15 @@ workflow {
     mapping(reads_qc_cl_ch, reference_ch)
 
     // 5: primer clipping [optional]
-    if (params.primer) {
-        clip_primer(mapping.out.bam_bai, primer_file)
+    if (params.primer_version || params.primer_bedpe || params.primer_bed) {
+        if( params.primer_version || params.primer_bed ){
+            new_basename = params.primer_version ? params.primer_version : primer_file.baseName
+            bed2bedpe(primer_file_ch.map{primer_scheme -> [new_basename, primer_scheme]}, '_LEFT', '_RIGHT')
+            primer_file_ch = bed2bedpe.out
+        }
+        clip_primer(mapping.out.bam_bai, primer_file_ch)
     }
-    mapping_ch = params.primer ? clip_primer.out : mapping.out.bam_bai
+    mapping_ch = params.primer_version || params.primer_bedpe || params.primer_bed ? clip_primer.out : mapping.out.bam_bai
 
     // 6: variant calling
     variant_calling(reference_ch, reference_preprocessing.out.fai, mapping_ch)
@@ -201,7 +222,7 @@ workflow {
     }
 
     // 9: annotate mutations
-    annotate_variant(variant_calling.out.vcf, generate_consensus.out.consensus_ambiguous, reference_ch)
+    annotate_variant(variant_calling.out.vcf, generate_consensus.out.consensus_ambiguous, 'sars-cov-2', 'NC_045512.2')
 
     // 10: compare with variants/mutations of interest [optional]
     if ( params.vois ) {
@@ -216,7 +237,7 @@ workflow {
     genome_quality(generate_consensus.out.consensus_ambiguous, reference_ch)
 
     // 12: report
-    summary_report(generate_consensus.out.consensus_ambiguous, read_qc.out.fastp_json, kraken_reports.ifEmpty([]), mapping.out.flagstat, mapping.out.flagstat_csv, mapping.out.fragment_size, mapping.out.coverage, genome_quality.out, assign_linages.out.report, assign_linages.out.version, assign_linages.out.scorpio_version, assign_linages.out.scorpio_constellations_version, annotate_variant.out.results, annotate_variant.out.nextclade_version, annotate_variant.out.nextclade_dataset_version, vois.ifEmpty([]) )
+    summary_report(generate_consensus.out.consensus_ambiguous, read_qc.out.fastp_json, kraken_reports.ifEmpty([]), mapping.out.flagstat, mapping.out.flagstat_csv, mapping.out.fragment_size, mapping.out.coverage, genome_quality.out, assign_linages.out.report, assign_linages.out.version, assign_linages.out.scorpio_version, assign_linages.out.scorpio_constellations_version, annotate_variant.out.nextclade_results, annotate_variant.out.nextclade_version, annotate_variant.out.nextclade_dataset_version, vois.ifEmpty([]) )
     
 }
 
@@ -251,7 +272,7 @@ def helpMSG() {
     --run_id                 Run ID [default: $params.run_id]
 
     ${c_yellow}Reference:${c_reset}
-    ${c_green}--reference ${c_reset}             Currently supported: 'sars-cov2' (NC_045512)
+    ${c_green}--reference ${c_reset}             Currently supported: 'sars-cov-2' (MN908947.3)
     OR
     ${c_green}--ref_genome ${c_reset}            e.g.: 'ref.fasta'
     ${c_green}--ref_annotation ${c_reset}        e.g.: 'ref.gff'
@@ -269,9 +290,13 @@ def helpMSG() {
     --taxid                  Taxonomic ID used together with the kraken2 database for read filtering [default: $params.taxid]
 
     ${c_yellow}Primer detection: ${c_reset}
-    --primer                 Provide the path to the primer BEDPE file. [default: $params.primer]
+    --primer_bedpe           Provide the path to the primer BEDPE file. [default: $params.primer_bedpe]
                                  ${c_dim}TAB-delimited text file containing at least 6 fields, see here:
                                  https://bedtools.readthedocs.io/en/latest/content/general-usage.html#bedpe-format${c_reset}
+    OR
+    --primer_bed             Provide the path to the primer BED file. [default: $params.primer_bed]
+    OR
+    --primer_version         Provide a primer version. Currently supported ARTIC versions: V1, V2, V3, V4, V4.1 [default: $params.primer_version]
 
     ${c_yellow}Variant calling:${c_reset}
     --vcount                 Minimum number of reads at a position to be considered for variant calling. [default: $params.vcount]

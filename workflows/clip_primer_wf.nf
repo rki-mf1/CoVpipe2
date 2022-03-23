@@ -6,7 +6,7 @@ workflow clip_primer {
         primer_bed
 
     main:
-        bamclipper(bam_bai, primer_bed)
+        bamclipper(bam_bai.combine(primer_bed))
 
     emit:
         bam_bai = bamclipper.out

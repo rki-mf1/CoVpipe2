@@ -40,7 +40,7 @@ dry-run1:   # This job runs in the test stage.
   stage: test    # It only starts when the job in the build stage completes successfully.
   script:
     - touch reads_1.fastq reads_2.fastq
-    - nextflow run CoVpipeNext.nf --fastq reads_{1,2}.fastq --reference sars-cov2 --cores 2 --max_cores 2 -stub -profile stub
+    - nextflow run CoVpipeNext.nf --fastq reads_{1,2}.fastq --reference sars-cov-2 --cores 2 --max_cores 2 -stub -profile stub
   variables:
     CONDA_PKGS_DIRS: "$CI_PROJECT_DIR/.conda-pkgs-cache/"
   cache:
