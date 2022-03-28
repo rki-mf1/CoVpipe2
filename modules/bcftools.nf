@@ -31,9 +31,10 @@ process filter_variants_hard {
     tuple val(name), path("${name}.filtered.vcf.gz")
 
     script:
+    var_sap_filter = params.var_sap == '-1' ? '' : "| INFO/SAP > ${params.var_sap}"
     """
     bcftools filter -e \
-                    "INFO/MQM < ${params.var_mqm} | INFO/SAP > ${params.var_sap} | QUAL < ${params.var_qual}" \
+                    "INFO/MQM < ${params.var_mqm} ${var_sap_filter} | QUAL < ${params.var_qual}" \
                     -o ${name}.filtered.vcf.gz -O z ${vcf}
     """
     stub:
