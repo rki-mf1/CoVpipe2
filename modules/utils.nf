@@ -59,7 +59,7 @@ process adapt_consensus_header {
   """
   }
 
-process replace_questionmark_format_fasta {
+process remove_del_symbol {
   publishDir "${params.output}/${params.consensus_dir}/${name}", mode: params.publish_dir_mode
 
   input:
