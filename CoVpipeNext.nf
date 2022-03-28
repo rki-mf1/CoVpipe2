@@ -259,23 +259,23 @@ def helpMSG() {
     Workflow: CoVpipeNext
 
     ${c_yellow}Usage examples:${c_reset}
-    nextflow run CoVpipeNext.nf --fastq '*R{1,2}.fastq.gz' --reference 'sars-cov2' --cores 4 --max_cores 8
+    nextflow run CoVpipeNext.nf --fastq '*R{1,2}.fastq.gz' --reference 'sars-cov-2' --cores 4 --max_cores 8
     or
-    nextflow run RKIBioinformaticsPipelines/covpipenxt -hub gitlab -r <version> --fastq '*R{1,2}.fastq.gz' --reference ref.fasta --cores 4 --max_cores 8
+    nextflow run RKIBioinformaticsPipelines/covpipenxt -hub gitlab -r <version> --fastq '*R{1,2}.fastq.gz' --ref_genome ref.fasta --cores 4 --max_cores 8
 
     ${c_yellow}Inputs:
     Illumina read data:${c_reset}
     ${c_green}--fastq ${c_reset}                 e.g.: 'sample{1,2}.fastq' or '*.fastq.gz' or '*/*.fastq.gz'
     --list                   This flag activates csv input for the above flags [default: false]
                                  ${c_dim}style and header of the csv is: sample,fastq_1,fastq_2${c_reset}
-    --mode                          Switch between 'paired'- and 'single'-end FASTQ [default: $params.mode]
+    --mode                   Switch between 'paired'- and 'single'-end FASTQ [default: $params.mode]
     --run_id                 Run ID [default: $params.run_id]
 
     ${c_yellow}Reference:${c_reset}
     ${c_green}--reference ${c_reset}             Currently supported: 'sars-cov-2' (MN908947.3)
     OR
-    ${c_green}--ref_genome ${c_reset}            e.g.: 'ref.fasta'
-    ${c_green}--ref_annotation ${c_reset}        e.g.: 'ref.gff'
+    ${c_green}--ref_genome ${c_reset}            Reference FASTA file.
+    ${c_green}--ref_annotation ${c_reset}        Reference GFF file.
 
     ${c_yellow}Adapter clipping:${c_reset}
      --adapter               Define the path of a FASTA file containing the adapter sequences to be clipped. [default: $params.adapter]
@@ -284,9 +284,9 @@ def helpMSG() {
     --fastp_additional_parameters      Additional parameters for FeatureCounts [default: $params.fastp_additional_parameters]
     
     ${c_yellow}Taxonomic read filter:${c_reset}
-    --kraken                 Activate taxonomic read filtering to exclude reads not classified as SARS-COV-2 (NCBI taxonomy ID 2697049) 
-                                 from read mapping. A pre-processed kraken2 database will be automatically downloaded from 
-                                 https://zenodo.org/record/3854856 and stored locally [default: $params.kraken]
+    --kraken                 Activate taxonomic read filtering to exclude reads not classified with specific taxonomic ID (see --taxid) [default: $params.kraken]
+                                 ${c_dim}A pre-processed kraken2 database will be automatically downloaded from 
+                                 https://zenodo.org/record/3854856 and stored locally.${c_reset}
     --taxid                  Taxonomic ID used together with the kraken2 database for read filtering [default: $params.taxid]
 
     ${c_yellow}Primer detection: ${c_reset}
@@ -307,13 +307,13 @@ def helpMSG() {
 
     ${c_yellow}Variant hard filtering:${c_reset}
     --var_mqm                Minimal mean mapping quality of observed alternate alleles (MQM). The mapping quality (MQ) 
-                                measures how good reads align to the respective reference genome region. Good mapping qualities are 
-                                around MQ 60. GATK recommends hard filtering of variants with MQ less than 40. [default: $params.var_mqm]
+                                 measures how good reads align to the respective reference genome region. Good mapping qualities are 
+                                 around MQ 60. GATK recommends hard filtering of variants with MQ less than 40. [default: $params.var_mqm]
     --var_sap                Strand balance probability for the alternate allele (SAP). The SAP is the Phred-scaled 
-                                probability that there is strand bias at the respective site. A value near 0 indicates little or 
-                                no strand bias. Set to -1 to disable the filter. [default: $params.var_sap]
+                                 probability that there is strand bias at the respective site. A value near 0 indicates little or 
+                                 no strand bias. Set to -1 to disable the filter. [default: $params.var_sap]
     --var_qual               Minimal variant call quality. Freebayes produces a general judgement of the 
-                                variant call. [default: $params.var_qual]
+                                 variant call. [default: $params.var_qual]
 
     ${c_yellow}Consensus generation:${c_reset}
     --cns_min_cov            Minimum number of reads required so that the respective position in the consensus sequence 
@@ -323,23 +323,25 @@ def helpMSG() {
                                  To turn genotype adjustment off, set the value to 0. [default: $params.cns_gt_adjust]
 
     ${c_yellow}Linage assignment:${c_reset}
-    --update_pangolin        Update pangolin environment to get the latest version that is available from bioconda. [default: $params.update_pangolin]
+    --update_pangolin        Update pangolin conda environment to get the latest version that is available from bioconda. [default: $params.update_pangolin]
 
     ${c_yellow}Mutation calling:${c_reset}
-    --update_nextclade       Update nextclade environment to get the latest version that is available from bioconda. [default: $params.update_nextclade]
+    --update_nextclade       Update nextclade conda environment to get the latest version that is available from bioconda. [default: $params.update_nextclade]
 
     ${c_yellow}Computing options:${c_reset}
     --cores                  Max cores per process for local use [default: $params.cores]
     --max_cores              Max cores used on the machine for local use [default: $params.max_cores]
     --memory                 Max memory in GB for local use [default: $params.memory]
+
+    ${c_yellow}Output options:${c_reset}
     --output                 Name of the result folder [default: $params.output]
+    --publish_dir_mode       Mode of output publishing: 'copy', 'symlink' [default: $params.publish_dir_mode]
+                                 ${c_dim}With 'symlink' results are lost when removing the work directory.${c_reset}
 
     ${c_yellow}Caching:${c_reset}
-    --databases                Location for auto-download data like databases [default: $params.databases]
-    --conda_cache_dir          Location for storing the conda environments [default: $params.conda_cache_dir]
-    --singularity_cache_dir    Location for storing the singularity images [default: $params.singularity_cache_dir]
-    --publish_dir_mode         Mode of output publishing: 'copy', 'symlink' [default: $params.publish_dir_mode]
-
+    --databases              Location for auto-download data like databases [default: $params.databases]
+    --conda_cache_dir        Location for storing the conda environments [default: $params.conda_cache_dir]
+    --singularity_cache_dir  Location for storing the singularity images [default: $params.singularity_cache_dir]
     
     ${c_yellow}Execution/Engine profiles:${c_reset}
     The pipeline supports profiles to run via different ${c_green}Executers${c_reset} and ${c_blue}Engines${c_reset} e.g.: -profile ${c_green}local${c_reset},${c_blue}conda${c_reset}
