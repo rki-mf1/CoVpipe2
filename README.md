@@ -222,3 +222,8 @@ Workflow overview:
 <sub><sub>Components originally designed by James A. Fellows Yates & nf-core</sub></sub>
 
 </details>
+
+## Acknowledgement, props and inspiration
+
+- [ncov_minipipe aka CoCpipe](https://gitlab.com/RKIBioinformaticsPipelines/ncov_minipipe)
+- [poreCov](https://github.com/replikation/poreCov)
