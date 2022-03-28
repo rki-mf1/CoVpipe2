@@ -218,7 +218,7 @@ workflow {
 
     // 8: annotate consensus [optional]
     if (params.reference || params.ref_annotation) {
-        annotate_consensus(generate_consensus.out.consensus_ambiguous, reference_ch, ref_annotation_file)
+        annotate_consensus(generate_consensus.out.consensus_ambiguous.mix(generate_consensus.out.consensus_masked), reference_ch, ref_annotation_file)
     }
 
     // 9: annotate mutations
@@ -311,7 +311,7 @@ def helpMSG() {
                                 around MQ 60. GATK recommends hard filtering of variants with MQ less than 40. [default: $params.var_mqm]
     --var_sap                Strand balance probability for the alternate allele (SAP). The SAP is the Phred-scaled 
                                 probability that there is strand bias at the respective site. A value near 0 indicates little or 
-                                no strand bias.  [default: $params.var_sap]
+                                no strand bias. Set to -1 to disable the filter. [default: $params.var_sap]
     --var_qual               Minimal variant call quality. Freebayes produces a general judgement of the 
                                 variant call. [default: $params.var_qual]
 
