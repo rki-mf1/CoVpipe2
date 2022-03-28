@@ -57,7 +57,11 @@ nextflow pull RKIBioinformaticsPipelines/covpipenext -hub gitlab -r <RELEASE>
 
 ### Example 1:
 ```bash
-nextflow run RKIBioinformaticsPipelines/covpipenxt -hub gitlab --reference 'sars-cov-2' --fastq my_samples.csv --list --kraken --cores 4 --max_cores 8
+nextflow run RKIBioinformaticsPipelines/covpipenxt -hub gitlab \
+      --reference 'sars-cov-2' \
+      --fastq my_samples.csv --list \
+      --kraken \
+      --cores 4 --max_cores 8
 ```
 - Read input from sample sheet
 - Perform taxonomic classification to remove not SARS-CoV-2 reads
@@ -65,12 +69,17 @@ nextflow run RKIBioinformaticsPipelines/covpipenxt -hub gitlab --reference 'sars
 
 ### Example 2:
 ```bash
-nextflow run RKIBioinformaticsPipelines/covpipenxt -hub gitlab --reference 'sars-cov-2' --fastq '*R{1,2}.fastq.gz' -profile slurm,singularity --primer_version V4.1 --adapter /path/to/repo/data/adapters/NexteraTransposase.fasta
+nextflow run RKIBioinformaticsPipelines/covpipenxt -hub gitlab \
+      --reference 'sars-cov-2' \
+      --fastq '*R{1,2}.fastq.gz' \
+      --adapter /path/to/repo/data/adapters/NexteraTransposase.fasta \
+      --primer_version V4.1 \
+      -profile slurm,singularity
 ```
 
-- Execution on a SLURM system with Singularity
 - Remove adapters
 - Clip primer (ARTIC version V4.1)
+- Execution on a SLURM system with Singularity
 
 ### Example sample sheet
 
@@ -227,3 +236,4 @@ Workflow overview:
 
 - [ncov_minipipe aka CoCpipe](https://gitlab.com/RKIBioinformaticsPipelines/ncov_minipipe)
 - [poreCov](https://github.com/replikation/poreCov)
+- [nf-core](https://nf-co.re/pipelines)
