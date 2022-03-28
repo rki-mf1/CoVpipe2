@@ -22,20 +22,21 @@ process get_genomecov {
     """
 }
 
-process create_low_coverage_mask {
+process create_low_coverage_no_del_mask {
     label 'bedtools'
 
     publishDir "${params.output}/${params.consensus_dir}/${name}", mode: params.publish_dir_mode
 
     input:
-    tuple val(name), file(bam)
+    tuple val(name), path(bam), path(vcf)
 
     output:
-    tuple val(name), file("${name}.lowcov.bed")
+    tuple val(name), path("${name}.lowcov.bed")
 
     script:
     """
-    bedtools genomecov -bga -ibam ${bam} | awk '\$4 < ${params.cns_min_cov}' | bedtools merge  > ${name}.lowcov.bed
+    bedtools genomecov -bga -ibam ${bam} | awk '\$4 < ${params.cns_min_cov}' | bedtools merge > ${name}.lowcov.bed.tmp
+    bedtools intersect -v -a ${name}.lowcov.bed.tmp -b ${vcf} > ${name}.lowcov.bed
     """
     stub:
     """
