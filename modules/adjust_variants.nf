@@ -31,7 +31,7 @@ process adjust_del {
 
     script:
     """
-    adjust_gt.py --gz ${vcf} -o ${vcf.baseName}.del_adjusted.vcf
+    adjust_del.py --gz ${vcf} -o ${vcf.baseName}.del_adjusted.vcf
     """
     stub:
     """

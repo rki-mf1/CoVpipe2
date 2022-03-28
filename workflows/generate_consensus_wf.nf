@@ -1,4 +1,4 @@
-include { bgzip_compress as bgzip_compress_1; bgzip_compress as bgzip_compress_2; bgzip_compress as bgzip_compress_3; adapt_consensus_header; mask_iupac as consensus_masked } from '../modules/utils' addParams ( publish_dir: "${params.output}/${params.consensus_dir}/" )
+include { bgzip_compress as bgzip_compress_1; bgzip_compress as bgzip_compress_2; bgzip_compress as bgzip_compress_3; adapt_consensus_header; replace_questionmark_format_fasta; mask_iupac as consensus_masked } from '../modules/utils' addParams ( publish_dir: "${params.output}/${params.consensus_dir}/" )
 include { filter_variants_hard; consensus_ambiguous; index_vcf } from '../modules/bcftools' addParams ( publish_dir: "${params.output}/${params.consensus_dir}/" )
 include { adjust_gt; adjust_del } from '../modules/adjust_variants'
 include { create_low_coverage_mask } from '../modules/bedtools' addParams ( publish_dir: "${params.output}/${params.consensus_dir}/" )
@@ -26,11 +26,12 @@ workflow generate_consensus{
         
         consensus_ambiguous(del_adjusted_vcf.join(create_low_coverage_mask(bam)), reference) \
             | adapt_consensus_header \
+            | replace_questionmark_format_fasta \
             | consensus_masked
 
     emit:
         hard_filtered_variants = filter_variants_hard.out
-        consensus_ambiguous = adapt_consensus_header.out
+        consensus_ambiguous = replace_questionmark_format_fasta.out
         consensus_masked = consensus_masked.out
         low_coverage_bed = create_low_coverage_mask.out
 }
