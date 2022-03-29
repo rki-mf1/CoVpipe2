@@ -1,11 +1,11 @@
 process snpeff {
     label 'snpeff'
 
-    // publishDir "${params.output}/${params.variant_calling_dir}/${name}/", mode: params.publish_dir_mode
+    publishDir "${params.output}/${params.variant_calling_dir}/${name}/", mode: params.publish_dir_mode, pattern: "*.html"
 
     input:
         tuple val(name), path(vcf)
-        path(reference)
+        val(dataset_id)
 
     output:
         tuple val(name), path("${vcf.baseName}.annotation.html"), emit: html
@@ -13,13 +13,10 @@ process snpeff {
 
     script:
     """
-    # get genome name   
-    genome_name=\$(head -n1 ${reference} | cut -f1 -d' ' | sed 's/>//')
-
     snpEff ann \
         -noLog \
         -stats ${vcf.baseName}.annotation.html \
-        \$genome_name \
+        ${dataset_id} \
         ${vcf} 1> ${vcf.baseName}.annotation.covered.af.vcf
     """
     stub:

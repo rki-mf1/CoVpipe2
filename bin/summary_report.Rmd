@@ -190,6 +190,27 @@ if (nrow(dt.sample_cov_negative) > 0) {
 }
 ```
 
+## Genome quality
+
+Quality statistics by [PRESIDENT](https://gitlab.com/RKIBioinformaticsPipelines/president) (PaiRwisE Sequence IDENtiTy) with identity of ACGT bases of 90% and maximal 5% Ns in the query/sample compared to the reference genome (see RKI genome submission requirements: [PDF](https://www.rki.de/DE/Content/InfAZ/N/Neuartiges_Coronavirus/DESH/Qualitaetskriterien.pdf?__blob=publicationFile) in German).
+
+```{r president}
+dt.president_results$query_name <-  unlist(lapply(strsplit(dt.president_results$query_name, '_iupac_consensus_unknown_version'), function(e){
+    return(e[1])
+  }))
+# dt.president_results <- dt.president_results[,c("query_name","ACGT Nucleotide identity","ACGT Nucleotide identity (ignoring Ns)","ACGT Nucleotide identity (ignoring non-ACGTNs)","qc_all_valid","qc_is_empty_query","qc_post_align_pass_threshold","qc_post_aligned","qc_post_aligned_all_valid","qc_valid_length","qc_valid_nucleotides","qc_valid_pass_nthreshold","acgt_bases","iupac_bases","non_iupac_bases","N_bases","length_query","length_reference","LongestNGap","Matches","Mismatches")]
+dt.president_results <- dt.president_results[,c("query_name", "qc_all_valid", "ACGT Nucleotide identity", "N_bases", "Mismatches")]
+dt.president_results$qc_all_valid <- ifelse(dt.president_results$qc_all_valid == TRUE,
+                                    cell_spec('PASS', background = "lightgreen", align = "right"),
+                                    cell_spec('FAIL', background = "red", align = "right"))
+datatable(dt.president_results, 
+      colnames = c("sample", "QC status", "ACGT Nucleotide identity", "#N", "Mismatches"),
+      rownames = FALSE,
+      caption = "Quality statistics by PRESIDENT.",
+      options = list(scrollX = TRUE, order = list(list(0, 'asc')), columnDefs = list(list(targets="_all", render = JS("function(data, type, row, meta) {return data === null ? 'NA' : data;}")))),
+      escape = FALSE)
+```
+
 ## Trimming statistics
 
 Trimming and clipping is performed using fastp.
@@ -437,24 +458,6 @@ datatable(dt.sample_cov_table[,c("sample", "covered.bases", "genome.coverage", "
 rm(dt.sample_cov_table)
 ```
 
-## Genome quality
-
-Quality statistics by [PRESIDENT](https://gitlab.com/RKIBioinformaticsPipelines/president) (PaiRwisE Sequence IDENtiTy) with identity of ACGT bases of 90% and maximal 5% Ns in the query/sample compared to the reference genome.
-
-```{r president}
-dt.president_results$query_name <-  unlist(lapply(strsplit(dt.president_results$query_name, '_iupac_consensus_unknown_version'), function(e){
-    return(e[1])
-  }))
-# dt.president_results <- dt.president_results[,c("query_name","ACGT Nucleotide identity","ACGT Nucleotide identity (ignoring Ns)","ACGT Nucleotide identity (ignoring non-ACGTNs)","qc_all_valid","qc_is_empty_query","qc_post_align_pass_threshold","qc_post_aligned","qc_post_aligned_all_valid","qc_valid_length","qc_valid_nucleotides","qc_valid_pass_nthreshold","acgt_bases","iupac_bases","non_iupac_bases","N_bases","length_query","length_reference","LongestNGap","Matches","Mismatches")]
-dt.president_results <- dt.president_results[,c("query_name", "ACGT Nucleotide identity", "N_bases", "Mismatches")]
-datatable(dt.president_results, 
-      colnames = c("sample", "ACGT Nucleotide identity", "#N", "Mismatches"),
-      rownames = FALSE,
-      caption = "Quality statistics by PRESIDENT.",
-      options = list(scrollX = TRUE, order = list(list(0, 'asc')), columnDefs = list(list(targets="_all", render = JS("function(data, type, row, meta) {return data === null ? 'NA' : data;}")))),
-      escape = FALSE)
-```
-
 ## Lineage overview
 
 Covpipe runs a preliminary lineage assignment with Pangolin (https://github.com/cov-lineages/pangolin). Note that there are several lineage assignment schemes that need to get run in separate analyses steps.
@@ -474,7 +477,7 @@ datatable(dt.pangolin_results[,c("taxon", "lineage", "conflict", "scorpio_call",
       colnames = c("sample", "lineage", "conflict", "scorpio call", "scorpio conflict", "qc status"),
       rownames = FALSE,
       caption = "Preliminary lineage assignment using Pangolin.",
-      options = list(scrollX = TRUE, order = list(list(0, 'asc')),columnDefs = list(list(targets="_all", render = JS("function(data, type, row, meta) {return data === null ? 'NA' : data;}")))),
+      options = list(scrollX = TRUE, order = list(list(0, 'asc')), columnDefs = list(list(targets="_all", render = JS("function(data, type, row, meta) {return data === null ? 'NA' : data;}")))),
       escape = FALSE)
 ```
 

@@ -39,6 +39,27 @@ process bgzip_compress {
 }
 
 process adapt_consensus_header {
+  input:
+  tuple val(name), path(fasta)
+
+  output:
+  tuple val(name), path("${name}.header_renamed.fasta")
+
+  script:
+  """
+    VERSION='unknown_version'
+    if [ ${workflow.revision} != 'null' ]; then
+      VERSION=${workflow.revision}
+    fi
+    sed "1 s/.*/>${name}_iupac_consensus_\${VERSION}/" ${fasta} 1> ${name}.header_renamed.fasta
+  """
+  stub:
+  """
+  touch ${name}.header_renamed.fasta
+  """
+  }
+
+process remove_del_symbol {
   publishDir "${params.output}/${params.consensus_dir}/${name}", mode: params.publish_dir_mode
 
   input:
@@ -49,18 +70,14 @@ process adapt_consensus_header {
 
   script:
   """
-    VERSION='unknown_version'
-    if [ ${workflow.revision} != 'null' ]; then
-      VERSION=${workflow.revision}
-    fi
-    sed "1 s/.*/>${name}_iupac_consensus_\${VERSION}/" ${fasta} 1> ${name}.iupac_consensus.fasta
+  head -n 1 ${fasta} > ${name}.iupac_consensus.fasta
+  tail -n +2 ${fasta} | tr -d "?\r\n" | fold -w 80 1>> ${name}.iupac_consensus.fasta
   """
   stub:
   """
   touch ${name}.iupac_consensus.fasta
   """
   }
-
 
 process mask_iupac {
   publishDir "${params.output}/${params.consensus_dir}/${name}", mode: params.publish_dir_mode
@@ -77,8 +94,8 @@ process mask_iupac {
       if [ ${workflow.revision} != 'null' ]; then
         VERSION=${workflow.revision}
       fi
-      echo ">${name}_masked_consensus_\${VERSION}\" 1> ${name}.masked_consensus.fasta 2> ${name}_createMaskedConsensus.log
-      tail -n +2 ${fasta} | tr "RYSWKMBDHVN" "N" 1>> ${name}.masked_consensus.fasta 2>> ${name}_createMaskedConsensus.log
+      echo ">${name}_masked_consensus_\${VERSION}\" 1> ${name}.masked_consensus.fasta
+      tail -n +2 ${fasta} | tr "RYSWKMBDHVN" "N" 1>> ${name}.masked_consensus.fasta
     """
   stub:
   """
@@ -133,4 +150,44 @@ process make_voi_table {
     """
     touch ${name}_vois.csv
     """
+}
+
+process bed2bedpe {
+  label 'president'
+
+  input:
+  tuple val(name), path(bed)
+  val(forward)
+  val(reverse)
+
+  output:
+  path("${name}.bedpe")
+
+  script:
+  """
+  primerbed2bedpe.py ${bed} --forward_identifier ${forward} --reverse_identifier ${reverse} -o "${name}.bedpe"
+  """
+  stub:
+  """
+  touch "${name}.bedpe"
+  """
+}
+
+process replace_in_file {
+  input:
+  tuple val(name), path(file)
+  val(from)
+  val(to)
+  
+  output:
+  tuple val(name), path("${file}.replaced")
+  
+  script:
+  """
+  sed 's/${from}/${to}/g' ${file} > ${file}.replaced
+  """
+  stub:
+  """
+  touch "${file}.replaced"
+  """
 }

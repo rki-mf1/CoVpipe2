@@ -42,29 +42,6 @@ process index_bam {
     """
 }
 
-process stats {
-    label 'samtools'
-    publishDir "${params.output}/${params.mapping_dir}/${name}", mode: params.publish_dir_mode
-    
-    input:
-    tuple val(name), path(bam)
-
-    output:
-    tuple val(name), path("${name}.stats"), emit: stats
-    tuple val(name), path("${name}.stats_small"), emit: stats_small
-
-    script:
-    """
-    samtools stats ${bam} -@ ${task.cpus} > ${name}.stats
-    grep -P 'SN\\traw total sequences:' ${name}.stats | awk -F'\\t' 'BEGIN{OFS="\\t"} {print "total", \$3}' > ${name}.stats_small
-    grep -P 'SN\\treads mapped:' ${name}.stats | awk -F'\\t' 'BEGIN{OFS="\\t"} {print "mapped", \$3}' >> ${name}.stats_small
-    """
-    stub:
-    """
-    touch ${name}.stats ${name}.stats_small
-    """
-}
-
 process flagstat {
     label 'samtools'
     
