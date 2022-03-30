@@ -1,6 +1,6 @@
 process nextclade {
     label 'nextclade'
-
+    container = params.nextclade_docker
     publishDir "${params.output}/${params.variant_calling_dir}/${name}/", mode: params.publish_dir_mode
 
     input:
@@ -37,7 +37,7 @@ process nextclade {
     """
 }
 
-process update_nextclade {
+process update_nextclade_conda_env {
     // execute this locally - would most likely fail on custer systems
     label 'nextclade'
     executor 'local'

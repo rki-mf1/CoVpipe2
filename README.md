@@ -168,11 +168,12 @@ Robert Koch Institute, MF1 Bioinformatics
                                  variant (genotype adjustment). The value has to be greater than 0.5 but not greater than 1. 
                                  To turn genotype adjustment off, set the value to 0. [default: 0.9]
 
-    Linage assignment:
-    --update_pangolin        Update pangolin conda environment to get the latest version that is available from bioconda. [default: false]
-
-    Mutation calling:
-    --update_nextclade       Update nextclade conda environment to get the latest version that is available from bioconda. [default: false]
+    Updated for linage assignment and mutation calling:
+    --update                   Update pangolin and nextclade [default: false]
+                                  Depending on the chosen profile either the conda environment (profiles 'standard', 'conda', 'mamba') 
+                                  or the container (profiles 'docker', 'singularity') is updated.
+    --pangolin_docker_default  Default container tag for pangolin [default: rkimf1/pangolin:3.1.20--3bb06db]
+    --nextclade_docker_default Default container tag for nextclade [default: rkimf1/nextclade:1.10.2--1764691]
 
     Computing options:
     --cores                  Max cores per process for local use [default: 4]
