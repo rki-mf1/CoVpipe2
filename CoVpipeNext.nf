@@ -6,7 +6,7 @@ nextflow.enable.dsl=2
 if (params.help) { exit 0, helpMSG() }
 
 // parameter sanity check
-Set valid_params = ['cores', 'max_cores', 'memory', 'help', 'profile', 'workdir', 'fastq', 'list', 'mode', 'run_id', 'reference', 'ref_genome', 'ref_annotation', 'adapter', 'fastp_additional_parameters', 'kraken', 'taxid', 'primer_bed', 'primer_bedpe', 'primer_version', 'vcount', 'frac', 'cov', 'vois', 'var_mqm', 'var_sap', 'var_qual', 'cns_min_cov', 'cns_gt_adjust', 'update_pangolin', 'update_nextclade', 'output', 'reference_dir', 'read_dir', 'mapping_dir', 'variant_calling_dir', 'consensus_dir', 'linage_dir', 'report_dir', 'runinfo_dir', 'singularity_cache_dir', 'conda_cache_dir', 'databases', 'publish_dir_mode', 'cloudProcess', 'cloud-process']
+Set valid_params = ['cores', 'max_cores', 'memory', 'help', 'profile', 'workdir', 'fastq', 'list', 'mode', 'run_id', 'reference', 'ref_genome', 'ref_annotation', 'adapter', 'fastp_additional_parameters', 'kraken', 'taxid', 'primer_bed', 'primer_bedpe', 'primer_version', 'vcount', 'frac', 'cov', 'vois', 'var_mqm', 'var_sap', 'var_qual', 'cns_min_cov', 'cns_gt_adjust', 'update', 'pangolin_docker_default', 'nextclade_docker_default', 'output', 'reference_dir', 'read_dir', 'mapping_dir', 'variant_calling_dir', 'consensus_dir', 'linage_dir', 'report_dir', 'runinfo_dir', 'singularity_cache_dir', 'conda_cache_dir', 'databases', 'publish_dir_mode', 'cloudProcess', 'cloud-process']
 def parameter_diff = params.keySet() - valid_params
 if (parameter_diff.size() != 0){
     exit 1, "ERROR: Parameter(s) $parameter_diff is/are not valid in the pipeline!\n"
@@ -134,6 +134,47 @@ if( params.vois ){
     voi_id=vois_file.withReader {  r-> r.eachLine {it} }.split()[0]
     assert ref_id == voi_id: "Faster header ($ref_id) and VOI VCF file chrom ($voi_id) don't match. Provide a matching VCF file or don't set --vois"
 }
+
+/************************** 
+* AUTO-UPDATE (nextclade and pangolin)
+**************************/
+
+static boolean DockernetIsAvailable() {
+    try {
+        final URL url = new URL("https://registry.hub.docker.com/v2/repositories/rkimf1/pangolin/tags/");
+        final URLConnection conn = url.openConnection();
+        conn.connect();
+        conn.getInputStream().close();
+        return true;
+    } catch (MalformedURLException e) {
+        return false;
+    } catch (IOException e) {
+        return false;
+    }
+}
+
+def internetcheck = DockernetIsAvailable()
+
+if ( ( workflow.profile.contains('singularity') || workflow.profile.contains('docker') ) && params.update) {
+println "\033[0;33mWarning: Running --update might not be CoVpipe compatible!\033[0m"
+    if ( internetcheck.toString() == "true" ) { 
+        tagname = 'https://registry.hub.docker.com/v2/repositories/rkimf1/pangolin/tags/'.toURL().text.split(',"name":"')[1].split('","')[0]
+        params.pangolin_docker = "rkimf1/pangolin:" + tagname
+        println "\033[0;32mFound latest pangolin container, using: " + params.pangolin_docker + " \033[0m" 
+
+        tagname = 'https://registry.hub.docker.com/v2/repositories/rkimf1/nextclade/tags/'.toURL().text.split(',"name":"')[1].split('","')[0]
+        params.nextclade_docker = "rkimf1/nextclade:" + tagname 
+        println "\033[0;32mFound latest nextclade container, using: " + params.nextclade_docker + " \033[0m"
+    } 
+    if ( internetcheck.toString() == "false" ) { 
+        println "\033[0;33mCould not find the latest pangolin container, trying: " + params.pangolin_docker_default + "\033[0m"
+        params.pangolin_docker = params.pangolin_docker_default 
+
+        println "\033[0;33mCould not find the latest nextclade container, trying: " + params.nextclade_docker_default + "\033[0m"
+        params.nextclade_docker = params.nextclade_docker_default 
+    } 
+}
+else { params.pangolin_docker = params.pangolin_docker_default ; params.nextclade_docker = params.nextclade_docker_default  }
 
 /************************** 
 * MODULES
@@ -322,11 +363,12 @@ def helpMSG() {
                                  variant (genotype adjustment). The value has to be greater than 0.5 but not greater than 1. 
                                  To turn genotype adjustment off, set the value to 0. [default: $params.cns_gt_adjust]
 
-    ${c_yellow}Linage assignment:${c_reset}
-    --update_pangolin        Update pangolin conda environment to get the latest version that is available from bioconda. [default: $params.update_pangolin]
-
-    ${c_yellow}Mutation calling:${c_reset}
-    --update_nextclade       Update nextclade conda environment to get the latest version that is available from bioconda. [default: $params.update_nextclade]
+    ${c_yellow}Updated for linage assignment and mutation calling:${c_reset}
+    --update                   Update pangolin and nextclade [default: $params.update]
+                                  ${c_dim}Depending on the chosen engine either the conda environment (profiles: 'standard', 'conda', 'mamba') 
+                                  or the container (profiles: 'docker', 'singularity') is updated.${c_reset}
+    --pangolin_docker_default  Default container tag for pangolin [default: $params.pangolin_docker_default]
+    --nextclade_docker_default Default container tag for nextclade [default: $params.nextclade_docker_default]
 
     ${c_yellow}Computing options:${c_reset}
     --cores                  Max cores per process for local use [default: $params.cores]

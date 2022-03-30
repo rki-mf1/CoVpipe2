@@ -1,6 +1,6 @@
 process pangolin {
     label 'pangolin'
-
+    container = params.pangolin_docker
     publishDir "${params.output}/${params.linage_dir}/${name}", mode: params.publish_dir_mode
     
     input:
@@ -37,7 +37,7 @@ process pangolin {
     """
 }
 
-process update_pangolin {
+process update_pangolin_conda_env {
     // execute this locally - would most likely fail on custer systems
     label 'pangolin'
     executor 'local'
