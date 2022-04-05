@@ -151,43 +151,34 @@ if (params$run_id != 'none') {
 }
 ```
 
-```{r conditional_warning, results='asis'}
-dt.sample_cov_negative <- dt.sample_cov[grepl("NK|Empty", dt.sample_cov$sample, ignore.case = TRUE) & dt.sample_cov$genome.coverage >= 0.2, ]
-
-if (nrow(dt.sample_cov_negative) > 0) {
-    
-    cat("## WARNING \n")
-    cat("Samples identified automatically as negative controls show unusual large coverage of the reference genome (more than 20%). Please check the following table, if this is expected for the samples. \n")
-}
-```
 
 ```{r conditional_table}
-if (nrow(dt.sample_cov_negative) > 0) {
-    dt.sample_cov_tmp <- dt.sample_cov
-    dt.sample_cov_tmp$genome.coverage <- round(dt.sample_cov_tmp$genome.coverage, 2)
+# if (nrow(dt.sample_cov_negative) > 0) {
+#     dt.sample_cov_tmp <- dt.sample_cov
+#     dt.sample_cov_tmp$genome.coverage <- round(dt.sample_cov_tmp$genome.coverage, 2)
 
-    # add a row with all 0 and 1 to make colour scaling reproducible
-    df.tmp <- data.frame("sample" = c(0,1), 
-                         "genome.length" = c(0,1),
-                         "covered.bases" = c(0,1), 
-                         "genome.coverage" = c(0,1)
-                         )
-    dt.sample_cov_tmp <- rbind(dt.sample_cov_tmp, df.tmp)
-    rm(df.tmp)
-    # highlight important rows
-    dt.sample_cov_tmp$sample <- cell_spec(dt.sample_cov_tmp$sample, color = ifelse(dt.sample_cov_tmp$genome.coverage > 0.2, "red", "black"))
-    dt.sample_cov_tmp$genome.coverage <- color_tile("white", "orange")(dt.sample_cov_tmp$genome.coverage)
-    #remove added lines
-    dt.sample_cov_tmp <- head(dt.sample_cov_tmp, n = -2)
+#     # add a row with all 0 and 1 to make colour scaling reproducible
+#     df.tmp <- data.frame("sample" = c(0,1), 
+#                          "genome.length" = c(0,1),
+#                          "covered.bases" = c(0,1), 
+#                          "genome.coverage" = c(0,1)
+#                          )
+#     dt.sample_cov_tmp <- rbind(dt.sample_cov_tmp, df.tmp)
+#     rm(df.tmp)
+#     # highlight important rows
+#     dt.sample_cov_tmp$sample <- cell_spec(dt.sample_cov_tmp$sample, color = ifelse(dt.sample_cov_tmp$genome.coverage > 0.2, "red", "black"))
+#     dt.sample_cov_tmp$genome.coverage <- color_tile("white", "orange")(dt.sample_cov_tmp$genome.coverage)
+#     #remove added lines
+#     dt.sample_cov_tmp <- head(dt.sample_cov_tmp, n = -2)
     
-    datatable(dt.sample_cov_tmp[,c("sample", "covered.bases", "genome.coverage")], 
-        colnames = c("sample", "ref.coverage [bp]", "ref.coverage [fraction]"), 
-        caption = "Reference genome coverage in base pairs and as fraction of the total length. Bases with more than 10x sequencing depth are counted as covered. Negative control's names are highlighted in red if more than 20% of reference genome is covered, increasing coverage fraction is coloured orange (scaled from 0 to 1).",
-        options = list(order = list(list(0, 'asc'))),
-        escape = F)
+#     datatable(dt.sample_cov_tmp[,c("sample", "covered.bases", "genome.coverage")], 
+#         colnames = c("sample", "ref.coverage [bp]", "ref.coverage [fraction]"), 
+#         caption = "Reference genome coverage in base pairs and as fraction of the total length. Bases with more than 10x sequencing depth are counted as covered. Negative control's names are highlighted in red if more than 20% of reference genome is covered, increasing coverage fraction is coloured orange (scaled from 0 to 1).",
+#         options = list(order = list(list(0, 'asc'))),
+#         escape = F)
 
-    rm(dt.sample_cov_tmp)
-}
+#     rm(dt.sample_cov_tmp)
+# }
 ```
 
 ```{r overview_table}
@@ -216,6 +207,13 @@ write.csv( x=dt.overview,
 ```
 
 ## Short summary
+```{r conditional_warning, results='asis'}
+dt.sample_cov_negative <- dt.sample_cov[grepl("NK|Empty", dt.sample_cov$sample, ignore.case = TRUE) & dt.sample_cov$genome.coverage >= 0.2, ]
+
+if (nrow(dt.sample_cov_negative) > 0) {
+    cat("<p style=\"color:red\">Warning: Samples identified automatically as negative controls show unusual large coverage of the reference genome (more than 20%). Please check, if this is expected for the samples.</p>\n")
+}
+```
 
 ```{r overview}
 dt.overview$president_QC_pass <- ifelse(dt.overview$president_QC_pass == TRUE,
