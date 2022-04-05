@@ -157,18 +157,18 @@ process kraken_table {
     """
 }
 
-process flagstat_table {
+process mapping_stats_table {
     label 'r'
 
     input:
-    path(flagstat_csv)
+    path(samtools_stats_small)
 
     output:
     path("mapping_stats.csv")
 
     script:
-    name_list = flagstat_csv.collect{ "\"${it.getSimpleName()}\"" }.join(",")
-    file_list = flagstat_csv.collect{ "\"${it}\"" }.join(",")
+    name_list = samtools_stats_small.collect{ "\"${it.getSimpleName()}\"" }.join(",")
+    file_list = samtools_stats_small.collect{ "\"${it}\"" }.join(",")
     """
     #!/usr/bin/env Rscript
 
@@ -178,12 +178,12 @@ process flagstat_table {
     f.list <- c(${file_list})
     names(f.list) <- c(${name_list})
 
-    df.bamstat.data <- ldply(f.list, fread, sep = ';')
-    colnames(df.bamstat.data) <- c("sample", "count", "unknown", "description")
+    df.bamstat.data <- ldply(f.list, fread, sep = '\\t')
+    colnames(df.bamstat.data) <- c("sample", "description", "count")
 
     df.output <- data.frame("sample" = unique(df.bamstat.data\$sample),
-                            "input" = df.bamstat.data\$count[grepl("in total", df.bamstat.data\$description)],
-                            "mapped" = df.bamstat.data\$count[grepl("properly paired", df.bamstat.data\$description)])
+                            "input" = df.bamstat.data\$count[grepl("total", df.bamstat.data\$description)],
+                            "mapped" = df.bamstat.data\$count[grepl("mapped", df.bamstat.data\$description)])
 
     df.output\$mapping.rate <- df.output\$mapped / df.output\$input
 
