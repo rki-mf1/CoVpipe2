@@ -335,7 +335,7 @@ process rmarkdown_report {
 
     output:
     path("report.html")
-    path("overview.csv")
+    path("report_datatable.csv")
 
     script:
     kraken_table_optional = kraken_table ? kraken_table : 'none'
