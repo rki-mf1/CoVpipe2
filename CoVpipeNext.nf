@@ -213,6 +213,7 @@ include { assign_linages } from './workflows/assign_linages_wf'
 include { genome_quality } from './workflows/genome_quality_wf'
 
 include { summary_report } from './workflows/report_wf'
+include { rki_report_wf } from './workflows/rki_wf'
 
 include { bed2bedpe } from './modules/utils'
 
@@ -278,8 +279,9 @@ workflow {
     genome_quality(generate_consensus.out.consensus_ambiguous, reference_ch)
 
     // 12: report
-    summary_report(generate_consensus.out.consensus_ambiguous, read_qc.out.fastp_json, kraken_reports.ifEmpty([]), mapping.out.mapping_stats, mapping.out.fragment_size, mapping.out.coverage, genome_quality.out, assign_linages.out.report, assign_linages.out.version, assign_linages.out.scorpio_version, assign_linages.out.scorpio_constellations_version, annotate_variant.out.nextclade_results, annotate_variant.out.nextclade_version, annotate_variant.out.nextclade_dataset_version, vois.ifEmpty([]) )
-    
+    summary_report(generate_consensus.out.consensus_ambiguous, read_qc.out.fastp_json, kraken_reports.ifEmpty([]), mapping.out.mapping_stats, mapping.out.fragment_size, mapping.out.coverage, genome_quality.out.report, assign_linages.out.report, assign_linages.out.version, assign_linages.out.scorpio_version, assign_linages.out.scorpio_constellations_version, annotate_variant.out.nextclade_results, annotate_variant.out.nextclade_version, annotate_variant.out.nextclade_dataset_version, vois.ifEmpty([]) )
+
+    rki_report_wf(genome_quality.out.valid, genome_quality.out.invalid)
 }
 
 /************************** 
