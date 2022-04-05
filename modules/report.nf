@@ -348,6 +348,6 @@ process rmarkdown_report {
     """
     stub:
     """
-    touch report.html
+    touch report.html report_datatable.csv
     """
 }
