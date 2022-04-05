@@ -1,7 +1,7 @@
 process president {
     label 'president'
 
-    publishDir "${params.output}/${params.report_dir}/${name}/", pattern: "${name}*.fasta", mode: params.publish_dir_mode
+    publishDir "${params.output}/${params.consensus_dir}/${name}/", pattern: "${name}*_report.tsv", mode: params.publish_dir_mode
 
     input:
     tuple val(name), path(fasta)
