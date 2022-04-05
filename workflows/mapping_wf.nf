@@ -11,10 +11,11 @@ workflow mapping {
         index_bwa(reference_fasta)
         bwa(illumina_reads, index_bwa.out) \
             | (index_bam & get_genomecov & stats & get_fragment_size)
+        stats_output = stats.out.stats_small
 
     emit:
         bam_bai= index_bam.out
         coverage = get_genomecov.out.tsv
-        mapping_stats = stats.out.stats_small
+        mapping_stats = stats_output
         fragment_size = get_fragment_size.out
 }
