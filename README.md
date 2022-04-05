@@ -217,19 +217,19 @@ Robert Koch Institute, MF1 Bioinformatics
 
 Workflow overview:
 ![workflow](/data/figures/covpipenext_steps.png)
-<sub><sub>Components originally designed by James A. Fellows Yates & nf-core</sub></sub>
+<sub><sub>Components originally designed by James A. Fellows Yates & nf-core under a CC0 license (public domain)</sub></sub>
 
 <details><summary>More detailed overview with process names:</summary>
 
 ![workflow](/data/figures/covpipenext_processes.png)
-<sub><sub>Components originally designed by James A. Fellows Yates & nf-core</sub></sub>
+<sub><sub>Components originally designed by James A. Fellows Yates & nf-core under a CC0 license (public domain)</sub></sub>
 
 </details>
 
 <details><summary>Even more detailed overview with process names and parameters:</summary>
 
 ![workflow](/data/figures/covpipenext_processes_params.png)
-<sub><sub>Components originally designed by James A. Fellows Yates & nf-core</sub></sub>
+<sub><sub>Components originally designed by James A. Fellows Yates & nf-core under a CC0 license (public domain)</sub></sub>
 
 </details>
 
