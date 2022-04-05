@@ -151,63 +151,100 @@ if (params$run_id != 'none') {
 }
 ```
 
+
+```{r conditional_table}
+# if (nrow(dt.sample_cov_negative) > 0) {
+#     dt.sample_cov_tmp <- dt.sample_cov
+#     dt.sample_cov_tmp$genome.coverage <- round(dt.sample_cov_tmp$genome.coverage, 2)
+
+#     # add a row with all 0 and 1 to make colour scaling reproducible
+#     df.tmp <- data.frame("sample" = c(0,1), 
+#                          "genome.length" = c(0,1),
+#                          "covered.bases" = c(0,1), 
+#                          "genome.coverage" = c(0,1)
+#                          )
+#     dt.sample_cov_tmp <- rbind(dt.sample_cov_tmp, df.tmp)
+#     rm(df.tmp)
+#     # highlight important rows
+#     dt.sample_cov_tmp$sample <- cell_spec(dt.sample_cov_tmp$sample, color = ifelse(dt.sample_cov_tmp$genome.coverage > 0.2, "red", "black"))
+#     dt.sample_cov_tmp$genome.coverage <- color_tile("white", "orange")(dt.sample_cov_tmp$genome.coverage)
+#     #remove added lines
+#     dt.sample_cov_tmp <- head(dt.sample_cov_tmp, n = -2)
+    
+#     datatable(dt.sample_cov_tmp[,c("sample", "covered.bases", "genome.coverage")], 
+#         colnames = c("sample", "ref.coverage [bp]", "ref.coverage [fraction]"), 
+#         caption = "Reference genome coverage in base pairs and as fraction of the total length. Bases with more than 10x sequencing depth are counted as covered. Negative control's names are highlighted in red if more than 20% of reference genome is covered, increasing coverage fraction is coloured orange (scaled from 0 to 1).",
+#         options = list(order = list(list(0, 'asc'))),
+#         escape = F)
+
+#     rm(dt.sample_cov_tmp)
+# }
+```
+
+```{r overview_table}
+dt.overview <- merge(x=dt.fastp_table_stats[,c('sample', "reads.before.clip")], y=dt.flagstat_table[,c('sample', "input")], by='sample')
+
+if(params$kraken_table != 'none'){
+  dt.overview <- merge(x=dt.overview, y=dt.kraken_table, by='sample')
+}
+
+dt.president_results$N_percent <- (dt.president_results$N_bases / dt.president_results$length_query) * 100
+dt.president_results <- dt.president_results[,c("query_name", "qc_all_valid", "ACGT Nucleotide identity", "N_bases", "N_percent", "Mismatches")]
+colnames(dt.president_results)[1] <- 'sample'
+dt.overview <- merge(x=dt.overview, y=dt.president_results, by='sample')
+
+dt.pangolin_results <- dt.pangolin_results[,c("taxon", "lineage", "conflict", "scorpio_call", "scorpio_conflict", "status")]
+dt.overview <- merge(x=dt.overview, y=dt.pangolin_results, by.x='sample', by.y='taxon')
+
+dt.overview <- merge(x=dt.overview, y=dt.nextclade_results[,c("seqName", "clade", "substitutions", "aaSubstitutions", "deletions", "aaDeletions",	"insertions", "aaInsertions", "frameShifts", "privateNucMutations.reversionSubstitutions",	"privateNucMutations.labeledSubstitutions",	"privateNucMutations.unlabeledSubstitutions","qc.privateMutations.status")], by.x='sample', by.y='seqName')
+
+if(params$kraken_table != 'none') {
+  colnames(dt.overview) <- c('sample', '# total reads', '# filtered reads', 'kraken2_ratio_human', 'kraken2_ratio_sarscov2', 'kraken2_ratio_unclassified', 'kraken2_numreads_human', 'kraken2_numreads_sarscov2', 'kraken2_numreads_unclassified', 'president_QC_pass', 'president_identity', 'president_numN', 'president_percentN', 'president_mismatches', 'pangolin_lineage', 'pangolin_conflict', 'scorpio_constellation', 'scorpio_conflict', 'pangolin_status', 'nextclade_clade', 'nextclade_mutations_nt', 'nextclade_mutations', 'nextclade_deletions_nt', 'nextclade_deletions', 'nextclade_insertions_nt', 'nextclade_insertions', 'nextclade_frameshifts', 'nextclade_private_nt_mutation_reversionSubstitutions', 'nextclade_private_nt_mutation_labeledSubstitutions', 'nextclade_private_nt_mutation_unlabeledSubstitutions', 'nextclade_privateMutations_status')
+} else {
+  colnames(dt.overview) <- c('sample', '# total reads', '# filtered reads', 'president_QC_pass', 'president_identity', 'president_numN', 'president_percentN', 'president_mismatches', 'pangolin_lineage', 'pangolin_conflict', 'scorpio_constellation', 'scorpio_conflict', 'pangolin_status', 'nextclade_clade', 'nextclade_mutations_nt', 'nextclade_mutations', 'nextclade_deletions_nt', 'nextclade_deletions', 'nextclade_insertions_nt', 'nextclade_insertions', 'nextclade_frameshifts', 'nextclade_private_nt_mutation_reversionSubstitutions', 'nextclade_private_nt_mutation_labeledSubstitutions', 'nextclade_private_nt_mutation_unlabeledSubstitutions', 'nextclade_privateMutations_status')
+}
+
+dt.overview[dt.overview == ""] <- "-"  
+
+write.csv( x=dt.overview, 
+            row.names = FALSE,
+            file = file.path("report_datatable.csv"))
+```
+
+## Short summary
 ```{r conditional_warning, results='asis'}
 dt.sample_cov_negative <- dt.sample_cov[grepl("NK|Empty", dt.sample_cov$sample, ignore.case = TRUE) & dt.sample_cov$genome.coverage >= 0.2, ]
 
 if (nrow(dt.sample_cov_negative) > 0) {
-    
-    cat("## WARNING \n")
-    cat("Samples identified automatically as negative controls show unusual large coverage of the reference genome (more than 20%). Please check the following table, if this is expected for the samples. \n")
+    cat("<p style=\"color:red\">Warning: Samples identified automatically as negative controls show unusual large coverage of the reference genome (more than 20%). Please check, if this is expected for the samples.</p>\n")
 }
 ```
 
-```{r conditional_table}
-if (nrow(dt.sample_cov_negative) > 0) {
-    dt.sample_cov_tmp <- dt.sample_cov
-    dt.sample_cov_tmp$genome.coverage <- round(dt.sample_cov_tmp$genome.coverage, 2)
-
-    # add a row with all 0 and 1 to make colour scaling reproducible
-    df.tmp <- data.frame("sample" = c(0,1), 
-                         "genome.length" = c(0,1),
-                         "covered.bases" = c(0,1), 
-                         "genome.coverage" = c(0,1)
-                         )
-    dt.sample_cov_tmp <- rbind(dt.sample_cov_tmp, df.tmp)
-    rm(df.tmp)
-    # highlight important rows
-    dt.sample_cov_tmp$sample <- cell_spec(dt.sample_cov_tmp$sample, color = ifelse(dt.sample_cov_tmp$genome.coverage > 0.2, "red", "black"))
-    dt.sample_cov_tmp$genome.coverage <- color_tile("white", "orange")(dt.sample_cov_tmp$genome.coverage)
-    #remove added lines
-    dt.sample_cov_tmp <- head(dt.sample_cov_tmp, n = -2)
-    
-    datatable(dt.sample_cov_tmp[,c("sample", "covered.bases", "genome.coverage")], 
-        colnames = c("sample", "ref.coverage [bp]", "ref.coverage [fraction]"), 
-        caption = "Reference genome coverage in base pairs and as fraction of the total length. Bases with more than 10x sequencing depth are counted as covered. Negative control's names are highlighted in red if more than 20% of reference genome is covered, increasing coverage fraction is coloured orange (scaled from 0 to 1).",
-        options = list(order = list(list(0, 'asc'))),
-        escape = F)
-
-    rm(dt.sample_cov_tmp)
-}
-```
-
-## Genome quality
-
-Quality statistics by [PRESIDENT](https://gitlab.com/RKIBioinformaticsPipelines/president) (PaiRwisE Sequence IDENtiTy) with identity of ACGT bases of 90% and maximal 5% Ns in the query/sample compared to the reference genome (see RKI genome submission requirements: [PDF](https://www.rki.de/DE/Content/InfAZ/N/Neuartiges_Coronavirus/DESH/Qualitaetskriterien.pdf?__blob=publicationFile) in German).
-
-```{r president}
-dt.president_results$query_name <-  unlist(lapply(strsplit(dt.president_results$query_name, '_iupac_consensus_unknown_version'), function(e){
-    return(e[1])
-  }))
-# dt.president_results <- dt.president_results[,c("query_name","ACGT Nucleotide identity","ACGT Nucleotide identity (ignoring Ns)","ACGT Nucleotide identity (ignoring non-ACGTNs)","qc_all_valid","qc_is_empty_query","qc_post_align_pass_threshold","qc_post_aligned","qc_post_aligned_all_valid","qc_valid_length","qc_valid_nucleotides","qc_valid_pass_nthreshold","acgt_bases","iupac_bases","non_iupac_bases","N_bases","length_query","length_reference","LongestNGap","Matches","Mismatches")]
-dt.president_results <- dt.president_results[,c("query_name", "qc_all_valid", "ACGT Nucleotide identity", "N_bases", "Mismatches")]
-dt.president_results$qc_all_valid <- ifelse(dt.president_results$qc_all_valid == TRUE,
+```{r overview}
+dt.overview$president_QC_pass <- ifelse(dt.overview$president_QC_pass == TRUE,
                                     cell_spec('PASS', background = "lightgreen", align = "right"),
                                     cell_spec('FAIL', background = "red", align = "right"))
-datatable(dt.president_results, 
-      colnames = c("sample", "QC status", "ACGT Nucleotide identity", "#N", "Mismatches"),
+dt.overview$nextclade_privateMutations_status <- ifelse(dt.overview$nextclade_privateMutations_status == 'good',
+                                    cell_spec(dt.overview$nextclade_privateMutations_status, background = "lightgreen", align = "right"),
+                                    ifelse(dt.overview$nextclade_privateMutations_status == 'mediocre',
+                                    cell_spec(dt.overview$nextclade_privateMutations_status, background = "orange", align = "right"),
+                                    ifelse(dt.overview$nextclade_privateMutations_status == '-',
+                                    dt.overview$nextclade_privateMutations_status, 
+                                    cell_spec(dt.overview$nextclade_privateMutations_status, background = "red", align = "right"))))
+
+if(params$kraken_table != 'none'){
+  col <- c("sample", '# total reads', '# filtered reads', "kraken2_ratio_sarscov2", "president_QC_pass", "president_identity", "pangolin_lineage","scorpio_constellation", "nextclade_frameshifts","nextclade_privateMutations_status")
+  col_names <- c("Sample", '# total reads', '# filtered reads', "Severe acute respiratory syndrome coronavirus 2 (ratio)", "Genome QC", "%N", "Linage", "Scorpio call", "Frameshifts", "Private mutations QC")
+} else {
+  col <- c("sample", '# total reads', '# filtered reads', "president_QC_pass", "president_identity", "pangolin_lineage","scorpio_constellation", "nextclade_frameshifts","nextclade_privateMutations_status")
+  col_names <- c("Sample", '# total reads', '# filtered reads', "Genome QC", "%N", "Linage", "Scorpio call", "Frameshifts", "Private mutations QC")
+}
+
+datatable(dt.overview[, col, with=FALSE], 
+      colnames = col_names,
       rownames = FALSE,
-      caption = "Quality statistics by PRESIDENT.",
-      options = list(scrollX = TRUE, order = list(list(0, 'asc')), columnDefs = list(list(targets="_all", render = JS("function(data, type, row, meta) {return data === null ? 'NA' : data;}")))),
+      caption = "Short overview over the pipeline run. Please see below or pipeline results for more extensive output.",
+      options = list(scrollX = TRUE, order = list(list(0, 'asc')), columnDefs = list(list(targets="_all", render = JS("function(data, type, row, meta) {return data === null ? 'n/a' : data;}")))),
       escape = FALSE)
 ```
 
@@ -228,7 +265,7 @@ dt.table$reads.after.clip <- f.color_bar("lightgreen")(dt.table$reads.after.clip
 
 datatable(dt.table,
     rownames = FALSE,
-    colnames = c("sample", "reads before clip", "reads after clip", "ratio passed", "Q30 before clip", "Q30 after clip"),
+    colnames = c("Sample", "Reads before clip", "Reads after clip", "% passed", "Q30 before clip", "Q30 after clip"),
     caption = "Counts of reads before and after clipping as well as base count of >=Q30. Read counts before and after clipping augmented with bar chart for visual aid.",
     options = list(order = list(list(0, 'asc'))),
     escape = F) %>%
@@ -272,6 +309,7 @@ dt.fastp_table_stats_filter$passed_filter <- f.color_bar("lightgreen")(dt.fastp_
 
 datatable(dt.fastp_table_stats_filter,
     rownames = FALSE,
+    colnames = c("Sample", "# reads passed filter", "Low quality reads", "High #N", "Low complexity reads", "Too short reads"),
     caption = "Counts of reads after clipping and counts of reads removed by several filters. Passed filter read counts augmented with bar chart for visual aid.",
     options = list(order = list(list(0, 'asc'))),
     escape = FALSE)
@@ -310,7 +348,7 @@ dt.flagstat_table$mapped <- f.color_bar("lightgreen")(dt.flagstat_table$mapped)
 
 datatable(dt.flagstat_table, 
     rownames = FALSE,
-    colnames = c("sample", "reads in", "reads mapped", "mapped ratio"),
+    colnames = c("Sample", "Total reads", "Reads mapped", "Mapping ratio"),
     caption = "Amount of reads subjected to reference genome mapping (after the optional Kraken filtering) and the respective numbers of mapped reads. In paired end sequencing each DNA fragment is counted twice. Input and mapped read counts augmented with bar chart for visual aid.",
     options = list(order = list(list(0, 'asc'))),
     escape = F) %>%
@@ -335,7 +373,7 @@ dt.fragment_size_median_table$median.fragsize <- ifelse(dt.fragment_size_median_
 
 datatable(dt.fragment_size_median_table,
     rownames = FALSE,
-    colnames = c("sample", "fragment size (median)", "fragment size (stdev)"),
+    colnames = c("Sample", "Fragment size (median)", "Fragment size (stdev)"),
     caption = "Median fragment size determined by the distance of reads after mapping to reference genome. Read distance not between 90 and 110 bp are highlighted in orange.",
     options = list(order = list(list(0, 'asc'))),
     escape = FALSE) %>%
@@ -450,12 +488,30 @@ dt.sample_cov_table$sample <- ifelse(grepl(pattern = "NK", dt.sample_cov_table$s
 dt.sample_cov_table <- head(dt.sample_cov_table, n = -2)
 datatable(dt.sample_cov_table[,c("sample", "covered.bases", "genome.coverage", "DP.median", "DP.mean")], 
         rownames = FALSE,
-        colnames = c("sample", "coverage [bp]", "coverage [fraction]", "depth median", "depth mean"), 
+        colnames = c("Sample", "Coverage [bp]", "Coverage [fraction]", "Depth median", "Depth mean"), 
         caption = paste0("Genome coverage values shown as coverage of the reference genome and sequencing depth. Bases with more than ", toString(params$cns_min_cov),"x sequencing depth are counted as covered. Sample names of negative controls are highlighted in red and reference genome coverage fraction >=95% is highlighted in green. Negative controls with more than 20% reference genome coverage could indicate contamination."),
         options = list(order = list(list(0, 'asc'))),
         escape = FALSE) %>%
     formatRound(columns=c("DP.mean"), digits=2)
 rm(dt.sample_cov_table)
+```
+
+## Genome quality
+
+Quality statistics by [PRESIDENT](https://gitlab.com/RKIBioinformaticsPipelines/president) (PaiRwisE Sequence IDENtiTy) with identity of ACGT bases of 90% and maximal 5% Ns in the query/sample compared to the reference genome (see RKI genome submission requirements: [PDF](https://www.rki.de/DE/Content/InfAZ/N/Neuartiges_Coronavirus/DESH/Qualitaetskriterien.pdf?__blob=publicationFile) in German).
+
+```{r president}
+# dt.president_results <- dt.president_results[,c("query_name","ACGT Nucleotide identity","ACGT Nucleotide identity (ignoring Ns)","ACGT Nucleotide identity (ignoring non-ACGTNs)","qc_all_valid","qc_is_empty_query","qc_post_align_pass_threshold","qc_post_aligned","qc_post_aligned_all_valid","qc_valid_length","qc_valid_nucleotides","qc_valid_pass_nthreshold","acgt_bases","iupac_bases","non_iupac_bases","N_bases","length_query","length_reference","LongestNGap","Matches","Mismatches")]
+
+dt.president_results$qc_all_valid <- ifelse(dt.president_results$qc_all_valid == TRUE,
+                                    cell_spec('PASS', background = "lightgreen", align = "right"),
+                                    cell_spec('FAIL', background = "red", align = "right"))
+datatable(dt.president_results, 
+      colnames = c("Sample", "QC status", "ACGT Nucleotide identity", "#N", "%N", "Mismatches"),
+      rownames = FALSE,
+      caption = "Quality statistics by PRESIDENT.",
+      options = list(scrollX = TRUE, order = list(list(0, 'asc')), columnDefs = list(list(targets="_all", render = JS("function(data, type, row, meta) {return data === null ? 'NA' : data;}")))),
+      escape = FALSE)
 ```
 
 ## Lineage overview
@@ -470,11 +526,11 @@ Versions:
 - scorpio: `r params$scorpio_version` with constellation `r params$scorpio_constellations_version`
 
 ```{r lineage_assignment}
-dt.pangolin_results$taxon <-  unlist(lapply(strsplit(dt.pangolin_results$taxon, '_iupac_consensus_unknown_version'), function(e){
-    return(e[1])
-  }))
-datatable(dt.pangolin_results[,c("taxon", "lineage", "conflict", "scorpio_call", "scorpio_conflict", "status")], 
-      colnames = c("sample", "lineage", "conflict", "scorpio call", "scorpio conflict", "qc status"),
+dt.pangolin_results$status <- ifelse(dt.pangolin_results$status == "passed_qc",
+                                    cell_spec('PASS', background = "lightgreen", align = "right"),
+                                    cell_spec('FAIL', background = "red", align = "right"))
+datatable(dt.pangolin_results, 
+      colnames = c("Sample", "Lineage", "Conflict", "Scorpio call", "Scorpio conflict", "QC status"),
       rownames = FALSE,
       caption = "Preliminary lineage assignment using Pangolin.",
       options = list(scrollX = TRUE, order = list(list(0, 'asc')), columnDefs = list(list(targets="_all", render = JS("function(data, type, row, meta) {return data === null ? 'NA' : data;}")))),
@@ -486,11 +542,8 @@ Clade, mutations, deletions, insertions and frameshifts were determined with Nex
 
 Versions: nextclade `r params$nextclade_version` with dataset date `r params$nextclade_dataset_version`
 ```{r nextclade}
-dt.nextclade_results$seqName <-  unlist(lapply(strsplit(dt.nextclade_results$seqName, '_iupac_consensus_unknown_version'), function(e){
-    return(e[1])
-  }))
 datatable(dt.nextclade_results[,c("seqName", "aaSubstitutions", "aaDeletions", "aaInsertions", "frameShifts")], 
-      colnames = c("sample", "aaSubstitutions", "aaDeletions", "aaInsertions call", "frameShifts"),
+      colnames = c("Sample", " AA substitutions", "AA deletions", "AA insertions", "Frameshifts"),
       rownames = FALSE,
       caption = "Mutation profile",
       options = list(scrollX = TRUE, order = list(list(0, 'asc')), autoWidth = FALSE, columnDefs = list(list(targets="_all", render = JS("function(data, type, row, meta) {return data === null ? '-' : data;}")))),

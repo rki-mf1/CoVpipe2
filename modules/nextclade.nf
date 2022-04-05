@@ -1,7 +1,7 @@
 process nextclade {
     label 'nextclade'
     container = params.nextclade_docker
-    publishDir "${params.output}/${params.variant_calling_dir}/${name}/", mode: params.publish_dir_mode
+    publishDir "${params.output}/${params.linage_dir}/${name}/", mode: params.publish_dir_mode
 
     input:
     tuple val(name), path(consensus)

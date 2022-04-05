@@ -8,5 +8,7 @@ workflow genome_quality {
     main:
         president(fasta, reference)
     emit:
-        president.out.report
+        report = president.out.report
+        valid = president.out.valid
+        invalid = president.out.invalid
 }
