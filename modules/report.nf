@@ -131,20 +131,6 @@ process kraken_table {
         colnames(df.kraken_output) <- paste0(colnames(df.kraken_output), c("", " (ratio)", " (ratio)", " (ratio)", " (count)", " (count)", " (count)"))
     }
 
-    # add rows for reproducible colour scaling
-    if (length(colnames(df.kraken_output)) == 3) {
-        df.tmp <- as.data.frame(matrix(rep(c(0,100),3), ncol = 3))
-    } else if (length(colnames(df.kraken_output)) == 5) {
-        df.tmp <- as.data.frame(matrix(rep(c(0,100),5), ncol = 5))
-    } else if (length(colnames(df.kraken_output)) == 7) {
-        df.tmp <- as.data.frame(matrix(rep(c(0,100),7), ncol = 7))
-    }
-    colnames(df.tmp) <- colnames(df.kraken_output)
-    df.kraken_output <- rbind(df.kraken_output, df.tmp)
-    
-    # remove added lines for colour scaling
-    df.kraken_output <- head(df.kraken_output, n = -2)
-
     # save table as csv for later use
     write.csv(  x=df.kraken_output, 
                 row.names = FALSE, 
@@ -349,6 +335,7 @@ process rmarkdown_report {
 
     output:
     path("report.html")
+    path("report_datatable.csv")
 
     script:
     kraken_table_optional = kraken_table ? kraken_table : 'none'
@@ -361,6 +348,6 @@ process rmarkdown_report {
     """
     stub:
     """
-    touch report.html
+    touch report.html report_datatable.csv
     """
 }
