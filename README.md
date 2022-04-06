@@ -1,6 +1,6 @@
-# CoVpipeNext
+# CoVpipe2
 
-CoVpipeNext is a Nextflow pipeline for reference-based genome reconstruction of SARS-CoV-2 from NGS data. In principle it can be used also for other viruses.
+CoVpipe2 is a Nextflow pipeline for reference-based genome reconstruction of SARS-CoV-2 from NGS data. In principle it can be used also for other viruses.
 
 ## Quick installation
 
@@ -83,7 +83,7 @@ nextflow run rki-mf1/CoVpipe2 \
 
 ### Example sample sheet
 
-`CoVpipeNext` accepts a sample sheet in `CSV` format as input and should look like this:
+`CoVpipe2` accepts a sample sheet in `CSV` format as input and should look like this:
 
 ```
 sample,fastq_1,fastq_2
@@ -102,10 +102,10 @@ The header is required. Pay attention the set unique sample names!
 ```
 Robert Koch Institute, MF1 Bioinformatics
 
-    Workflow: CoVpipeNext
+    Workflow: CoVpipe2
 
     Usage examples:
-    nextflow run CoVpipeNext.nf --fastq '*R{1,2}.fastq.gz' --reference 'sars-cov-2' --cores 4 --max_cores 8
+    nextflow run CoVpipe2.nf --fastq '*R{1,2}.fastq.gz' --reference 'sars-cov-2' --cores 4 --max_cores 8
     or
     nextflow run rki-mf1/CoVpipe2 -r <version> --fastq '*R{1,2}.fastq.gz' --ref_genome ref.fasta --cores 4 --max_cores 8
 

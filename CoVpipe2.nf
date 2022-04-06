@@ -299,10 +299,10 @@ def helpMSG() {
     
     ${c_blue}Robert Koch Institute, MF1 Bioinformatics${c_reset}
 
-    Workflow: CoVpipeNext
+    Workflow: CoVpipe2
 
     ${c_yellow}Usage examples:${c_reset}
-    nextflow run CoVpipeNext.nf --fastq '*R{1,2}.fastq.gz' --reference 'sars-cov-2' --cores 4 --max_cores 8
+    nextflow run CoVpipe2.nf --fastq '*R{1,2}.fastq.gz' --reference 'sars-cov-2' --cores 4 --max_cores 8
     or
     nextflow run rki-mf1/CoVpipe2 -r <version> --fastq '*R{1,2}.fastq.gz' --ref_genome ref.fasta --cores 4 --max_cores 8
 
