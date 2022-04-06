@@ -1,9 +1,0 @@
-reference: sars-cov-2
-adapter: /scratch/lataretum/data/illumina/adapter.fasta
-kraken: true
-primer_version: V4.1
-update: false
-list: true
-fastq: /home/lataretum/scratch/projects/covpipenext/sample_sheet.csv
-output: results
-runinfo_dir: 'X.Pipeline-Runinfo'
