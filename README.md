@@ -235,6 +235,6 @@ Workflow overview:
 
 ## Acknowledgement, props and inspiration
 
-- [ncov_minipipe aka CoCpipe](https://gitlab.com/RKIBioinformaticsPipelines/ncov_minipipe)
+- [ncov_minipipe aka CoVpipe](https://gitlab.com/RKIBioinformaticsPipelines/ncov_minipipe)
 - [poreCov](https://github.com/replikation/poreCov)
 - [nf-core](https://nf-co.re/pipelines)
