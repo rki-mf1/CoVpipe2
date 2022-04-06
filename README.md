@@ -36,13 +36,13 @@ All other dependencies and tools will be installed within the pipeline via `cond
 ### Call help
 
 ```bash
-nextflow run RKIBioinformaticsPipelines/covpipenext -hub gitlab --help
+nextflow run RKIBioinformaticsPipelines/covpipenext --help
 ```
 
 ### Update the pipeline
 
 ```bash
-nextflow pull RKIBioinformaticsPipelines/covpipenext -hub gitlab
+nextflow pull RKIBioinformaticsPipelines/covpipenext
 ```
 
 ### Use a certain release
@@ -50,14 +50,14 @@ nextflow pull RKIBioinformaticsPipelines/covpipenext -hub gitlab
 We recommend to use a stable release of the pipeline:
 
 ```bash
-nextflow pull RKIBioinformaticsPipelines/covpipenext -hub gitlab -r <RELEASE>
+nextflow pull RKIBioinformaticsPipelines/covpipenext -r <RELEASE>
 ```
 
 ## Quick run examples
 
 ### Example 1:
 ```bash
-nextflow run RKIBioinformaticsPipelines/covpipenxt -hub gitlab \
+nextflow run RKIBioinformaticsPipelines/covpipenxt \
       --reference 'sars-cov-2' \
       --fastq my_samples.csv --list \
       --kraken \
@@ -69,7 +69,7 @@ nextflow run RKIBioinformaticsPipelines/covpipenxt -hub gitlab \
 
 ### Example 2:
 ```bash
-nextflow run RKIBioinformaticsPipelines/covpipenxt -hub gitlab \
+nextflow run RKIBioinformaticsPipelines/covpipenxt \
       --reference 'sars-cov-2' \
       --fastq '*R{1,2}.fastq.gz' \
       --adapter /path/to/repo/data/adapters/NexteraTransposase.fasta \
@@ -107,7 +107,7 @@ Robert Koch Institute, MF1 Bioinformatics
     Usage examples:
     nextflow run CoVpipeNext.nf --fastq '*R{1,2}.fastq.gz' --reference 'sars-cov-2' --cores 4 --max_cores 8
     or
-    nextflow run RKIBioinformaticsPipelines/covpipenxt -hub gitlab -r <version> --fastq '*R{1,2}.fastq.gz' --ref_genome ref.fasta --cores 4 --max_cores 8
+    nextflow run RKIBioinformaticsPipelines/covpipenxt -r <version> --fastq '*R{1,2}.fastq.gz' --ref_genome ref.fasta --cores 4 --max_cores 8
 
     Inputs:
     Illumina read data:
