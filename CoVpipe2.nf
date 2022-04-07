@@ -281,6 +281,7 @@ workflow {
     // 12: report
     summary_report(generate_consensus.out.consensus_ambiguous, read_qc.out.fastp_json, kraken_reports.ifEmpty([]), mapping.out.mapping_stats, mapping.out.fragment_size, mapping.out.coverage, genome_quality.out.report, assign_linages.out.report, assign_linages.out.version, assign_linages.out.scorpio_version, assign_linages.out.scorpio_constellations_version, annotate_variant.out.nextclade_results, annotate_variant.out.nextclade_version, annotate_variant.out.nextclade_dataset_version, vois.ifEmpty([]) )
 
+    // 13: provide data for DESH upload at RKI
     rki_report_wf(genome_quality.out.valid, genome_quality.out.invalid)
 }
 
@@ -299,12 +300,12 @@ def helpMSG() {
     
     ${c_blue}Robert Koch Institute, MF1 Bioinformatics${c_reset}
 
-    Workflow: CoVpipeNext
+    Workflow: CoVpipe2
 
     ${c_yellow}Usage examples:${c_reset}
-    nextflow run CoVpipeNext.nf --fastq '*R{1,2}.fastq.gz' --reference 'sars-cov-2' --cores 4 --max_cores 8
+    nextflow run CoVpipe2.nf --fastq '*R{1,2}.fastq.gz' --reference 'sars-cov-2' --cores 4 --max_cores 8
     or
-    nextflow run RKIBioinformaticsPipelines/covpipenxt -hub gitlab -r <version> --fastq '*R{1,2}.fastq.gz' --ref_genome ref.fasta --cores 4 --max_cores 8
+    nextflow run rki-mf1/CoVpipe2 -r <version> --fastq '*R{1,2}.fastq.gz' --ref_genome ref.fasta --cores 4 --max_cores 8
 
     ${c_yellow}Inputs:
     Illumina read data:${c_reset}

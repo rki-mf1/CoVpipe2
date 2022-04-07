@@ -1,6 +1,6 @@
-# CoVpipeNext
+# CoVpipe2
 
-CoVpipeNext is a Nextflow pipeline for reference-based genome reconstruction of SARS-CoV-2 from NGS data. In principle it can be used also for other viruses.
+CoVpipe2 is a Nextflow pipeline for reference-based genome reconstruction of SARS-CoV-2 from NGS data. In principle it can be used also for other viruses.
 
 ## Quick installation
 
@@ -36,13 +36,13 @@ All other dependencies and tools will be installed within the pipeline via `cond
 ### Call help
 
 ```bash
-nextflow run RKIBioinformaticsPipelines/covpipenext -hub gitlab --help
+nextflow run rki-mf1/CoVpipe2 --help
 ```
 
 ### Update the pipeline
 
 ```bash
-nextflow pull RKIBioinformaticsPipelines/covpipenext -hub gitlab
+nextflow pull rki-mf1/CoVpipe2
 ```
 
 ### Use a certain release
@@ -50,14 +50,14 @@ nextflow pull RKIBioinformaticsPipelines/covpipenext -hub gitlab
 We recommend to use a stable release of the pipeline:
 
 ```bash
-nextflow pull RKIBioinformaticsPipelines/covpipenext -hub gitlab -r <RELEASE>
+nextflow pull rki-mf1/CoVpipe2 -r <RELEASE>
 ```
 
 ## Quick run examples
 
 ### Example 1:
 ```bash
-nextflow run RKIBioinformaticsPipelines/covpipenxt -hub gitlab \
+nextflow run rki-mf1/CoVpipe2 \
       --reference 'sars-cov-2' \
       --fastq my_samples.csv --list \
       --kraken \
@@ -69,7 +69,7 @@ nextflow run RKIBioinformaticsPipelines/covpipenxt -hub gitlab \
 
 ### Example 2:
 ```bash
-nextflow run RKIBioinformaticsPipelines/covpipenxt -hub gitlab \
+nextflow run rki-mf1/CoVpipe2 \
       --reference 'sars-cov-2' \
       --fastq '*R{1,2}.fastq.gz' \
       --adapter /path/to/repo/data/adapters/NexteraTransposase.fasta \
@@ -83,7 +83,7 @@ nextflow run RKIBioinformaticsPipelines/covpipenxt -hub gitlab \
 
 ### Example sample sheet
 
-`CoVpipeNext` accepts a sample sheet in `CSV` format as input and should look like this:
+`CoVpipe2` accepts a sample sheet in `CSV` format as input and should look like this:
 
 ```
 sample,fastq_1,fastq_2
@@ -102,12 +102,12 @@ The header is required. Pay attention the set unique sample names!
 ```
 Robert Koch Institute, MF1 Bioinformatics
 
-    Workflow: CoVpipeNext
+    Workflow: CoVpipe2
 
     Usage examples:
-    nextflow run CoVpipeNext.nf --fastq '*R{1,2}.fastq.gz' --reference 'sars-cov-2' --cores 4 --max_cores 8
+    nextflow run CoVpipe2.nf --fastq '*R{1,2}.fastq.gz' --reference 'sars-cov-2' --cores 4 --max_cores 8
     or
-    nextflow run RKIBioinformaticsPipelines/covpipenxt -hub gitlab -r <version> --fastq '*R{1,2}.fastq.gz' --ref_genome ref.fasta --cores 4 --max_cores 8
+    nextflow run rki-mf1/CoVpipe2 -r <version> --fastq '*R{1,2}.fastq.gz' --ref_genome ref.fasta --cores 4 --max_cores 8
 
     Inputs:
     Illumina read data:
@@ -216,25 +216,25 @@ Robert Koch Institute, MF1 Bioinformatics
 ## Workflow
 
 Workflow overview:
-![workflow](/data/figures/covpipenext_steps.png)
+![workflow](/data/figures/covpipe2_steps.png)
 <sub><sub>Components originally designed by James A. Fellows Yates & nf-core under a CC0 license (public domain)</sub></sub>
 
 <details><summary>More detailed overview with process names:</summary>
 
-![workflow](/data/figures/covpipenext_processes.png)
+![workflow](/data/figures/covpipe2_processes.png)
 <sub><sub>Components originally designed by James A. Fellows Yates & nf-core under a CC0 license (public domain)</sub></sub>
 
 </details>
 
 <details><summary>Even more detailed overview with process names and parameters:</summary>
 
-![workflow](/data/figures/covpipenext_processes_params.png)
+![workflow](/data/figures/covpipe2_processes_params.png)
 <sub><sub>Components originally designed by James A. Fellows Yates & nf-core under a CC0 license (public domain)</sub></sub>
 
 </details>
 
 ## Acknowledgement, props and inspiration
 
-- [ncov_minipipe aka CoCpipe](https://gitlab.com/RKIBioinformaticsPipelines/ncov_minipipe)
+- [ncov_minipipe aka CoVpipe](https://gitlab.com/RKIBioinformaticsPipelines/ncov_minipipe)
 - [poreCov](https://github.com/replikation/poreCov)
 - [nf-core](https://nf-co.re/pipelines)

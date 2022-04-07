@@ -11,8 +11,8 @@ process kraken_db {
     // label just some environment or container where we are sure that wget and tar are available
     label 'dos2unix'
 
-    if (params.cloudProcess) { publishDir "${params.databases}/kraken", mode: 'copy', pattern: "GRCh38.p13_SC2_2022-03-01" }
-    else { storeDir "${params.databases}/kraken" }  
+    if (params.cloudProcess) { publishDir "${params.databases}/kraken2", mode: 'copy', pattern: "GRCh38.p13_SC2_2022-03-01" }
+    else { storeDir "${params.databases}/kraken2" }  
 
     output:
     path("GRCh38.p13_SC2_2022-03-01", type: 'dir')

@@ -336,6 +336,7 @@ process rmarkdown_report {
     output:
     path("report.html")
     path("report_datatable.csv")
+    path("report_datatable.xlsx")
 
     script:
     kraken_table_optional = kraken_table ? kraken_table : 'none'
@@ -348,6 +349,6 @@ process rmarkdown_report {
     """
     stub:
     """
-    touch report.html report_datatable.csv
+    touch report.html report_datatable.csv report_datatable.xlsx 
     """
 }

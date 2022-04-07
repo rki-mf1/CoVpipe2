@@ -80,6 +80,7 @@ library("plyr")
 library("rjson")
 library("dplyr")
 library("DT")
+library("xlsx")
 ```
 
 ```{r get_cmd_line_parameters}
@@ -204,11 +205,15 @@ if(params$kraken_table != 'none') {
   colnames(dt.overview) <- c('sample', '# total reads', '# filtered reads', 'president_QC_pass', 'president_identity', 'president_numN', 'president_percentN', 'president_mismatches', 'pangolin_lineage', 'pangolin_conflict', 'scorpio_constellation', 'scorpio_conflict', 'pangolin_status', 'nextclade_clade', 'nextclade_mutations_nt', 'nextclade_mutations', 'nextclade_deletions_nt', 'nextclade_deletions', 'nextclade_insertions_nt', 'nextclade_insertions', 'nextclade_frameshifts', 'nextclade_private_nt_mutation_reversionSubstitutions', 'nextclade_private_nt_mutation_labeledSubstitutions', 'nextclade_private_nt_mutation_unlabeledSubstitutions', 'nextclade_privateMutations_status')
 }
 
-dt.overview[dt.overview == ""] <- "-"  
+# dt.overview[dt.overview == ""] <- "n/a"
+dt.overview[is.na(dt.overview)] <- ""
 
 write.csv( x=dt.overview, 
             row.names = FALSE,
             file = file.path("report_datatable.csv"))
+write.xlsx( x=dt.overview, 
+            row.names = FALSE,
+            file = file.path("report_datatable.xlsx"))
 ```
 
 ## Short summary
@@ -228,7 +233,7 @@ dt.overview$nextclade_privateMutations_status <- ifelse(dt.overview$nextclade_pr
                                     cell_spec(dt.overview$nextclade_privateMutations_status, background = "lightgreen", align = "right"),
                                     ifelse(dt.overview$nextclade_privateMutations_status == 'mediocre',
                                     cell_spec(dt.overview$nextclade_privateMutations_status, background = "orange", align = "right"),
-                                    ifelse(dt.overview$nextclade_privateMutations_status == '-',
+                                    ifelse(dt.overview$nextclade_privateMutations_status == '',
                                     dt.overview$nextclade_privateMutations_status, 
                                     cell_spec(dt.overview$nextclade_privateMutations_status, background = "red", align = "right"))))
 
@@ -244,7 +249,7 @@ datatable(dt.overview[, col, with=FALSE],
       colnames = col_names,
       rownames = FALSE,
       caption = "Short overview over the pipeline run. Please see below or pipeline results for more extensive output.",
-      options = list(scrollX = TRUE, order = list(list(0, 'asc')), columnDefs = list(list(targets="_all", render = JS("function(data, type, row, meta) {return data === null ? 'n/a' : data;}")))),
+      options = list(scrollX = TRUE, order = list(list(0, 'asc')), columnDefs = list(list(targets="_all", render = JS("function(data, type, row, meta) {return data === null || data === '' ? 'n/a' : data;}")))),
       escape = FALSE)
 ```
 
