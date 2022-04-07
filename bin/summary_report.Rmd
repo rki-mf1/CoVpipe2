@@ -16,9 +16,6 @@ params:
   sample_cov: "none"
   president_results: "none"
   pangolin_results: "none"
-  pangolin_version: "none"
-  scorpio_version: "none"
-  scorpio_constellations_version: "none"
   nextclade_results: "none"
   nextclade_version: "none"
   nextclade_dataset_version: "none"
@@ -194,8 +191,8 @@ dt.president_results <- dt.president_results[,c("query_name", "qc_all_valid", "A
 colnames(dt.president_results)[1] <- 'sample'
 dt.overview <- merge(x=dt.overview, y=dt.president_results, by='sample')
 
-dt.pangolin_results <- dt.pangolin_results[,c("taxon", "lineage", "conflict", "scorpio_call", "scorpio_conflict", "status")]
-dt.overview <- merge(x=dt.overview, y=dt.pangolin_results, by.x='sample', by.y='taxon')
+dt.pangolin_results_tmp <- dt.pangolin_results[,c("taxon", "lineage", "conflict", "scorpio_call", "scorpio_conflict", "qc_status")]
+dt.overview <- merge(x=dt.overview, y=dt.pangolin_results_tmp, by.x='sample', by.y='taxon')
 
 dt.overview <- merge(x=dt.overview, y=dt.nextclade_results[,c("seqName", "clade", "Nextclade_pango", "substitutions", "aaSubstitutions", "deletions", "aaDeletions",	"insertions", "aaInsertions", "frameShifts", "privateNucMutations.reversionSubstitutions",	"privateNucMutations.labeledSubstitutions",	"privateNucMutations.unlabeledSubstitutions","qc.privateMutations.status")], by.x='sample', by.y='seqName')
 
@@ -525,16 +522,15 @@ Covpipe runs a preliminary lineage assignment with Pangolin (https://github.com/
 
 Versions: 
 
-- `r params$pangolin_version`
-- pangoLEARN: `r dt.pangolin_results$pangoLEARN_version[1]`
-- pango: `r dt.pangolin_results$pango_version[1]`
-- scorpio: `r params$scorpio_version` with constellation `r params$scorpio_constellations_version`
+- pangolin: `r dt.pangolin_results$pangolin_version[1]`
+- pangolin-data: `r dt.pangolin_results$version[1]`
+- scorpio: `r dt.pangolin_results$scorpio_version[1]` with constellation `r dt.pangolin_results$constellation_version[1]`
 
 ```{r lineage_assignment}
-dt.pangolin_results$status <- ifelse(dt.pangolin_results$status == "passed_qc",
+dt.pangolin_results$qc_status <- ifelse(dt.pangolin_results$qc_status == "pass",
                                     cell_spec('PASS', background = "lightgreen", align = "right"),
                                     cell_spec('FAIL', background = "red", align = "right"))
-datatable(dt.pangolin_results, 
+datatable(dt.pangolin_results[,c("taxon", "lineage", "conflict", "scorpio_call", "scorpio_conflict", "qc_status")], 
       colnames = c("Sample", "Lineage", "Conflict", "Scorpio call", "Scorpio conflict", "QC status"),
       rownames = FALSE,
       caption = "Preliminary lineage assignment using Pangolin.",
