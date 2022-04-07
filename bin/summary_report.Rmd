@@ -16,9 +16,6 @@ params:
   sample_cov: "none"
   president_results: "none"
   pangolin_results: "none"
-  pangolin_version: "none"
-  scorpio_version: "none"
-  scorpio_constellations_version: "none"
   nextclade_results: "none"
   nextclade_version: "none"
   nextclade_dataset_version: "none"
@@ -194,15 +191,15 @@ dt.president_results <- dt.president_results[,c("query_name", "qc_all_valid", "A
 colnames(dt.president_results)[1] <- 'sample'
 dt.overview <- merge(x=dt.overview, y=dt.president_results, by='sample')
 
-dt.pangolin_results <- dt.pangolin_results[,c("taxon", "lineage", "conflict", "scorpio_call", "scorpio_conflict", "status")]
-dt.overview <- merge(x=dt.overview, y=dt.pangolin_results, by.x='sample', by.y='taxon')
+dt.pangolin_results_tmp <- dt.pangolin_results[,c("taxon", "lineage", "conflict", "scorpio_call", "scorpio_conflict", "qc_status")]
+dt.overview <- merge(x=dt.overview, y=dt.pangolin_results_tmp, by.x='sample', by.y='taxon')
 
-dt.overview <- merge(x=dt.overview, y=dt.nextclade_results[,c("seqName", "clade", "substitutions", "aaSubstitutions", "deletions", "aaDeletions",	"insertions", "aaInsertions", "frameShifts", "privateNucMutations.reversionSubstitutions",	"privateNucMutations.labeledSubstitutions",	"privateNucMutations.unlabeledSubstitutions","qc.privateMutations.status")], by.x='sample', by.y='seqName')
+dt.overview <- merge(x=dt.overview, y=dt.nextclade_results[,c("seqName", "clade", "Nextclade_pango", "substitutions", "aaSubstitutions", "deletions", "aaDeletions",	"insertions", "aaInsertions", "frameShifts", "privateNucMutations.reversionSubstitutions",	"privateNucMutations.labeledSubstitutions",	"privateNucMutations.unlabeledSubstitutions","qc.privateMutations.status")], by.x='sample', by.y='seqName')
 
 if(params$kraken_table != 'none') {
-  colnames(dt.overview) <- c('sample', '# total reads', '# filtered reads', 'kraken2_ratio_human', 'kraken2_ratio_sarscov2', 'kraken2_ratio_unclassified', 'kraken2_numreads_human', 'kraken2_numreads_sarscov2', 'kraken2_numreads_unclassified', 'president_QC_pass', 'president_identity', 'president_numN', 'president_percentN', 'president_mismatches', 'pangolin_lineage', 'pangolin_conflict', 'scorpio_constellation', 'scorpio_conflict', 'pangolin_status', 'nextclade_clade', 'nextclade_mutations_nt', 'nextclade_mutations', 'nextclade_deletions_nt', 'nextclade_deletions', 'nextclade_insertions_nt', 'nextclade_insertions', 'nextclade_frameshifts', 'nextclade_private_nt_mutation_reversionSubstitutions', 'nextclade_private_nt_mutation_labeledSubstitutions', 'nextclade_private_nt_mutation_unlabeledSubstitutions', 'nextclade_privateMutations_status')
+  colnames(dt.overview) <- c('sample', '# total reads', '# filtered reads', 'kraken2_ratio_human', 'kraken2_ratio_sarscov2', 'kraken2_ratio_unclassified', 'kraken2_numreads_human', 'kraken2_numreads_sarscov2', 'kraken2_numreads_unclassified', 'president_QC_pass', 'president_identity', 'president_numN', 'president_percentN', 'president_mismatches', 'pangolin_lineage', 'pangolin_conflict', 'scorpio_constellation', 'scorpio_conflict', 'pangolin_status', 'nextclade_clade', 'nextclade_pango', 'nextclade_mutations_nt', 'nextclade_mutations', 'nextclade_deletions_nt', 'nextclade_deletions', 'nextclade_insertions_nt', 'nextclade_insertions', 'nextclade_frameshifts', 'nextclade_private_nt_mutation_reversionSubstitutions', 'nextclade_private_nt_mutation_labeledSubstitutions', 'nextclade_private_nt_mutation_unlabeledSubstitutions', 'nextclade_privateMutations_status')
 } else {
-  colnames(dt.overview) <- c('sample', '# total reads', '# filtered reads', 'president_QC_pass', 'president_identity', 'president_numN', 'president_percentN', 'president_mismatches', 'pangolin_lineage', 'pangolin_conflict', 'scorpio_constellation', 'scorpio_conflict', 'pangolin_status', 'nextclade_clade', 'nextclade_mutations_nt', 'nextclade_mutations', 'nextclade_deletions_nt', 'nextclade_deletions', 'nextclade_insertions_nt', 'nextclade_insertions', 'nextclade_frameshifts', 'nextclade_private_nt_mutation_reversionSubstitutions', 'nextclade_private_nt_mutation_labeledSubstitutions', 'nextclade_private_nt_mutation_unlabeledSubstitutions', 'nextclade_privateMutations_status')
+  colnames(dt.overview) <- c('sample', '# total reads', '# filtered reads', 'president_QC_pass', 'president_identity', 'president_numN', 'president_percentN', 'president_mismatches', 'pangolin_lineage', 'pangolin_conflict', 'scorpio_constellation', 'scorpio_conflict', 'pangolin_status', 'nextclade_clade', 'nextclade_pango', 'nextclade_mutations_nt', 'nextclade_mutations', 'nextclade_deletions_nt', 'nextclade_deletions', 'nextclade_insertions_nt', 'nextclade_insertions', 'nextclade_frameshifts', 'nextclade_private_nt_mutation_reversionSubstitutions', 'nextclade_private_nt_mutation_labeledSubstitutions', 'nextclade_private_nt_mutation_unlabeledSubstitutions', 'nextclade_privateMutations_status')
 }
 
 # dt.overview[dt.overview == ""] <- "n/a"
@@ -525,16 +522,15 @@ Covpipe runs a preliminary lineage assignment with Pangolin (https://github.com/
 
 Versions: 
 
-- `r params$pangolin_version`
-- pangoLEARN: `r dt.pangolin_results$pangoLEARN_version[1]`
-- pango: `r dt.pangolin_results$pango_version[1]`
-- scorpio: `r params$scorpio_version` with constellation `r params$scorpio_constellations_version`
+- pangolin: `r dt.pangolin_results$pangolin_version[1]`
+- pangolin-data: `r dt.pangolin_results$version[1]`
+- scorpio: `r dt.pangolin_results$scorpio_version[1]` with constellation `r dt.pangolin_results$constellation_version[1]`
 
 ```{r lineage_assignment}
-dt.pangolin_results$status <- ifelse(dt.pangolin_results$status == "passed_qc",
+dt.pangolin_results$qc_status <- ifelse(dt.pangolin_results$qc_status == "pass",
                                     cell_spec('PASS', background = "lightgreen", align = "right"),
                                     cell_spec('FAIL', background = "red", align = "right"))
-datatable(dt.pangolin_results, 
+datatable(dt.pangolin_results[,c("taxon", "lineage", "conflict", "scorpio_call", "scorpio_conflict", "qc_status")], 
       colnames = c("Sample", "Lineage", "Conflict", "Scorpio call", "Scorpio conflict", "QC status"),
       rownames = FALSE,
       caption = "Preliminary lineage assignment using Pangolin.",

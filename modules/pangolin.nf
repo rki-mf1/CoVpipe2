@@ -9,9 +9,6 @@ process pangolin {
 
     output:
     tuple val(name), path("${name}_lineage_report.csv"), emit: report
-    env(used_pangolin_version), emit: version
-    env(scorpio_version), emit: scorpio_version
-    env(scorpio_constellations_version), emit: scorpio_constellations_version
 
     script:
     """
@@ -23,10 +20,6 @@ process pangolin {
         fi
     fi
     pangolin --outfile ${name}_lineage_report.csv --tempdir . --threads ${task.cpus} ${fasta}
-
-    used_pangolin_version=\$pangolin_version_curr
-    scorpio_version=\$(pangolin  --all-versions | grep 'scorpio' | awk '{print \$2}')
-    scorpio_constellations_version=\$(pangolin  --all-versions | grep 'constellations' | awk '{print \$2}')
     """
     stub:
     """
