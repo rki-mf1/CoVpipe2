@@ -27,4 +27,5 @@ dependencies:
  - r-dplyr
  - mscorefonts=0.0.1
  - r-dt
+ - r-xlsx
  
