@@ -1,9 +1,11 @@
 process krona {
-    label 'krona'   
+    label 'krona'
     publishDir "${params.output}/${params.read_dir}/${name}/kraken", mode: params.publish_dir_mode
+    if ( workflow.profile.contains('mamba') ||  workflow.profile.contains('conda') ){ errorStrategy 'ignore' }
 
     input:
         tuple val(name), path(kreport)
+        val(tax_status)
   	output:
     	tuple val(name), file("${name}_krona.html")
     
@@ -16,5 +18,18 @@ process krona {
     stub:
     """
     touch ${name}_krona.html
+    """
+}
+
+process krona_taxonomy_update {
+    label 'krona'
+    executor 'local'
+
+    output:
+        val('updated')
+
+    script:
+    """
+    ktUpdateTaxonomy.sh
     """
 }
