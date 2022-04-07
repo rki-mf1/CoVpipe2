@@ -2,4 +2,4 @@ channels:
  - bioconda
  - conda-forge
 dependencies:
- - nextclade=1.10.2
+ - nextclade=1.11.0
