@@ -13,7 +13,4 @@ workflow assign_linages {
         pangolin(fasta, version)
     emit:
         report = pangolin.out.report
-        version = pangolin.out.version
-        scorpio_version = pangolin.out.scorpio_version
-        scorpio_constellations_version = pangolin.out.scorpio_constellations_version
 }
