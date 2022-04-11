@@ -28,6 +28,11 @@ if ( !workflow.revision ) {
     println ""
     println "\033[0;33mWARNING: not a stable execution. Please use -r for full reproducibility.\033[0m"
 }
+if ( workflow.profile.contains('singularity') ) {
+    println ""
+    println "\033[0;33mWARNING: Singularity image building sometimes fails!"
+    println "Multiple resumes (-resume) and --max_cores 1 --cores 1 for local execution might help.\033[0m\n"
+}
 
 // print info message
 defaultMSG()
