@@ -6,7 +6,7 @@ nextflow.enable.dsl=2
 if (params.help) { exit 0, helpMSG() }
 
 // parameter sanity check
-Set valid_params = ['cores', 'max_cores', 'memory', 'help', 'profile', 'workdir', 'fastq', 'list', 'mode', 'run_id', 'reference', 'ref_genome', 'ref_annotation', 'adapter', 'fastp_additional_parameters', 'kraken', 'taxid', 'primer_bed', 'primer_bedpe', 'primer_version', 'vcount', 'frac', 'cov', 'vois', 'var_mqm', 'var_sap', 'var_qual', 'cns_min_cov', 'cns_gt_adjust', 'update', 'pangolin_docker_default', 'nextclade_docker_default', 'output', 'reference_dir', 'read_dir', 'mapping_dir', 'variant_calling_dir', 'consensus_dir', 'linage_dir', 'report_dir', 'rki_dir', 'runinfo_dir', 'singularity_cache_dir', 'conda_cache_dir', 'databases', 'publish_dir_mode', 'cloudProcess', 'cloud-process']
+Set valid_params = ['cores', 'max_cores', 'memory', 'help', 'profile', 'workdir', 'fastq', 'list', 'dir', 'mode', 'run_id', 'reference', 'ref_genome', 'ref_annotation', 'adapter', 'fastp_additional_parameters', 'kraken', 'taxid', 'primer_bed', 'primer_bedpe', 'primer_version', 'vcount', 'frac', 'cov', 'vois', 'var_mqm', 'var_sap', 'var_qual', 'cns_min_cov', 'cns_gt_adjust', 'update', 'pangolin_docker_default', 'nextclade_docker_default', 'output', 'reference_dir', 'read_dir', 'mapping_dir', 'variant_calling_dir', 'consensus_dir', 'linage_dir', 'report_dir', 'rki_dir', 'runinfo_dir', 'singularity_cache_dir', 'conda_cache_dir', 'databases', 'publish_dir_mode', 'cloudProcess', 'cloud-process']
 def parameter_diff = params.keySet() - valid_params
 if (parameter_diff.size() != 0){
     exit 1, "ERROR: Parameter(s) $parameter_diff is/are not valid in the pipeline!\n"
@@ -80,21 +80,23 @@ if ( params.reference ) {
 }
 
 // illumina reads input & --list support
-if (params.mode == 'paired') {
-    if (params.fastq && params.list) { fastqInputChannel = Channel
-        .fromPath( params.fastq, checkIfExists: true )
-        .splitCsv(header: true, sep: ',')
-        .map { row -> [row.sample, [file(row.fastq_1, checkIfExists: true), file(row.fastq_2, checkIfExists: true)]] }
-    } else if (params.fastq) { fastqInputChannel = Channel
-        .fromFilePairs( params.fastq, checkIfExists: true )}
-} else {
-    if (params.fastq && params.list) { fastqInputChannel = Channel
-        .fromPath( params.fastq, checkIfExists: true )
-        .splitCsv(header: true, sep: ',')
-        .map { row -> [row.sample, [file(row.fastq, checkIfExists: true)]] }}
-    else if (params.fastq) { fastqInputChannel = Channel
-        .fromPath( params.fastq, checkIfExists: true )
-        .map { file -> [file.simpleName, [file]]}}
+if (! params.dir) {
+    if (params.mode == 'paired') {
+        if (params.fastq && params.list) { fastqInputChannel = Channel
+            .fromPath( params.fastq, checkIfExists: true )
+            .splitCsv(header: true, sep: ',')
+            .map { row -> [row.sample, [file(row.fastq_1, checkIfExists: true), file(row.fastq_2, checkIfExists: true)]] }
+        } else if (params.fastq) { fastqInputChannel = Channel
+            .fromFilePairs( params.fastq, checkIfExists: true )}
+    } else {
+        if (params.fastq && params.list) { fastqInputChannel = Channel
+            .fromPath( params.fastq, checkIfExists: true )
+            .splitCsv(header: true, sep: ',')
+            .map { row -> [row.sample, [file(row.fastq, checkIfExists: true)]] }}
+        else if (params.fastq) { fastqInputChannel = Channel
+            .fromPath( params.fastq, checkIfExists: true )
+            .map { file -> [file.simpleName, [file]]}}
+    }
 }
 
 // load adapters [optional]
@@ -220,12 +222,23 @@ include { genome_quality } from './workflows/genome_quality_wf'
 include { summary_report } from './workflows/report_wf'
 include { rki_report_wf } from './workflows/rki_wf'
 
-include { bed2bedpe } from './modules/utils'
+include { bed2bedpe; make_sample_sheet } from './modules/utils'
 
 /************************** 
 * MAIN WORKFLOW
 **************************/
 workflow {
+    if(params.dir){
+        make_sample_sheet(params.fastq)
+
+        if (params.mode == 'paired') { fastqInputChannel = make_sample_sheet.out
+            .splitCsv(header: true, sep: ',')
+            .map { row -> [row.sample, [file(row.fastq_1, checkIfExists: true), file(row.fastq_2, checkIfExists: true)]] }
+        } else { fastqInputChannel = make_sample_sheet.out
+            .splitCsv(header: true, sep: ',')
+            .map { row -> [row.sample, [file(row.fastq, checkIfExists: true)]] }
+        }
+    }
 
     // 1: reference preprocessing
     reference_preprocessing(ref_genome_file)

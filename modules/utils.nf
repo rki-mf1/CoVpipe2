@@ -1,3 +1,20 @@
+process make_sample_sheet {
+  label 'president'
+  cache false
+  publishDir "${params.output}/${params.runinfo_dir}", mode: params.publish_dir_mode
+
+  input:
+  val(read_dir)
+  
+  output:
+  path('sample_sheet.csv')
+  
+  script:
+  """
+  make_sample_sheet.py ${read_dir} > sample_sheet.csv
+  """
+}
+
 process compress_reads {
   label 'pigz'
 
@@ -20,7 +37,7 @@ process compress_reads {
 process bgzip_compress {
   label 'samtools'
 
-  publishDir "${params.publish_dir}/${name}", mode: params.publish_dir_mode
+  publishDir "${params.output}/${name}", mode: params.publish_dir_mode
 
   input:
   tuple val(name), path(file)
