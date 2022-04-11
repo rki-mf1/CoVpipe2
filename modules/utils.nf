@@ -86,12 +86,8 @@ process mask_iupac {
 
   script:
     """
-      VERSION='unknown_version'
-      if [ ${workflow.revision} != 'null' ]; then
-        VERSION=${workflow.revision}
-      fi
-      echo ">${name}_masked_consensus_\${VERSION}\" 1> ${name}.masked_consensus.fasta
-      tail -n +2 ${fasta} | tr "RYSWKMBDHVN" "N" 1>> ${name}.masked_consensus.fasta
+    head -n 1 ${fasta} 1> ${name}.masked_consensus.fasta
+    tail -n +2 ${fasta} | tr "RYSWKMBDHVN" "N" 1>> ${name}.masked_consensus.fasta
     """
   stub:
   """
