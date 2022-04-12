@@ -36,7 +36,7 @@ process create_low_coverage_no_del_mask {
     script:
     """
     bedtools genomecov -bga -ibam ${bam} | awk '\$4 < ${params.cns_min_cov}' | bedtools merge > ${name}.lowcov.bed.tmp
-    bedtools intersect -v -a ${name}.lowcov.bed.tmp -b ${vcf} > ${name}.lowcov.bed
+    bedtools subtract -a ${name}.lowcov.bed.tmp -b ${vcf} > ${name}.lowcov.bed
     """
     stub:
     """
