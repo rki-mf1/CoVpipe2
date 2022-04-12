@@ -44,6 +44,9 @@ defaultMSG()
 if ( !params.fastq ) {
     exit 1, "input missing, use [--fastq]"
 }
+if ( params.list && params.dir ) {
+    exit 1, "choose one input option: [--list] (csv sample sheet) or [--dir] (directory containing fastq(.gz) files)"
+}
 
 Set reference = ['sars-cov-2'] // can be extended later on
 if ( !params.reference && !params.ref_genome && !params.ref_annotation ) {
@@ -80,6 +83,7 @@ if ( params.reference ) {
 }
 
 // illumina reads input & --list support
+// --dir in main wf
 if (! params.dir) {
     if (params.mode == 'paired') {
         if (params.fastq && params.list) { fastqInputChannel = Channel
@@ -228,7 +232,8 @@ include { bed2bedpe; make_sample_sheet } from './modules/utils'
 * MAIN WORKFLOW
 **************************/
 workflow {
-    if(params.dir){
+    // 0: read in fastq from directory with automated sample sheet generation
+    if( params.dir ){
         make_sample_sheet(params.fastq)
 
         if (params.mode == 'paired') { fastqInputChannel = make_sample_sheet.out
@@ -332,16 +337,20 @@ def helpMSG() {
     ${c_green}--ref_annotation ${c_reset}        Reference GFF file.
 
     ${c_yellow}Illumina read data, required:${c_reset}
-    ${c_green}--fastq ${c_reset}                 e.g.: 'sample{1,2}.fastq' or '*.fastq.gz' or '*/*.fastq.gz'
+    ${c_green}--fastq ${c_reset}                 One fastq file 'sample{1,2}.fastq' or multiple: '*.fastq.gz' or '*/*.fastq.gz'
+                                 ${c_dim}If --list, a csv file
+                                 If --dir, a directory containing fastq files${c_reset}
 
     ${c_yellow}Optional input settings:${c_reset}
-    --list                   This flag activates csv input for --fastq [default: false]
+    --list                   Activates csv input for --fastq [default: $params.list]
                                  ${c_dim}style and header of the csv is: sample,fastq_1,fastq_2${c_reset}
+    OR
+    --dir                    Read fastq files from directory [default: $params.dir]
     --mode                   Switch between 'paired'- and 'single'-end FASTQ; 'single' is experimental [default: $params.mode]
     --run_id                 Run ID [default: $params.run_id]
 
     ${c_yellow}Adapter clipping:${c_reset}
-     --adapter               Define the path of a FASTA file containing the adapter sequences to be clipped. [default: $params.adapter]
+    --adapter               Define the path of a FASTA file containing the adapter sequences to be clipped. [default: $params.adapter]
 
     ${c_yellow}Trimming and QC:${c_reset}
     --fastp_additional_parameters      Additional parameters for FeatureCounts [default: $params.fastp_additional_parameters]

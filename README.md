@@ -133,13 +133,18 @@ Robert Koch Institute, MF1 Bioinformatics
     --ref_annotation         Reference GFF file.
 
     Illumina read data, required:
-    --fastq                  e.g.: 'sample{1,2}.fastq' or '*.fastq.gz' or '*/*.fastq.gz'
+    --fastq                  One fastq file 'sample{1,2}.fastq' or multiple: '*.fastq.gz' or '*/*.fastq.gz'
+                                 If --list, a csv file
+                                 If --dir, a directory containing fastq files
 
     Optional input settings:
-    --list                   This flag activates csv input for --fastq [default: false]
+    --list                   Activates csv input for --fastq [default: false]
                                  style and header of the csv is: sample,fastq_1,fastq_2
+    OR
+    --dir                    Read fastq files from directory [default: false]
     --mode                   Switch between 'paired'- and 'single'-end FASTQ; 'single' is experimental [default: paired]
     --run_id                 Run ID [default: ]
+
 
     Adapter clipping:
      --adapter               Define the path of a FASTA file containing the adapter sequences to be clipped. [default: false]
