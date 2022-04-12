@@ -68,6 +68,8 @@ process remove_del_symbol {
   """
   head -n 1 ${fasta} > ${name}.iupac_consensus.fasta
   tail -n +2 ${fasta} | tr -d "?\r\n" | fold -w 80 1>> ${name}.iupac_consensus.fasta
+  # force new line at end of file to enable concatenation
+  echo >> ${name}.iupac_consensus.fasta
   """
   stub:
   """
@@ -88,6 +90,8 @@ process mask_iupac {
     """
     head -n 1 ${fasta} 1> ${name}.masked_consensus.fasta
     tail -n +2 ${fasta} | tr "RYSWKMBDHVN" "N" 1>> ${name}.masked_consensus.fasta
+    # force new line at end of file to enable concatenation
+    echo >> ${name}.masked_consensus.fasta
     """
   stub:
   """
