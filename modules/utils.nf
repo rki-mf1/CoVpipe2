@@ -37,7 +37,7 @@ process compress_reads {
 process bgzip_compress {
   label 'samtools'
 
-  publishDir "${params.output}/${name}", mode: params.publish_dir_mode
+  publishDir "${params.publish_dir}/${name}", mode: params.publish_dir_mode
 
   input:
   tuple val(name), path(file)
