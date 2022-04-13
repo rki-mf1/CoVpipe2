@@ -175,7 +175,7 @@ Robert Koch Institute, MF1 Bioinformatics
                                  around MQ 60. GATK recommends hard filtering of variants with MQ less than 40. [default: 40]
     --var_sap                Strand balance probability for the alternate allele (SAP). The SAP is the Phred-scaled 
                                  probability that there is strand bias at the respective site. A value near 0 indicates little or 
-                                 no strand bias. Set to -1 to disable the filter. [default: 60]
+                                 no strand bias. Set to -1 to disable the filter. [default: -1]
     --var_qual               Minimal variant call quality. Freebayes produces a general judgement of the 
                                  variant call. [default: 10]
 
