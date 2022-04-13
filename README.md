@@ -2,6 +2,23 @@
 
 CoVpipe2 is a Nextflow pipeline for reference-based genome reconstruction of SARS-CoV-2 from NGS data. In principle it can be used also for other viruses.
 
+<details><summary>Table of contents</summary>
+
+- [CoVpipe2](#covpipe2)
+  - [Quick installation](#quick-installation)
+    - [Call help](#call-help)
+    - [Update the pipeline](#update-the-pipeline)
+    - [Use a certain release](#use-a-certain-release)
+  - [Quick run examples](#quick-run-examples)
+    - [Example 1:](#example-1)
+    - [Example 2:](#example-2)
+    - [Example sample sheet](#example-sample-sheet)
+  - [Manual / help](#manual--help)
+  - [Workflow](#workflow)
+  - [Acknowledgement, props and inspiration](#acknowledgement-props-and-inspiration)
+
+</details>
+
 ## Quick installation
 
 The pipeline is written in [`Nextflow`](https://nf-co.re/usage/installation), which can be used on any POSIX compatible system (Linux, OS X, etc). Windows system is supported through [WSL](https://en.wikipedia.org/wiki/Windows_Subsystem_for_Linux). You need `Nextflow` installed and either `conda`, or `Docker`, or `Singularity` to run the steps of the pipeline:
@@ -95,7 +112,7 @@ sample4,/path/to/reads/id4_1.fastq.gz,/path/to/reads/id4_2.fastq.gz
 
 The header is required. Pay attention the set unique sample names!
 
-## Manual aka help message
+## Manual / help
 
 <details><summary>click here to see the complete help message</summary>
 
@@ -109,19 +126,20 @@ Robert Koch Institute, MF1 Bioinformatics
     or
     nextflow run rki-mf1/CoVpipe2 -r <version> --fastq '*R{1,2}.fastq.gz' --ref_genome ref.fasta --cores 4 --max_cores 8
 
-    Inputs:
-    Illumina read data:
-    --fastq                  e.g.: 'sample{1,2}.fastq' or '*.fastq.gz' or '*/*.fastq.gz'
-    --list                   This flag activates csv input for the above flags [default: false]
-                                 style and header of the csv is: sample,fastq_1,fastq_2
-    --mode                   Switch between 'paired'- and 'single'-end FASTQ [default: paired]
-    --run_id                 Run ID [default: ]
-
-    Reference:
+    Reference, required:
     --reference              Currently supported: 'sars-cov-2' (MN908947.3)
     OR
     --ref_genome             Reference FASTA file.
     --ref_annotation         Reference GFF file.
+
+    Illumina read data, required:
+    --fastq                  e.g.: 'sample{1,2}.fastq' or '*.fastq.gz' or '*/*.fastq.gz'
+
+    Optional input settings:
+    --list                   This flag activates csv input for --fastq [default: false]
+                                 style and header of the csv is: sample,fastq_1,fastq_2
+    --mode                   Switch between 'paired'- and 'single'-end FASTQ; 'single' is experimental [default: paired]
+    --run_id                 Run ID [default: ]
 
     Adapter clipping:
      --adapter               Define the path of a FASTA file containing the adapter sequences to be clipped. [default: false]
@@ -157,7 +175,7 @@ Robert Koch Institute, MF1 Bioinformatics
                                  around MQ 60. GATK recommends hard filtering of variants with MQ less than 40. [default: 40]
     --var_sap                Strand balance probability for the alternate allele (SAP). The SAP is the Phred-scaled 
                                  probability that there is strand bias at the respective site. A value near 0 indicates little or 
-                                 no strand bias. Set to -1 to disable the filter. [default: 60]
+                                 no strand bias. Set to -1 to disable the filter. [default: -1]
     --var_qual               Minimal variant call quality. Freebayes produces a general judgement of the 
                                  variant call. [default: 10]
 

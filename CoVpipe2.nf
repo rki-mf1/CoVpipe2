@@ -28,6 +28,11 @@ if ( !workflow.revision ) {
     println ""
     println "\033[0;33mWARNING: not a stable execution. Please use -r for full reproducibility.\033[0m"
 }
+if ( workflow.profile.contains('singularity') ) {
+    println ""
+    println "\033[0;33mWARNING: Singularity image building sometimes fails!"
+    println "Multiple resumes (-resume) and --max_cores 1 --cores 1 for local execution might help.\033[0m\n"
+}
 
 // print info message
 defaultMSG()
@@ -307,19 +312,20 @@ def helpMSG() {
     or
     nextflow run rki-mf1/CoVpipe2 -r <version> --fastq '*R{1,2}.fastq.gz' --ref_genome ref.fasta --cores 4 --max_cores 8
 
-    ${c_yellow}Inputs:
-    Illumina read data:${c_reset}
-    ${c_green}--fastq ${c_reset}                 e.g.: 'sample{1,2}.fastq' or '*.fastq.gz' or '*/*.fastq.gz'
-    --list                   This flag activates csv input for the above flags [default: false]
-                                 ${c_dim}style and header of the csv is: sample,fastq_1,fastq_2${c_reset}
-    --mode                   Switch between 'paired'- and 'single'-end FASTQ [default: $params.mode]
-    --run_id                 Run ID [default: $params.run_id]
-
-    ${c_yellow}Reference:${c_reset}
+    ${c_yellow}Reference, required:${c_reset}
     ${c_green}--reference ${c_reset}             Currently supported: 'sars-cov-2' (MN908947.3)
     OR
     ${c_green}--ref_genome ${c_reset}            Reference FASTA file.
     ${c_green}--ref_annotation ${c_reset}        Reference GFF file.
+
+    ${c_yellow}Illumina read data, required:${c_reset}
+    ${c_green}--fastq ${c_reset}                 e.g.: 'sample{1,2}.fastq' or '*.fastq.gz' or '*/*.fastq.gz'
+
+    ${c_yellow}Optional input settings:${c_reset}
+    --list                   This flag activates csv input for --fastq [default: false]
+                                 ${c_dim}style and header of the csv is: sample,fastq_1,fastq_2${c_reset}
+    --mode                   Switch between 'paired'- and 'single'-end FASTQ; 'single' is experimental [default: $params.mode]
+    --run_id                 Run ID [default: $params.run_id]
 
     ${c_yellow}Adapter clipping:${c_reset}
      --adapter               Define the path of a FASTA file containing the adapter sequences to be clipped. [default: $params.adapter]
