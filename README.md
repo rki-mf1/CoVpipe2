@@ -153,6 +153,10 @@ Robert Koch Institute, MF1 Bioinformatics
                                  https://zenodo.org/record/3854856 and stored locally.
     --taxid                  Taxonomic ID used together with the kraken2 database for read filtering [default: 2697049]
 
+    Linage detection on read level:
+    --read_linage            Linage detection on read level with LCS (https://github.com/rvalieris/LCS) [default: false]
+    --lcs_cutoff             Plot linages above this threshold [default: 0.03]
+
     Primer detection: 
     --primer_bedpe           Provide the path to the primer BEDPE file. [default: false]
                                  TAB-delimited text file containing at least 6 fields, see here:
