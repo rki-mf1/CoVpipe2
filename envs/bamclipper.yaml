@@ -5,4 +5,4 @@ channels:
   - defaults
 dependencies:
   - bamclipper>=1.0.0
-  - samtools>=1.11
+  - samtools>=1.14
