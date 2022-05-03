@@ -1,3 +1,22 @@
+process lcs_setup {
+    label 'lcs_sc2'
+    clusterOptions '--partition=long'
+
+    output:
+    path('LCS', type: 'dir')
+    path('LCS/outputs/variants_table/ucsc-markers-table.tsv')
+
+    script:
+    """
+    git clone https://github.com/MarieLataretu/LCS.git
+    cd LCS
+    sed -i "s/PB_VERSION=.*/PB_VERSION='${params.lcs_ucsc}'/" rules/config.py
+    sed -i "s/NUM_SAMPLE=.*/NUM_SAMPLE=100/" rules/config.py
+    mem=\$(echo ${task.memory} | cut -d' ' -f1)
+    snakemake --cores ${task.cpus} --resources mem_gb=\$mem --config dataset=pool markers=ucsc -- ucsc_gather_tables
+    """
+}
+
 process lcs_sc2 {
     label 'lcs_sc2'
     publishDir "${params.output}/${params.read_dir}/${name}/lineage-proportion-by-reads", mode: 'copy'
