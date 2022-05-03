@@ -45,10 +45,14 @@ process lcs_plot {
     val(cutoff)
     
     output:
-    path("*.png")
+    path("lcs_barplot.png")
     
     script:
     """
     lcs_bar_plot.R '${tsv}' ${cutoff}
+    """
+    stub:
+    """
+    touch lcs_barplot.png
     """
 }
