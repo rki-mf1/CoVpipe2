@@ -25,7 +25,6 @@ process lcs_sc2 {
     cd LCS
     mem=\$(echo ${task.memory} | cut -d' ' -f1)
     snakemake --config markers=ucsc dataset=mypool --cores ${task.cpus} --resources mem_gb=\$mem --set-threads pool_mutect=${task.cpus}
-    #PB_VERSION='${params.lcs_ucsc}' 
     cd ..
     cp LCS/outputs/decompose/mypool.out ${name}.lcs.tsv
 
