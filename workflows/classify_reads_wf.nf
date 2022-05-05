@@ -1,6 +1,6 @@
 include { kraken; filter_virus_reads } from '../modules/kraken'
 include { krona; krona_taxonomy_update } from '../modules/krona'
-include { lcs_setup; lcs_sc2; lcs_plot } from '../modules/lcs'
+include { lcs_ucsc_markers_table; lcs; lcs_plot } from '../modules/lcs'
 
 workflow classify_reads {
     take:
@@ -18,15 +18,13 @@ workflow classify_reads {
 
         krona(kraken.out.kraken_report, krona_tax_status)
 
-        // calculate mixed/pooled samples using LCS, https://github.com/rvalieris/LCS
+        // calculate mixed/pooled samples using LCS (fork https://github.com/MarieLataretu/LCS of https://github.com/rvalieris/LCS)
         if (params.read_linage) {
-            lcs_setup()
+            lcs_ucsc_markers_table( params.lcs_variant_groups == 'default' ? file('default') : Channel.fromPath("${params.lcs_variant_groups}", checkIfExists: true) )
+            lcs(filter_virus_reads.out.fastq.combine(lcs_ucsc_markers_table.out))
 
-            // lcs_sc2(filter_virus_reads.out.fastq)
-
-            // lcs_results = lcs_sc2.out.map {it -> it[1]}.collectFile(name: 'lcs_results.tsv', skip: 1, keepHeader: true, storeDir: "${params.output}/${params.read_dir}/")
-
-            // lcs_plot(lcs_results, params.lcs_cutoff)
+            lcs_results = lcs.out.map {it -> it[1]}.collectFile(name: 'lcs_results.tsv', skip: 1, keepHeader: true, storeDir: "${params.output}/${params.read_dir}/")
+            lcs_plot(lcs_results, params.lcs_cutoff)
         } else {
             lcs_output = Channel.empty()
         }
