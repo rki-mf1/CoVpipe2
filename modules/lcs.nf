@@ -10,7 +10,7 @@ process lcs_ucsc_markers_table {
     script:
     if ( params.lcs_ucsc_update || params.lcs_ucsc_default != 'predefined')
         """
-        git clone https://github.com/MarieLataretu/LCS.git
+        git clone https://github.com/rki-mf1/LCS.git
 
         if [[ "${variant_group_tsv}" != default ]]; then
             rm -rf LCS/data/variant_groups.tsv
@@ -29,7 +29,7 @@ process lcs_ucsc_markers_table {
         """
     else if ( params.lcs_ucsc_default == 'predefined' )
         """
-        git clone https://github.com/MarieLataretu/LCS.git
+        git clone https://github.com/rki-mf1/LCS.git
         mkdir -p LCS/outputs/variants_table
         zcat LCS/data/pre-generated-marker-tables/ucsc-markers-2022-01-31.tsv.gz > LCS/outputs/variants_table/ucsc-markers-table.tsv
         mv LCS/outputs/variants_table/ucsc-markers-table.tsv LCS/outputs/variants_table/ucsc-markers-table-predefined.tsv 
@@ -48,7 +48,7 @@ process lcs {
     
     script:
     """
-    git clone https://github.com/MarieLataretu/LCS.git
+    git clone https://github.com/rki-mf1/LCS.git
     mkdir -p LCS/outputs/variants_table
 
     mv ${ucsc_markers_table} LCS/outputs/variants_table/ucsc-markers-table.tsv
