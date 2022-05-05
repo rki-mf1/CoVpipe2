@@ -352,7 +352,7 @@ def helpMSG() {
     --taxid                  Taxonomic ID used together with the kraken2 database for read filtering [default: $params.taxid]
 
     ${c_yellow}Linage detection on read level with LCS:${c_reset}
-    ${c_dim}Uses this fork https://github.com/MarieLataretu/LCS of https://github.com/rvalieris/LCS${c_reset}
+    ${c_dim}Uses this fork https://github.com/rki-mf1/LCS of https://github.com/rvalieris/LCS${c_reset}
     --read_linage            Linage detection on read level [default: $params.read_linage]
     --lcs_ucsc_default       Create marker table based on a specific UCSC SARS-CoV-2 tree (e.g. '2022-05-01'). Use 'predefined' 
                                  to use the marker table from the repo (most probably not up-to-date) [default: $params.lcs_ucsc_default]
@@ -363,7 +363,7 @@ def helpMSG() {
                                  ${c_dim}Attention! Updating without downsampling needs a lot of resources in terms of memory and might fail.
                                  Consider downsampling or increase the memory for this process.${c_reset}
     --lcs_variant_groups     Provide path to custom variant groups table (TSV) for marker table update. Use 'default' for predefined groups from repo
-                                 (https://github.com/MarieLataretu/LCS/blob/master/data/variant_groups.tsv) [default: $params.lcs_variant_groups]
+                                 (https://github.com/rki-mf1/LCS/blob/master/data/variant_groups.tsv) [default: $params.lcs_variant_groups]
     --lcs_cutoff             Plot linages above this threshold [default: $params.lcs_cutoff]
 
     ${c_yellow}Primer detection: ${c_reset}

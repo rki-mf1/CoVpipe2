@@ -154,7 +154,7 @@ Robert Koch Institute, MF1 Bioinformatics
     --taxid                  Taxonomic ID used together with the kraken2 database for read filtering [default: 2697049]
 
     Linage detection on read level with LCS:
-    Uses this fork https://github.com/MarieLataretu/LCS of https://github.com/rvalieris/LCS
+    Uses this fork https://github.com/rki-mf1/LCS of https://github.com/rvalieris/LCS
     --read_linage            Linage detection on read level [default: false]
     --lcs_ucsc_default       Create marker table based on a specific UCSC SARS-CoV-2 tree (e.g. '2022-05-01'). Use 'predefined' 
                                  to use the marker table from the repo (most probably not up-to-date) [default: predefined]
@@ -165,7 +165,7 @@ Robert Koch Institute, MF1 Bioinformatics
                                  Attention! Updating without downsampling needs a lot of resources in terms of memory and might fail.
                                  Consider downsampling or increase the memory for this process.
     --lcs_variant_groups     Provide path to custom variant groups table (TSV) for marker table update. Use 'default' for predefined groups from repo
-                                 (https://github.com/MarieLataretu/LCS/blob/master/data/variant_groups.tsv) [default: default]
+                                 (https://github.com/rki-mf1/LCS/blob/master/data/variant_groups.tsv) [default: default]
     --lcs_cutoff             Plot linages above this threshold [default: 0.03]
 
     Primer detection: 
