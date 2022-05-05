@@ -153,8 +153,19 @@ Robert Koch Institute, MF1 Bioinformatics
                                  https://zenodo.org/record/3854856 and stored locally.
     --taxid                  Taxonomic ID used together with the kraken2 database for read filtering [default: 2697049]
 
-    Linage detection on read level:
-    --read_linage            Linage detection on read level with LCS (https://github.com/rvalieris/LCS) [default: false]
+    Linage detection on read level with LCS:
+    Uses this fork https://github.com/rki-mf1/LCS of https://github.com/rvalieris/LCS
+    --read_linage            Linage detection on read level [default: false]
+    --lcs_ucsc_default       Create marker table based on a specific UCSC SARS-CoV-2 tree (e.g. '2022-05-01'). Use 'predefined' 
+                                 to use the marker table from the repo (most probably not up-to-date) [default: predefined]
+                                 See https://hgdownload.soe.ucsc.edu/goldenPath/wuhCor1/UShER_SARS-CoV-2 for available trees.
+    --lcs_ucsc_update        Use latest UCSC SARS-CoV-2 tree for marker table update. Overwrites --lcs_ucsc_default [default: false]
+                                 Automatically checks https://hgdownload.soe.ucsc.edu/goldenPath/wuhCor1/UShER_SARS-CoV-2/public-latest.version.txt
+    --lcs_ucsc_downsampling  Downsample sequences when updating marker table to save resources. Use 'None' to turn off [default: 10000]
+                                 Attention! Updating without downsampling needs a lot of resources in terms of memory and might fail.
+                                 Consider downsampling or increase the memory for this process.
+    --lcs_variant_groups     Provide path to custom variant groups table (TSV) for marker table update. Use 'default' for predefined groups from repo
+                                 (https://github.com/rki-mf1/LCS/blob/master/data/variant_groups.tsv) [default: default]
     --lcs_cutoff             Plot linages above this threshold [default: 0.03]
 
     Primer detection: 
