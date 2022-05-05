@@ -6,7 +6,7 @@ nextflow.enable.dsl=2
 if (params.help) { exit 0, helpMSG() }
 
 // parameter sanity check
-Set valid_params = ['cores', 'max_cores', 'memory', 'help', 'profile', 'workdir', 'fastq', 'list', 'mode', 'run_id', 'reference', 'ref_genome', 'ref_annotation', 'adapter', 'fastp_additional_parameters', 'kraken', 'taxid', 'primer_bed', 'primer_bedpe', 'primer_version', 'vcount', 'frac', 'cov', 'vois', 'var_mqm', 'var_sap', 'var_qual', 'cns_min_cov', 'cns_gt_adjust', 'update', 'pangolin_docker_default', 'nextclade_docker_default', 'output', 'reference_dir', 'read_dir', 'mapping_dir', 'variant_calling_dir', 'consensus_dir', 'linage_dir', 'report_dir', 'rki_dir', 'runinfo_dir', 'singularity_cache_dir', 'conda_cache_dir', 'databases', 'publish_dir_mode', 'cloudProcess', 'cloud-process']
+Set valid_params = ['cores', 'max_cores', 'memory', 'help', 'profile', 'workdir', 'fastq', 'list', 'mode', 'run_id', 'reference', 'ref_genome', 'ref_annotation', 'adapter', 'fastp_additional_parameters', 'kraken', 'taxid', 'read_linage', 'lcs_ucsc_default', 'lcs_ucsc_update', 'lcs_ucsc_downsampling', 'lcs_variant_groups', 'lcs_cutoff', 'primer_bed', 'primer_bedpe', 'primer_version', 'vcount', 'frac', 'cov', 'vois', 'var_mqm', 'var_sap', 'var_qual', 'cns_min_cov', 'cns_gt_adjust', 'update', 'pangolin_docker_default', 'nextclade_docker_default', 'output', 'reference_dir', 'read_dir', 'mapping_dir', 'variant_calling_dir', 'consensus_dir', 'linage_dir', 'report_dir', 'rki_dir', 'runinfo_dir', 'singularity_cache_dir', 'conda_cache_dir', 'databases', 'publish_dir_mode', 'cloudProcess', 'cloud-process']
 def parameter_diff = params.keySet() - valid_params
 if (parameter_diff.size() != 0){
     exit 1, "ERROR: Parameter(s) $parameter_diff is/are not valid in the pipeline!\n"
@@ -181,6 +181,18 @@ println "\033[0;33mWarning: Running --update might not be CoVpipe compatible!\03
 }
 else { params.pangolin_docker = params.pangolin_docker_default ; params.nextclade_docker = params.nextclade_docker_default  }
 
+if ( params.read_linage && params.lcs_ucsc_update ){
+    if ( internetcheck.toString() == "true" ) { 
+        latest_version = 'https://hgdownload.soe.ucsc.edu/goldenPath/wuhCor1/UShER_SARS-CoV-2/public-latest.version.txt'.toURL().text.split('\\(')[1].split('\\)')[0]
+        println "\033[0;32mFound latest UCSC version, using: " + latest_version + " \033[0m" 
+        params.lcs_ucsc = latest_version
+    }
+    if ( internetcheck.toString() == "false" ) { 
+        println "\033[0;33mCould not find the latest UCSC version, trying: " + params.lcs_ucsc_default + "\033[0m"
+        params.lcs_ucsc = params.lcs_ucsc_default
+    }
+} else { params.lcs_ucsc = params.lcs_ucsc_default}
+
 /************************** 
 * MODULES
 **************************/
@@ -338,6 +350,21 @@ def helpMSG() {
                                  ${c_dim}A pre-processed kraken2 database will be automatically downloaded from 
                                  https://zenodo.org/record/3854856 and stored locally.${c_reset}
     --taxid                  Taxonomic ID used together with the kraken2 database for read filtering [default: $params.taxid]
+
+    ${c_yellow}Linage detection on read level with LCS:${c_reset}
+    ${c_dim}Uses this fork https://github.com/rki-mf1/LCS of https://github.com/rvalieris/LCS${c_reset}
+    --read_linage            Linage detection on read level [default: $params.read_linage]
+    --lcs_ucsc_default       Create marker table based on a specific UCSC SARS-CoV-2 tree (e.g. '2022-05-01'). Use 'predefined' 
+                                 to use the marker table from the repo (most probably not up-to-date) [default: $params.lcs_ucsc_default]
+                                 ${c_dim}See https://hgdownload.soe.ucsc.edu/goldenPath/wuhCor1/UShER_SARS-CoV-2 for available trees.${c_reset}
+    --lcs_ucsc_update        Use latest UCSC SARS-CoV-2 tree for marker table update. Overwrites --lcs_ucsc_default [default: $params.lcs_ucsc_update]
+                                 ${c_dim}Automatically checks https://hgdownload.soe.ucsc.edu/goldenPath/wuhCor1/UShER_SARS-CoV-2/public-latest.version.txt${c_reset}
+    --lcs_ucsc_downsampling  Downsample sequences when updating marker table to save resources. Use 'None' to turn off [default: $params.lcs_ucsc_downsampling]
+                                 ${c_dim}Attention! Updating without downsampling needs a lot of resources in terms of memory and might fail.
+                                 Consider downsampling or increase the memory for this process.${c_reset}
+    --lcs_variant_groups     Provide path to custom variant groups table (TSV) for marker table update. Use 'default' for predefined groups from repo
+                                 (https://github.com/rki-mf1/LCS/blob/master/data/variant_groups.tsv) [default: $params.lcs_variant_groups]
+    --lcs_cutoff             Plot linages above this threshold [default: $params.lcs_cutoff]
 
     ${c_yellow}Primer detection: ${c_reset}
     --primer_bedpe           Provide the path to the primer BEDPE file. [default: $params.primer_bedpe]
