@@ -34,6 +34,10 @@ process lcs_ucsc_markers_table {
         zcat LCS/data/pre-generated-marker-tables/ucsc-markers-2022-01-31.tsv.gz > LCS/outputs/variants_table/ucsc-markers-table.tsv
         mv LCS/outputs/variants_table/ucsc-markers-table.tsv LCS/outputs/variants_table/ucsc-markers-table-predefined.tsv 
         """
+    stub:
+    """
+    touch LCS/outputs/variants_table/ucsc-markers-table-42.tsv
+    """
 }
 
 process lcs {
