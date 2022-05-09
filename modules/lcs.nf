@@ -36,6 +36,7 @@ process lcs_ucsc_markers_table {
         """
     stub:
     """
+    mkdir -p LCS/outputs/variants_table/
     touch LCS/outputs/variants_table/ucsc-markers-table-42.tsv
     """
 }
