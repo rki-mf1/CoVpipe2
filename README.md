@@ -156,10 +156,12 @@ Robert Koch Institute, MF1 Bioinformatics
     Linage detection on read level with LCS:
     Uses this fork https://github.com/rki-mf1/LCS of https://github.com/rvalieris/LCS
     --read_linage            Linage detection on read level [default: false]
-    --lcs_ucsc_default       Create marker table based on a specific UCSC SARS-CoV-2 tree (e.g. '2022-05-01'). Use 'predefined' 
+    --lcs_ucsc_version       Create marker table based on a specific UCSC SARS-CoV-2 tree (e.g. '2022-05-01'). Use 'predefined' 
                                  to use the marker table from the repo (most probably not up-to-date) [default: predefined]
                                  See https://hgdownload.soe.ucsc.edu/goldenPath/wuhCor1/UShER_SARS-CoV-2 for available trees.
-    --lcs_ucsc_update        Use latest UCSC SARS-CoV-2 tree for marker table update. Overwrites --lcs_ucsc_default [default: false]
+    --lcs_ucsc_predefined    If '--lcs_ucsc_version 'predefined'', select pre-calculated UCSC table [default: 2022-01-31]
+                                 See https://github.com/rki-mf1/LCS/tree/master/data/pre-generated-marker-tables
+    --lcs_ucsc_update        Use latest UCSC SARS-CoV-2 tree for marker table update. Overwrites --lcs_ucsc_version [default: false]
                                  Automatically checks https://hgdownload.soe.ucsc.edu/goldenPath/wuhCor1/UShER_SARS-CoV-2/public-latest.version.txt
     --lcs_ucsc_downsampling  Downsample sequences when updating marker table to save resources. Use 'None' to turn off [default: 10000]
                                  Attention! Updating without downsampling needs a lot of resources in terms of memory and might fail.

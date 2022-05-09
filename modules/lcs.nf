@@ -8,7 +8,7 @@ process lcs_ucsc_markers_table {
     path("LCS/outputs/variants_table/ucsc-markers-table-*.tsv")
 
     script:
-    if ( params.lcs_ucsc_update || params.lcs_ucsc_default != 'predefined')
+    if ( params.lcs_ucsc_update || params.lcs_ucsc_version != 'predefined')
         """
         git clone https://github.com/rki-mf1/LCS.git
 
@@ -27,11 +27,11 @@ process lcs_ucsc_markers_table {
         ## output
         mv outputs/variants_table/ucsc-markers-table.tsv outputs/variants_table/ucsc-markers-table-${params.lcs_ucsc}.tsv 
         """
-    else if ( params.lcs_ucsc_default == 'predefined' )
+    else if ( params.lcs_ucsc_version == 'predefined' )
         """
         git clone https://github.com/rki-mf1/LCS.git
         mkdir -p LCS/outputs/variants_table
-        zcat LCS/data/pre-generated-marker-tables/ucsc-markers-2022-01-31.tsv.gz > LCS/outputs/variants_table/ucsc-markers-table.tsv
+        zcat LCS/data/pre-generated-marker-tables/ucsc-markers-${params.lcs_ucsc_predefined}.tsv.gz > LCS/outputs/variants_table/ucsc-markers-table.tsv
         mv LCS/outputs/variants_table/ucsc-markers-table.tsv LCS/outputs/variants_table/ucsc-markers-table-predefined.tsv 
         """
     stub:
