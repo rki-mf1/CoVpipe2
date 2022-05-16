@@ -14,6 +14,7 @@ CoVpipe2 is a Nextflow pipeline for reference-based genome reconstruction of SAR
     - [Example 2:](#example-2)
     - [Example sample sheet](#example-sample-sheet)
   - [Manual / help](#manual--help)
+  - [Changes to CoVpipe](#changes-to-covpipe)
   - [Workflow](#workflow)
   - [Acknowledgement, props and inspiration](#acknowledgement-props-and-inspiration)
 
@@ -247,6 +248,27 @@ Robert Koch Institute, MF1 Bioinformatics
 ```
 
 </details>
+
+## Changes to [CoVpipe](https://gitlab.com/RKIBioinformaticsPipelines/ncov_minipipe)
+
+- Workflow management framework: `snakemake` -> `Nextflow`
+- Docker/Singularity and conda support for each step
+- Container/conda updated feature for `pangolin` and `nextclade`
+- HPC/slurm profile provided
+- New features:
+  - `nexclade` (mutation calling, clade assignment)
+  - `LCS` (linage decomposition)
+  - Restructured report
+  - `krona` plots (visualization of `Kraken2` output)
+  - `president` (genome quality control)
+- Version update (status CoVpipe2 v0.2.1):
+  - `bcftools`: 1.11 -> 1.14
+    - Note: https://github.com/samtools/bcftools/issues/1708
+  - `liftoff`: 1.5.2 -> 1.6.2
+  - `kraken2`: 2.1.0 -> 2.1.2
+  - `freebayes`: 1.3.2 -> 1.3.6
+  - `fastp`: 0.20.1 -> 0.23.2
+  - `bedtools`: 2.29.2 -> 2.30.0
 
 ## Workflow
 
