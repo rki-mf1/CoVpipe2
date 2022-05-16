@@ -1,12 +1,13 @@
 process nextclade {
     label 'nextclade'
     container = params.nextclade_docker
+    if (! workflow.profile.contains('stub') ) { conda = params.nextclade_conda }
     publishDir "${params.output}/${params.linage_dir}/${name}/", mode: params.publish_dir_mode
 
     input:
     tuple val(name), path(consensus)
     val(nextclade_dataset_name)
-    val(nextclade_version)
+
 
     output:
     tuple val(name), path("${name}_clade.tsv"), emit: results
@@ -16,12 +17,6 @@ process nextclade {
     script:
     """
     nextclade_version_curr=\$(nextclade --version)
-    if [ "${nextclade_version}" != '' ]; then
-        if [ "\$nextclade_version_curr" != "${nextclade_version}" ]; then
-            echo "Something wrong in the nextclade update process."
-            exit 1;
-        fi
-    fi
     nextclade dataset get --name ${nextclade_dataset_name} --output-dir 'data/${nextclade_dataset_name}'
     nextclade run --input-fasta ${consensus} --input-dataset data/${nextclade_dataset_name} --output-tsv tmp.tsv
     cat tmp.tsv | tr -d "\r" > ${name}_clade.tsv
@@ -34,27 +29,5 @@ process nextclade {
     touch ${name}_clade.tsv
     used_nextclade_version=42
     used_nextcladedataset_version=42
-    """
-}
-
-process update_nextclade_conda_env {
-    // execute this locally - would most likely fail on custer systems
-    label 'nextclade'
-    executor 'local'
-    cpus 1
-    cache false
-
-    output:
-    env(nextclade_version)
-
-    script:
-    conda_mode = workflow.profile.contains('mamba') ? 'mamba' : 'conda'
-    """
-    ${conda_mode} update nextclade
-    nextclade_version=\$(nextclade --version)
-    """
-    stub:
-    """
-    nextclade_version=42
     """
 }
