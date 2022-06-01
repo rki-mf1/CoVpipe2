@@ -257,6 +257,8 @@ Robert Koch Institute, MF1 Bioinformatics
 - Docker/Singularity and conda support for each step
 - Container/conda updated feature for `pangolin` and `nextclade`
 - HPC/slurm profile provided
+- Fixes:
+  - Subtract only deletions from low coverage mask for consensus generation
 - New features:
   - `nexclade` (mutation calling, clade assignment)
   - `LCS` (linage decomposition)
