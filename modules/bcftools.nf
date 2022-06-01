@@ -22,7 +22,7 @@ process index_vcf {
 process filter_variants_hard {
     label 'bcftools'
 
-    publishDir "${params.output}/${params.consensus_dir}/${name}", mode: params.publish_dir_mode
+    publishDir "${params.output}/${params.variant_calling_dir}/${name}", mode: params.publish_dir_mode
 
     input:
     tuple val(name), path(vcf)
