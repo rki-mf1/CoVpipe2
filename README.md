@@ -153,6 +153,7 @@ Robert Koch Institute, MF1 Bioinformatics
     --kraken                 Activate taxonomic read filtering to exclude reads not classified with specific taxonomic ID (see --taxid) [default: false]
                                  A pre-processed kraken2 database will be automatically downloaded from 
                                  https://zenodo.org/record/3854856 and stored locally.
+    --kraken_db_custom       Path to a custom Kraken2 database. [default: ]
     --taxid                  Taxonomic ID used together with the kraken2 database for read filtering [default: 2697049]
 
     Linage detection on read level with LCS:
