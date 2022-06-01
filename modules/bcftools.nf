@@ -43,7 +43,24 @@ process filter_variants_hard {
     """
 }
 
+process vcf_filter_dels {
+    label 'bcftools'
 
+    input:
+    tuple val(name), path(vcf)
+
+    output:
+    tuple val(name), path("${vcf}.all_dels")
+
+    script:
+    """
+    bcftools filter -i "INFO/TYPE=='del'" ${vcf} > ${vcf}.all_dels
+    """
+    stub:
+    """
+    touch ${vcf}.all_dels
+    """
+}
 
 process consensus_ambiguous {
     label 'bcftools'
