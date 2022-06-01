@@ -366,6 +366,7 @@ def helpMSG() {
 
     ${c_yellow}Trimming and QC:${c_reset}
     --fastp_additional_parameters      Additional parameters for FeatureCounts [default: $params.fastp_additional_parameters]
+                                           ${c_dim}For shorter/longer amplicon length than 156 nt, adjust --length_required${c_reset}
     
     ${c_yellow}Taxonomic read filter:${c_reset}
     --kraken                 Activate taxonomic read filtering to exclude reads not classified with specific taxonomic ID (see --taxid) [default: $params.kraken]
@@ -410,9 +411,10 @@ def helpMSG() {
     --var_mqm                Minimal mean mapping quality of observed alternate alleles (MQM). The mapping quality (MQ) 
                                  measures how good reads align to the respective reference genome region. Good mapping qualities are 
                                  around MQ 60. GATK recommends hard filtering of variants with MQ less than 40. [default: $params.var_mqm]
-    --var_sap                Strand balance probability for the alternate allele (SAP). The SAP is the Phred-scaled 
+    --var_sap                Maximal strand balance probability for the alternate allele (SAP). The SAP is the Phred-scaled 
                                  probability that there is strand bias at the respective site. A value near 0 indicates little or 
-                                 no strand bias. Set to -1 to disable the filter. [default: $params.var_sap]
+                                 no strand bias. Amplicon data usually has a high, WGS data a low bias. [default: $params.var_sap]
+                                 ${c_dim}Disable (default) for amplicon sequencing; for WGS GATK recommends 60${c_reset}
     --var_qual               Minimal variant call quality. Freebayes produces a general judgement of the 
                                  variant call. [default: $params.var_qual]
 

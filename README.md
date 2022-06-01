@@ -147,6 +147,7 @@ Robert Koch Institute, MF1 Bioinformatics
 
     Trimming and QC:
     --fastp_additional_parameters      Additional parameters for FeatureCounts [default: --qualified_quality_phred 20 --length_required 50]
+                                           For shorter/longer amplicon length than 156 nt, adjust --length_required
     
     Taxonomic read filter:
     --kraken                 Activate taxonomic read filtering to exclude reads not classified with specific taxonomic ID (see --taxid) [default: false]
@@ -191,9 +192,10 @@ Robert Koch Institute, MF1 Bioinformatics
     --var_mqm                Minimal mean mapping quality of observed alternate alleles (MQM). The mapping quality (MQ) 
                                  measures how good reads align to the respective reference genome region. Good mapping qualities are 
                                  around MQ 60. GATK recommends hard filtering of variants with MQ less than 40. [default: 40]
-    --var_sap                Strand balance probability for the alternate allele (SAP). The SAP is the Phred-scaled 
+    --var_sap                Maximal strand balance probability for the alternate allele (SAP). The SAP is the Phred-scaled 
                                  probability that there is strand bias at the respective site. A value near 0 indicates little or 
-                                 no strand bias. Set to -1 to disable the filter. [default: -1]
+                                 no strand bias. Amplicon data usually has a high, WGS data a low bias. [default: false]
+                                 Disable (default) for amplicon sequencing; for WGS GATK recommends 60
     --var_qual               Minimal variant call quality. Freebayes produces a general judgement of the 
                                  variant call. [default: 10]
 
