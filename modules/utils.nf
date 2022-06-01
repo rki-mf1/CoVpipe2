@@ -39,23 +39,6 @@ process bgzip_compress {
 }
 
 process adapt_consensus_header {
-  input:
-  tuple val(name), path(fasta)
-
-  output:
-  tuple val(name), path("${name}.header_renamed.fasta")
-
-  script:
-  """
-  sed "1 s/.*/>${name}/" ${fasta} 1> ${name}.header_renamed.fasta
-  """
-  stub:
-  """
-  touch ${name}.header_renamed.fasta
-  """
-  }
-
-process remove_del_symbol {
   publishDir "${params.output}/${params.consensus_dir}/${name}", mode: params.publish_dir_mode
 
   input:
@@ -66,8 +49,8 @@ process remove_del_symbol {
 
   script:
   """
-  head -n 1 ${fasta} > ${name}.iupac_consensus.fasta
-  tail -n +2 ${fasta} | tr -d "?\r\n" | fold -w 80 1>> ${name}.iupac_consensus.fasta
+  head -n 1 ${fasta} | sed "1 s/.*/>${name}/" > ${name}.iupac_consensus.fasta
+  tail -n +2 ${fasta} |  tr -d "\r\n" | fold -w 80 1>> ${name}.iupac_consensus.fasta
   # force new line at end of file to enable concatenation
   echo >> ${name}.iupac_consensus.fasta
   """
