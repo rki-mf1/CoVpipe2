@@ -50,7 +50,7 @@ process adapt_consensus_header {
   script:
   """
   head -n 1 ${fasta} | sed "1 s/.*/>${name}/" > ${name}.iupac_consensus.fasta
-  tail -n +2 ${fasta} |  tr -d "\r\n" | fold -w 80 1>> ${name}.iupac_consensus.fasta
+  tail -n +2 ${fasta} | tr -d "\r\n" | fold -w 80 1>> ${name}.iupac_consensus.fasta
   # force new line at end of file to enable concatenation
   echo >> ${name}.iupac_consensus.fasta
   """
