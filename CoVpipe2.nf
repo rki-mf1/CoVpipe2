@@ -6,7 +6,7 @@ nextflow.enable.dsl=2
 if (params.help) { exit 0, helpMSG() }
 
 // parameter sanity check
-Set valid_params = ['cores', 'max_cores', 'memory', 'help', 'profile', 'workdir', 'fastq', 'list', 'mode', 'run_id', 'reference', 'ref_genome', 'ref_annotation', 'adapter', 'fastp_additional_parameters', 'kraken', 'taxid', 'read_linage', 'lcs_ucsc_version', 'lcs_ucsc_predefined', 'lcs_ucsc_update', 'lcs_ucsc_downsampling', 'lcs_variant_groups', 'lcs_cutoff', 'primer_bed', 'primer_bedpe', 'primer_version', 'vcount', 'frac', 'cov', 'vois', 'var_mqm', 'var_sap', 'var_qual', 'cns_min_cov', 'cns_gt_adjust', 'update', 'pangolin_docker_default', 'nextclade_docker_default', 'output', 'reference_dir', 'read_dir', 'mapping_dir', 'variant_calling_dir', 'consensus_dir', 'linage_dir', 'report_dir', 'rki_dir', 'runinfo_dir', 'singularity_cache_dir', 'conda_cache_dir', 'databases', 'publish_dir_mode', 'cloudProcess', 'cloud-process']
+Set valid_params = ['cores', 'max_cores', 'memory', 'help', 'profile', 'workdir', 'fastq', 'list', 'mode', 'run_id', 'reference', 'ref_genome', 'ref_annotation', 'adapter', 'fastp_additional_parameters', 'kraken', 'taxid', 'read_linage', 'lcs_ucsc_version', 'lcs_ucsc_predefined', 'lcs_ucsc_update', 'lcs_ucsc_downsampling', 'lcs_variant_groups', 'lcs_cutoff', 'primer_bed', 'primer_bedpe', 'primer_version', 'vcount', 'frac', 'cov', 'vois', 'var_mqm', 'var_sap', 'var_qual', 'cns_min_cov', 'cns_gt_adjust', 'update', 'pangolin_docker_default', 'nextclade_docker_default', 'pangolin_conda_default', 'nextclade_conda_default', 'output', 'reference_dir', 'read_dir', 'mapping_dir', 'variant_calling_dir', 'consensus_dir', 'linage_dir', 'report_dir', 'rki_dir', 'runinfo_dir', 'singularity_cache_dir', 'conda_cache_dir', 'databases', 'publish_dir_mode', 'cloudProcess', 'cloud-process']
 def parameter_diff = params.keySet() - valid_params
 if (parameter_diff.size() != 0){
     exit 1, "ERROR: Parameter(s) $parameter_diff is/are not valid in the pipeline!\n"
@@ -161,7 +161,7 @@ static boolean DockernetIsAvailable() {
 def internetcheck = DockernetIsAvailable()
 
 if ( ( workflow.profile.contains('singularity') || workflow.profile.contains('docker') ) && params.update) {
-println "\033[0;33mWarning: Running --update might not be CoVpipe compatible!\033[0m"
+    println "\033[0;33mWarning: Running --update might not be CoVpipe compatible!\033[0m"
     if ( internetcheck.toString() == "true" ) { 
         tagname = 'https://registry.hub.docker.com/v2/repositories/rkimf1/pangolin/tags/'.toURL().text.split(',"name":"')[1].split('","')[0]
         params.pangolin_docker = "rkimf1/pangolin:" + tagname
@@ -180,6 +180,28 @@ println "\033[0;33mWarning: Running --update might not be CoVpipe compatible!\03
     } 
 }
 else { params.pangolin_docker = params.pangolin_docker_default ; params.nextclade_docker = params.nextclade_docker_default  }
+
+if ( ( workflow.profile.contains('conda') || workflow.profile.contains('mamba') ) && params.update) {
+    println "\033[0;33mWarning: Running --update might not be CoVpipe compatible!\033[0m"
+    if ( internetcheck.toString() == "true" ) { 
+        pangolin_latest_conda = 'https://conda.anaconda.org/bioconda/channeldata.json'.toURL().text.split('"pangolin":')[1].split('"version":')[1].split('"')[1]
+        params.pangolin_conda = "bioconda::pangolin=" + pangolin_latest_conda
+        println "\033[0;32mFound latest pangolin conda, using: " + params.pangolin_conda + " \033[0m" 
+
+        nexclade_latest_conda = 'https://conda.anaconda.org/bioconda/channeldata.json'.toURL().text.split('"nextclade":')[1].split('"version":')[1].split('"')[1]
+        params.nextclade_conda = "bioconda::nextclade=" + nexclade_latest_conda 
+        println "\033[0;32mFound latest nextclade conda, using: " + params.nextclade_conda + " \033[0m"
+    } 
+    if ( internetcheck.toString() == "false" ) { 
+        println "\033[0;33mCould not find the latest pangolin conda, trying: " + params.pangolin_conda_default + "\033[0m"
+        params.pangolin_conda = params.pangolin_conda_default 
+
+        println "\033[0;33mCould not find the latest nextclade conda, trying: " + params.nextclade_conda_default + "\033[0m"
+        params.nextclade_conda = params.nextclade_conda_default 
+    } 
+} else {
+    params.pangolin_conda = params.pangolin_conda_default ; params.nextclade_conda = params.nextclade_conda_default
+}
 
 if ( params.read_linage && params.lcs_ucsc_update ){
     if ( internetcheck.toString() == "true" ) { 
@@ -344,6 +366,7 @@ def helpMSG() {
 
     ${c_yellow}Trimming and QC:${c_reset}
     --fastp_additional_parameters      Additional parameters for FeatureCounts [default: $params.fastp_additional_parameters]
+                                           ${c_dim}For shorter/longer amplicon length than 156 nt, adjust --length_required${c_reset}
     
     ${c_yellow}Taxonomic read filter:${c_reset}
     --kraken                 Activate taxonomic read filtering to exclude reads not classified with specific taxonomic ID (see --taxid) [default: $params.kraken]
@@ -388,9 +411,10 @@ def helpMSG() {
     --var_mqm                Minimal mean mapping quality of observed alternate alleles (MQM). The mapping quality (MQ) 
                                  measures how good reads align to the respective reference genome region. Good mapping qualities are 
                                  around MQ 60. GATK recommends hard filtering of variants with MQ less than 40. [default: $params.var_mqm]
-    --var_sap                Strand balance probability for the alternate allele (SAP). The SAP is the Phred-scaled 
+    --var_sap                Maximal strand balance probability for the alternate allele (SAP). The SAP is the Phred-scaled 
                                  probability that there is strand bias at the respective site. A value near 0 indicates little or 
-                                 no strand bias. Set to -1 to disable the filter. [default: $params.var_sap]
+                                 no strand bias. Amplicon data usually has a high, WGS data a low bias. [default: $params.var_sap]
+                                 ${c_dim}Disable (default) for amplicon sequencing; for WGS GATK recommends 60${c_reset}
     --var_qual               Minimal variant call quality. Freebayes produces a general judgement of the 
                                  variant call. [default: $params.var_qual]
 

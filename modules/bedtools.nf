@@ -28,7 +28,7 @@ process create_low_coverage_no_del_mask {
     publishDir "${params.output}/${params.consensus_dir}/${name}", mode: params.publish_dir_mode
 
     input:
-    tuple val(name), path(bam), path(vcf)
+    tuple val(name), path(vcf), path(bam)
 
     output:
     tuple val(name), path("${name}.lowcov.bed")

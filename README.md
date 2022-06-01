@@ -14,6 +14,7 @@ CoVpipe2 is a Nextflow pipeline for reference-based genome reconstruction of SAR
     - [Example 2:](#example-2)
     - [Example sample sheet](#example-sample-sheet)
   - [Manual / help](#manual--help)
+  - [Changes to CoVpipe](#changes-to-covpipe)
   - [Workflow](#workflow)
   - [Acknowledgement, props and inspiration](#acknowledgement-props-and-inspiration)
 
@@ -146,6 +147,7 @@ Robert Koch Institute, MF1 Bioinformatics
 
     Trimming and QC:
     --fastp_additional_parameters      Additional parameters for FeatureCounts [default: --qualified_quality_phred 20 --length_required 50]
+                                           For shorter/longer amplicon length than 156 nt, adjust --length_required
     
     Taxonomic read filter:
     --kraken                 Activate taxonomic read filtering to exclude reads not classified with specific taxonomic ID (see --taxid) [default: false]
@@ -190,9 +192,10 @@ Robert Koch Institute, MF1 Bioinformatics
     --var_mqm                Minimal mean mapping quality of observed alternate alleles (MQM). The mapping quality (MQ) 
                                  measures how good reads align to the respective reference genome region. Good mapping qualities are 
                                  around MQ 60. GATK recommends hard filtering of variants with MQ less than 40. [default: 40]
-    --var_sap                Strand balance probability for the alternate allele (SAP). The SAP is the Phred-scaled 
+    --var_sap                Maximal strand balance probability for the alternate allele (SAP). The SAP is the Phred-scaled 
                                  probability that there is strand bias at the respective site. A value near 0 indicates little or 
-                                 no strand bias. Set to -1 to disable the filter. [default: -1]
+                                 no strand bias. Amplicon data usually has a high, WGS data a low bias. [default: false]
+                                 Disable (default) for amplicon sequencing; for WGS GATK recommends 60
     --var_qual               Minimal variant call quality. Freebayes produces a general judgement of the 
                                  variant call. [default: 10]
 
@@ -247,6 +250,29 @@ Robert Koch Institute, MF1 Bioinformatics
 ```
 
 </details>
+
+## Changes to [CoVpipe](https://gitlab.com/RKIBioinformaticsPipelines/ncov_minipipe)
+
+- Workflow management framework: `snakemake` -> `Nextflow`
+- Docker/Singularity and conda support for each step
+- Container/conda updated feature for `pangolin` and `nextclade`
+- HPC/slurm profile provided
+- Fixes:
+  - Subtract only deletions from low coverage mask for consensus generation
+- New features:
+  - `nexclade` (mutation calling, clade assignment)
+  - `LCS` (linage decomposition)
+  - Restructured report
+  - `krona` plots (visualization of `Kraken2` output)
+  - `president` (genome quality control)
+- Version update (status CoVpipe2 v0.2.1):
+  - `bcftools`: 1.11 -> 1.14
+    - Note: https://github.com/samtools/bcftools/issues/1708
+  - `liftoff`: 1.5.2 -> 1.6.2
+  - `kraken2`: 2.1.0 -> 2.1.2
+  - `freebayes`: 1.3.2 -> 1.3.6
+  - `fastp`: 0.20.1 -> 0.23.2
+  - `bedtools`: 2.29.2 -> 2.30.0
 
 ## Workflow
 

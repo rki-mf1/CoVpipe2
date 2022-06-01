@@ -1,5 +1,5 @@
 include { snpeff }                                    from '../modules/snpeff'
-include { nextclade; update_nextclade_conda_env }     from '../modules/nextclade'
+include { nextclade }     from '../modules/nextclade'
 include { bgzip_compress; replace_in_file }           from '../modules/utils'         addParams ( publish_dir: "${params.output}/${params.variant_calling_dir}/" )
 include { index_vcf }                                 from '../modules/bcftools'      addParams ( publish_dir: "${params.output}/${params.variant_calling_dir}/" )
 
@@ -17,13 +17,7 @@ workflow annotate_variant {
         bgzip_compress(snpeff.out.vcf) \
             | index_vcf
 
-        if ( ( workflow.profile.contains('conda') || workflow.profile.contains('mamba') || workflow.profile.contains('standard') ) && params.update) {
-            update_nextclade_conda_env()
-            version = update_nextclade_conda_env.out
-        } else {
-            version = ''
-        }
-        nextclade(consensus, nextclade_dataset_name, version)
+        nextclade(consensus, nextclade_dataset_name)
 
     emit:
         html = snpeff.out.html
