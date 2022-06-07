@@ -23,4 +23,8 @@ process sc2rf {
         echo ${name},,,, >> ${name}_sc2rf.csv
     fi
     """
+    stub:
+    """
+    touch ${name}_sc2rf.csv
+    """
 }
