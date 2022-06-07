@@ -19,6 +19,7 @@ params:
   nextclade_results: "none"
   nextclade_version: "none"
   nextclade_dataset_version: "none"
+  sc2rf_results: "none"
   vois_results: "none"
   cns_min_cov: "none"
   run_id: "none"
@@ -99,6 +100,7 @@ dt.sample_cov <- as.data.table(ldply(params$sample_cov, fread))
 dt.president_results <- as.data.table(ldply(params$president_results, fread, sep='\t'))
 dt.pangolin_results <- as.data.table(ldply(params$pangolin_results, fread))
 dt.nextclade_results <- as.data.table(ldply(params$nextclade_results, fread, sep='\t'))
+dt.sc2rf_results <- as.data.table(ldply(params$sc2rf_results, fread, sep=','))
 if(params$vois_results != 'none'){
   dt.vois_results <- as.data.table(ldply(params$vois_results, fread))
 }
@@ -196,10 +198,13 @@ dt.overview <- merge(x=dt.overview, y=dt.pangolin_results_tmp, by.x='sample', by
 
 dt.overview <- merge(x=dt.overview, y=dt.nextclade_results[,c("seqName", "clade", "Nextclade_pango", "substitutions", "aaSubstitutions", "deletions", "aaDeletions",	"insertions", "aaInsertions", "frameShifts", "privateNucMutations.reversionSubstitutions",	"privateNucMutations.labeledSubstitutions",	"privateNucMutations.unlabeledSubstitutions","qc.privateMutations.status")], by.x='sample', by.y='seqName')
 
+dt.sc2rf_results$recomb <- ifelse(dt.sc2rf_results$intermissions <= 3 & dt.sc2rf_results$breakpoints > 0 & dt.sc2rf_results$breakpoints <= 2, 'yes', 'no')
+dt.overview <- merge(x=dt.overview, y=dt.sc2rf_results[,c("sample", "recomb", "regions")], by='sample')
+
 if(params$kraken_table != 'none') {
-  colnames(dt.overview) <- c('sample', '# total reads', '# filtered reads', 'kraken2_ratio_human', 'kraken2_ratio_sarscov2', 'kraken2_ratio_unclassified', 'kraken2_numreads_human', 'kraken2_numreads_sarscov2', 'kraken2_numreads_unclassified', 'president_QC_pass', 'president_identity', 'president_numN', 'president_percentN', 'president_mismatches', 'pangolin_lineage', 'pangolin_conflict', 'scorpio_constellation', 'scorpio_conflict', 'pangolin_status', 'nextclade_clade', 'nextclade_pango', 'nextclade_mutations_nt', 'nextclade_mutations', 'nextclade_deletions_nt', 'nextclade_deletions', 'nextclade_insertions_nt', 'nextclade_insertions', 'nextclade_frameshifts', 'nextclade_private_nt_mutation_reversionSubstitutions', 'nextclade_private_nt_mutation_labeledSubstitutions', 'nextclade_private_nt_mutation_unlabeledSubstitutions', 'nextclade_privateMutations_status')
+  colnames(dt.overview) <- c('sample', '# total reads', '# filtered reads', 'kraken2_ratio_human', 'kraken2_ratio_sarscov2', 'kraken2_ratio_unclassified', 'kraken2_numreads_human', 'kraken2_numreads_sarscov2', 'kraken2_numreads_unclassified', 'president_QC_pass', 'president_identity', 'president_numN', 'president_percentN', 'president_mismatches', 'pangolin_lineage', 'pangolin_conflict', 'scorpio_constellation', 'scorpio_conflict', 'pangolin_status', 'nextclade_clade', 'nextclade_pango', 'nextclade_mutations_nt', 'nextclade_mutations', 'nextclade_deletions_nt', 'nextclade_deletions', 'nextclade_insertions_nt', 'nextclade_insertions', 'nextclade_frameshifts', 'nextclade_private_nt_mutation_reversionSubstitutions', 'nextclade_private_nt_mutation_labeledSubstitutions', 'nextclade_private_nt_mutation_unlabeledSubstitutions', 'nextclade_privateMutations_status', 'sc2rf_potential_recombinant', 'sc2rf_regions')
 } else {
-  colnames(dt.overview) <- c('sample', '# total reads', '# filtered reads', 'president_QC_pass', 'president_identity', 'president_numN', 'president_percentN', 'president_mismatches', 'pangolin_lineage', 'pangolin_conflict', 'scorpio_constellation', 'scorpio_conflict', 'pangolin_status', 'nextclade_clade', 'nextclade_pango', 'nextclade_mutations_nt', 'nextclade_mutations', 'nextclade_deletions_nt', 'nextclade_deletions', 'nextclade_insertions_nt', 'nextclade_insertions', 'nextclade_frameshifts', 'nextclade_private_nt_mutation_reversionSubstitutions', 'nextclade_private_nt_mutation_labeledSubstitutions', 'nextclade_private_nt_mutation_unlabeledSubstitutions', 'nextclade_privateMutations_status')
+  colnames(dt.overview) <- c('sample', '# total reads', '# filtered reads', 'president_QC_pass', 'president_identity', 'president_numN', 'president_percentN', 'president_mismatches', 'pangolin_lineage', 'pangolin_conflict', 'scorpio_constellation', 'scorpio_conflict', 'pangolin_status', 'nextclade_clade', 'nextclade_pango', 'nextclade_mutations_nt', 'nextclade_mutations', 'nextclade_deletions_nt', 'nextclade_deletions', 'nextclade_insertions_nt', 'nextclade_insertions', 'nextclade_frameshifts', 'nextclade_private_nt_mutation_reversionSubstitutions', 'nextclade_private_nt_mutation_labeledSubstitutions', 'nextclade_private_nt_mutation_unlabeledSubstitutions', 'nextclade_privateMutations_status', 'sc2rf_potential_recombinant', 'sc2rf_regions')
 }
 
 # dt.overview[dt.overview == ""] <- "n/a"
@@ -233,13 +238,16 @@ dt.overview$nextclade_privateMutations_status <- ifelse(dt.overview$nextclade_pr
                                     ifelse(dt.overview$nextclade_privateMutations_status == '',
                                     dt.overview$nextclade_privateMutations_status, 
                                     cell_spec(dt.overview$nextclade_privateMutations_status, background = "red", align = "right"))))
+dt.overview$sc2rf_potential_recombinant <- ifelse(dt.overview$sc2rf_potential_recombinant == 'yes',
+                                    cell_spec(dt.overview$sc2rf_potential_recombinant, background = "orange", align = "right"),
+                                    dt.overview$sc2rf_potential_recombinant)
 
 if(params$kraken_table != 'none'){
-  col <- c("sample", '# total reads', '# filtered reads', "kraken2_ratio_sarscov2", "president_QC_pass", "president_identity", "pangolin_lineage","scorpio_constellation", "nextclade_frameshifts","nextclade_privateMutations_status")
-  col_names <- c("Sample", '# total reads', '# filtered reads', "Severe acute respiratory syndrome coronavirus 2 (ratio)", "Genome QC", "%N", "Linage", "Scorpio call", "Frameshifts", "Private mutations QC")
+  col <- c("sample", '# total reads', '# filtered reads', "kraken2_ratio_sarscov2", "president_QC_pass", "president_identity", "pangolin_lineage","scorpio_constellation", "nextclade_frameshifts","nextclade_privateMutations_status", 'sc2rf_potential_recombinant')
+  col_names <- c("Sample", '# total reads', '# filtered reads', "Severe acute respiratory syndrome coronavirus 2 (ratio)", "Genome QC", "%N", "Linage", "Scorpio call", "Frameshifts", "Private mutations QC", 'Potential recombinant')
 } else {
-  col <- c("sample", '# total reads', '# filtered reads', "president_QC_pass", "president_identity", "pangolin_lineage","scorpio_constellation", "nextclade_frameshifts","nextclade_privateMutations_status")
-  col_names <- c("Sample", '# total reads', '# filtered reads', "Genome QC", "%N", "Linage", "Scorpio call", "Frameshifts", "Private mutations QC")
+  col <- c("sample", '# total reads', '# filtered reads', "president_QC_pass", "president_identity", "pangolin_lineage","scorpio_constellation", "nextclade_frameshifts","nextclade_privateMutations_status", 'sc2rf_potential_recombinant')
+  col_names <- c("Sample", '# total reads', '# filtered reads', "Genome QC", "%N", "Linage", "Scorpio call", "Frameshifts", "Private mutations QC", 'Potential recombinant')
 }
 
 datatable(dt.overview[, col, with=FALSE], 

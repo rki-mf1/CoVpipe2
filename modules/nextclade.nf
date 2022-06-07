@@ -11,6 +11,7 @@ process nextclade {
 
     output:
     tuple val(name), path("${name}_clade.tsv"), emit: results
+    tuple val(name), path("*.aligned.fasta"), emit: fasta_algn
     env(used_nextclade_version), emit: version
     env(used_nextcladedataset_version), emit: dataset_version
 

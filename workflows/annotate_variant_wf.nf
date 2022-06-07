@@ -1,5 +1,6 @@
 include { snpeff }                                    from '../modules/snpeff'
-include { nextclade }     from '../modules/nextclade'
+include { nextclade }                                 from '../modules/nextclade'
+include { sc2rf }                                     from '../modules/sc2rf'
 include { bgzip_compress; replace_in_file }           from '../modules/utils'         addParams ( publish_dir: "${params.output}/${params.variant_calling_dir}/" )
 include { index_vcf }                                 from '../modules/bcftools'      addParams ( publish_dir: "${params.output}/${params.variant_calling_dir}/" )
 
@@ -19,10 +20,13 @@ workflow annotate_variant {
 
         nextclade(consensus, nextclade_dataset_name)
 
+        sc2rf(nextclade.out.fasta_algn)
+
     emit:
         html = snpeff.out.html
         vcf = snpeff.out.vcf
         nextclade_results = nextclade.out.results
         nextclade_version = nextclade.out.version
         nextclade_dataset_version = nextclade.out.dataset_version
+        sc2rf_result = sc2rf.out.csv
 }
