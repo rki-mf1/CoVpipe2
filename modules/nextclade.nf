@@ -27,7 +27,7 @@ process nextclade {
     """
     stub:
     """
-    touch ${name}_clade.tsv
+    touch ${name}_clade.tsv ${name}.aligned.fasta
     used_nextclade_version=42
     used_nextcladedataset_version=42
     """
