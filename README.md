@@ -146,7 +146,7 @@ Robert Koch Institute, MF1 Bioinformatics
      --adapter               Define the path of a FASTA file containing the adapter sequences to be clipped. [default: false]
 
     Trimming and QC:
-    --fastp_additional_parameters      Additional parameters for FeatureCounts [default: --qualified_quality_phred 20 --length_required 50]
+    --fastp_additional_parameters      Additional parameters for fastp [default: --qualified_quality_phred 20 --length_required 50]
                                            For shorter/longer amplicon length than 156 nt, adjust --length_required
     
     Taxonomic read filter:
@@ -213,6 +213,10 @@ Robert Koch Institute, MF1 Bioinformatics
                                   or the container (profiles 'docker', 'singularity') is updated.
     --pangolin_docker_default  Default container tag for pangolin [default: rkimf1/pangolin:3.1.20--3bb06db]
     --nextclade_docker_default Default container tag for nextclade [default: rkimf1/nextclade:1.10.2--1764691]
+
+    Pangolin options:
+    --pangolin_skip_scorpio     Skip Scorpio in pangolin call [default: true]
+                                  From pangolin version 4 Scorpio overwrites Usher results which leads to many unassigned samples
 
     Computing options:
     --cores                  Max cores per process for local use [default: 4]

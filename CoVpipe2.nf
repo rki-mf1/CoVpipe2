@@ -6,7 +6,7 @@ nextflow.enable.dsl=2
 if (params.help) { exit 0, helpMSG() }
 
 // parameter sanity check
-Set valid_params = ['cores', 'max_cores', 'memory', 'help', 'profile', 'workdir', 'fastq', 'list', 'mode', 'run_id', 'reference', 'ref_genome', 'ref_annotation', 'adapter', 'fastp_additional_parameters', 'kraken', 'kraken_db_custom', 'taxid', 'read_linage', 'lcs_ucsc_version', 'lcs_ucsc_predefined', 'lcs_ucsc_update', 'lcs_ucsc_downsampling', 'lcs_variant_groups', 'lcs_cutoff', 'primer_bed', 'primer_bedpe', 'primer_version', 'vcount', 'frac', 'cov', 'vois', 'var_mqm', 'var_sap', 'var_qual', 'cns_min_cov', 'cns_gt_adjust', 'update', 'pangolin_docker_default', 'nextclade_docker_default', 'pangolin_conda_default', 'nextclade_conda_default', 'output', 'reference_dir', 'read_dir', 'mapping_dir', 'variant_calling_dir', 'consensus_dir', 'linage_dir', 'report_dir', 'rki_dir', 'runinfo_dir', 'singularity_cache_dir', 'conda_cache_dir', 'databases', 'publish_dir_mode', 'cloudProcess', 'cloud-process']
+Set valid_params = ['cores', 'max_cores', 'memory', 'help', 'profile', 'workdir', 'fastq', 'list', 'mode', 'run_id', 'reference', 'ref_genome', 'ref_annotation', 'adapter', 'fastp_additional_parameters', 'kraken', 'kraken_db_custom', 'taxid', 'read_linage', 'lcs_ucsc_version', 'lcs_ucsc_predefined', 'lcs_ucsc_update', 'lcs_ucsc_downsampling', 'lcs_variant_groups', 'lcs_cutoff', 'primer_bed', 'primer_bedpe', 'primer_version', 'vcount', 'frac', 'cov', 'vois', 'var_mqm', 'var_sap', 'var_qual', 'cns_min_cov', 'cns_gt_adjust', 'update', 'pangolin_docker_default', 'nextclade_docker_default', 'pangolin_conda_default', 'nextclade_conda_default', 'pangolin_skip_scorpio', 'output', 'reference_dir', 'read_dir', 'mapping_dir', 'variant_calling_dir', 'consensus_dir', 'linage_dir', 'report_dir', 'rki_dir', 'runinfo_dir', 'singularity_cache_dir', 'conda_cache_dir', 'databases', 'publish_dir_mode', 'cloudProcess', 'cloud-process']
 def parameter_diff = params.keySet() - valid_params
 if (parameter_diff.size() != 0){
     exit 1, "ERROR: Parameter(s) $parameter_diff is/are not valid in the pipeline!\n"
@@ -367,7 +367,7 @@ def helpMSG() {
      --adapter               Define the path of a FASTA file containing the adapter sequences to be clipped. [default: $params.adapter]
 
     ${c_yellow}Trimming and QC:${c_reset}
-    --fastp_additional_parameters      Additional parameters for FeatureCounts [default: $params.fastp_additional_parameters]
+    --fastp_additional_parameters      Additional parameters for fastp [default: $params.fastp_additional_parameters]
                                            ${c_dim}For shorter/longer amplicon length than 156 nt, adjust --length_required${c_reset}
     
     ${c_yellow}Taxonomic read filter:${c_reset}
@@ -434,6 +434,10 @@ def helpMSG() {
                                   or the container (profiles: 'docker', 'singularity') is updated.${c_reset}
     --pangolin_docker_default  Default container tag for pangolin [default: $params.pangolin_docker_default]
     --nextclade_docker_default Default container tag for nextclade [default: $params.nextclade_docker_default]
+
+    ${c_yellow}Pangolin options:${c_reset}
+    --pangolin_skip_scorpio     Skip Scorpio in pangolin call [default: $params.pangolin_skip_scorpio]
+                                  ${c_dim}From pangolin version 4 Scorpio overwrites Usher results which leads to many unassigned samples${c_reset}
 
     ${c_yellow}Computing options:${c_reset}
     --cores                  Max cores per process for local use [default: $params.cores]
