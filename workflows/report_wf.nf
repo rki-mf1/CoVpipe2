@@ -34,7 +34,7 @@ workflow summary_report {
 
         nextclade_results = nextclade.map {it -> it[1]}.collectFile(name: 'nextclade_results.tsv', skip: 1, keepHeader: true, storeDir: "${params.output}/${params.report_dir}/single_tables")
 
-        sc2rf_results = sc2rf.map {it -> it[1]}.collectFile(name: 'sc2rf_results.csv', skip: 1, keepHeader: true, storeDir: "${params.output}/${params.report_dir}/single_tables")
+        sc2rf_results = sc2rf.map {it -> it[1]}.collectFile(name: 'sc2rf_results.csv', storeDir: "${params.output}/${params.report_dir}/single_tables")
         
         vois_results = vois_tsv.map {it -> it[1]}.collectFile(name: 'vois_results.tsv', skip: 1, keepHeader: true, storeDir: "${params.output}/${params.report_dir}/single_tables")
 
