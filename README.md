@@ -146,7 +146,7 @@ Robert Koch Institute, MF1 Bioinformatics
      --adapter               Define the path of a FASTA file containing the adapter sequences to be clipped. [default: false]
 
     Trimming and QC:
-    --fastp_additional_parameters      Additional parameters for FeatureCounts [default: --qualified_quality_phred 20 --length_required 50]
+    --fastp_additional_parameters      Additional parameters for fastp [default: --qualified_quality_phred 20 --length_required 50]
                                            For shorter/longer amplicon length than 156 nt, adjust --length_required
     
     Taxonomic read filter:
