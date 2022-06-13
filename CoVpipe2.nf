@@ -118,14 +118,16 @@ if( params.primer_bedpe || params.primer_bed || params.primer_version ){
     // check if fasta header matches with primer chrom
     // if not exit, because it does not do what the user expects
     // will fail for multi fastas!
-    primer_file.withReader { line = it.readLine() } // read only first line
-    primer_id = line.split()[0] // extract id
+    def id_list = [] // collect all primer chrom
+    primer_file.eachLine { line ->
+        id_list.add( line.split()[0] ) // get first field
+    }
 
     ref_genome_file.withReader { line = it.readLine() }  // read only first line
     ref_id = line.split()[0].replaceAll("^>", "") // extract id
-
-    assert ref_id == primer_id: "Faster header ($ref_id) and primer chrom ($primer_id) don't match. Provide a matching primer BEDPE file or don't set --primer"
-
+    
+    assert id_list.find( { it == ref_id } ): "No match of faster header and primer chrom. Provide a matching primer file or don't set --primer"
+    
     primer_file_ch = Channel.fromPath(primer_file, checkIfExists: true)
 }
 
