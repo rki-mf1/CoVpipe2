@@ -11,8 +11,9 @@ process pangolin {
     tuple val(name), path("${name}_lineage_report.csv"), emit: report
 
     script:
+    def args = params.pangolin_skip_scorpio ? '--skip-scorpio' : ''
     """
-    pangolin --outfile ${name}_lineage_report.csv --tempdir . --threads ${task.cpus} ${fasta}
+    pangolin ${args} --outfile ${name}_lineage_report.csv --tempdir . --threads ${task.cpus} ${fasta}
     """
     stub:
     """
