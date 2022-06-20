@@ -8,8 +8,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- updated default pangolin version to 4.0.6
 - renamed parameter `pangolin_skip_scorpio` to `pangolin_scorpio` (default behavior of skipping scorpio does not change)
 - Kraken2 read output is not compressed - changed the file naming accordingly
+
+###
+
+- removed unused conda yamls
 
 ## [0.2.4] 2022-06-14
 

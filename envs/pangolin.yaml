@@ -1,4 +1,0 @@
-channels:
- - bioconda
-dependencies:
- - pangolin=4.0.2
