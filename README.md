@@ -215,7 +215,7 @@ Robert Koch Institute, MF1 Bioinformatics
     --nextclade_docker_default Default container tag for nextclade [default: rkimf1/nextclade:1.10.2--1764691]
 
     Pangolin options:
-    --pangolin_scorpio     Skip Scorpio in pangolin call [default: false]
+    --pangolin_scorpio     Use Scorpio in pangolin call [default: false]
                                   From pangolin version 4 Scorpio overwrites Usher results which leads to many unassigned samples
 
     Computing options:
