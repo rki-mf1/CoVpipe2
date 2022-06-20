@@ -38,7 +38,7 @@ process kraken {
     path(db)
 
     output:
-    tuple val(name), file("${name}.classified.R_{1,2}.fastq.gz"),     emit: fastq
+    tuple val(name), file("${name}.classified.R_{1,2}.fastq"),     emit: fastq
     tuple val(name), file("${name}.kraken.out.txt"),                  emit: kraken_output
     tuple val(name), file("${name}.kraken.report.txt"),               emit: kraken_report
 
@@ -48,7 +48,7 @@ process kraken {
         --threads ${task.cpus} \
         --db ${db} \
         --paired \
-        --classified-out ${name}.classified.R#.fastq.gz \
+        --classified-out ${name}.classified.R#.fastq \
         --output ${name}.kraken.out.txt \
         --report ${name}.kraken.report.txt \
         --gzip-compressed \
@@ -56,7 +56,7 @@ process kraken {
     """
     stub:
     """
-    touch ${name}.classified.R_{1,2}.fastq.gz ${name}.kraken.out.txt ${name}.kraken.report.txt
+    touch ${name}.classified.R_{1,2}.fastq ${name}.kraken.out.txt ${name}.kraken.report.txt
     """
 }
 

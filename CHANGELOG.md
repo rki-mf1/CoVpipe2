@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Kraken2 read output is not compressed - changed the file naming accordingly
+
 ## [0.2.4] 2022-06-14
 
 ### Added
