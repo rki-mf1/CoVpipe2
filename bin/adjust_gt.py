@@ -37,7 +37,7 @@ def get_filehandle(in_fname, gz):
         inhandle = gzip.open(in_fname, "rt")
     return inhandle
                 
-def process(in_fname, out_fname, min_vf, ao_tag="ao", dp_tag="AO", gt_tag="GT", gz=False):
+def process(in_fname, out_fname, min_vf, ao_tag="AO", dp_tag="DP", gt_tag="GT", gz=False):
     #sanity checks
     if min_vf <= 0.5:
         sys.exit("error: min_vf has to be greater than 0.5")
@@ -57,13 +57,22 @@ def process(in_fname, out_fname, min_vf, ao_tag="ao", dp_tag="AO", gt_tag="GT", 
                 if len(line.strip()) == 0 or line.startswith("#"):
                     outhandle.write(line)
                     continue
-                
-                #checking line for mixed variants
+
                 fields = line.split("\t")
-                if "," not in fields[4]:
+                
+                #find GT position
+                gt_pos = fields[8].split(":").index(gt_tag)
+                
+                #replacing GT info (considering line eventual breaks at end)
+                cols = fields[9].split(":")
+
+                # check line for homo/herterozygot
+                gt1, gt2 = cols[gt_pos].split('/')
+                if gt1 == gt2:
+                    # homozygot
                     outhandle.write(line)
                     continue
-              
+                
                 #find ao and dp
                 ao = ao_pattern.findall(fields[7])
                 dp = dp_pattern.findall(fields[7])
@@ -82,15 +91,13 @@ def process(in_fname, out_fname, min_vf, ao_tag="ao", dp_tag="AO", gt_tag="GT", 
                     continue
                 
                 #generate new GT
-                gt = str(fracs.index(m))
+                gt = str(fracs.index(m) + 1) # REF == 0 -> ++1
                 gt = gt + "/" + gt
                 
                 #find GT position
                 gt_pos = fields[8].split(":").index(gt_tag)
                 
                 #replacing GT info (considering line eventual breaks at end)
-                cols = fields[9].split(":")
-                cols[gt_pos] = gt
                 if gt_pos == len(cols)-1:
                     cols[gt_pos] += "\n"
                 fields[9] = ":".join(cols)
