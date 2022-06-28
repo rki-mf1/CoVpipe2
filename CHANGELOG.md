@@ -8,6 +8,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- changed `bcftools consensus` parameter from `-I` to `-H I`
+  - does not change behaviour
 - genotype adjustment for all heterzygote variants
 - updated default pangolin version to 4.0.6
 - renamed parameter `pangolin_skip_scorpio` to `pangolin_scorpio` (default behavior of skipping scorpio does not change)
@@ -16,9 +18,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Removed
 
 - removed unsued script
-
-###
-
 - removed unused conda yamls
 
 ## [0.2.4] 2022-06-14

@@ -75,7 +75,7 @@ process consensus_ambiguous {
     script:
     """
     bcftools consensus \
-                    -I \
+                    -H I \
                     -o ${vcf.baseName}.iupac_consensus.tmp \
                     -f ${reference} \
                     -m ${mask_bed} \
