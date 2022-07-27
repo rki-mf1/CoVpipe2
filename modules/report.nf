@@ -131,6 +131,22 @@ process kraken_table {
         colnames(df.kraken_output) <- paste0(colnames(df.kraken_output), c("", " (ratio)", " (ratio)", " (ratio)", " (count)", " (count)", " (count)"))
     }
 
+    # add cols if no reads classified for 0, tax_id, "9606"
+    if (! "9606" %in% dt.kraken_data\$ncbi_taxid) {
+        df.kraken_output\$"Homo sapiens (ratio)" = 0
+        df.kraken_output\$"Homo sapiens (count)" = 0
+    }
+    if (! "0" %in% dt.kraken_data\$ncbi_taxid) {
+        df.kraken_output\$"unclassified (ratio)" = 0
+        df.kraken_output\$"unclassified (count)" = 0
+    }
+    if (! "2697049" %in% dt.kraken_data\$ncbi_taxid) {
+        df.kraken_output\$"Severe acute respiratory syndrome coronavirus 2 (ratio)" = 0
+        df.kraken_output\$"Severe acute respiratory syndrome coronavirus 2 (count)" = 0
+    }
+    # reorder cols
+    df.kraken_output = df.kraken_output[, c("sample", "Homo sapiens (ratio)", "Severe acute respiratory syndrome coronavirus 2 (ratio)", "unclassified (ratio)", "Homo sapiens (count)", "Severe acute respiratory syndrome coronavirus 2 (count)", "unclassified (count)")]
+
     # save table as csv for later use
     write.csv(  x=df.kraken_output, 
                 row.names = FALSE, 
