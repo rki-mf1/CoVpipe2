@@ -250,7 +250,6 @@ def generate_sample_config(sample_data):
 
 
 def main(fastq_dir):
-    # fastq_dir = '/scratch/Projekte/MF1_genome-reconstruction/covpipe_testdata/20211126_FS10000749_53_BPG61617-2127/sedaghatjoo/'
     assert os.path.isdir(fastq_dir), f"{fastq_dir} does not exist"
     fastq_all = [f for f in os.listdir(fastq_dir) if re.search(r'.(fq|fnq|fastq)(.gz)?', f)]
 
