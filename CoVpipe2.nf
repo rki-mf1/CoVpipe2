@@ -169,8 +169,8 @@ if ( ( workflow.profile.contains('singularity') || workflow.profile.contains('do
         params.pangolin_docker = "rkimf1/pangolin:" + tagname
         println "\033[0;32mFound latest pangolin container, using: " + params.pangolin_docker + " \033[0m" 
 
-        tagname = 'https://registry.hub.docker.com/v2/repositories/rkimf1/nextclade/tags/'.toURL().text.split(',"name":"')[1].split('","')[0]
-        params.nextclade_docker = "rkimf1/nextclade:" + tagname 
+        tagname = 'https://registry.hub.docker.com/v2/repositories/rkimf1/nextclade2/tags/'.toURL().text.split(',"name":"')[1].split('","')[0]
+        params.nextclade_docker = "rkimf1/nextclade2:" + tagname 
         println "\033[0;32mFound latest nextclade container, using: " + params.nextclade_docker + " \033[0m"
     } 
     if ( internetcheck.toString() == "false" ) { 
