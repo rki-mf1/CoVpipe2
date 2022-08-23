@@ -19,11 +19,11 @@ process nextclade {
     """
     nextclade_version_curr=\$(nextclade --version)
     nextclade dataset get --name ${nextclade_dataset_name} --output-dir 'data/${nextclade_dataset_name}'
-    nextclade run --input-fasta ${consensus} --input-dataset data/${nextclade_dataset_name} --output-tsv tmp.tsv
+    nextclade run -j ${task.cpus} --input-dataset data/${nextclade_dataset_name} --output-fasta ${name}.aligned.fasta --output-tsv tmp.tsv ${consensus}
     cat tmp.tsv | tr -d "\r" > ${name}_clade.tsv
 
     used_nextclade_version=\$nextclade_version_curr
-    used_nextcladedataset_version=\$(nextclade dataset list --name '${nextclade_dataset_name}' | grep 'Tag' | awk '{print \$3}')
+    used_nextcladedataset_version=\$(nextclade dataset list --name 'sars-cov-2' | grep 'tag=' | grep '*' | awk '{print \$5}' | awk -F "=" '{print \$2}')
     """
     stub:
     """

@@ -214,10 +214,6 @@ Robert Koch Institute, MF1 Bioinformatics
     --pangolin_docker_default  Default container tag for pangolin [default: rkimf1/pangolin:3.1.20--3bb06db]
     --nextclade_docker_default Default container tag for nextclade [default: rkimf1/nextclade:1.10.2--1764691]
 
-    Pangolin options:
-    --pangolin_scorpio     Use Scorpio in pangolin call [default: false]
-                                  From pangolin version 4 Scorpio overwrites Usher results which leads to many unassigned samples
-
     Computing options:
     --cores                  Max cores per process for local use [default: 4]
     --max_cores              Max cores used on the machine for local use [default: 12]
