@@ -1,4 +1,5 @@
 # Changelog
+
 All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
@@ -6,9 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+### Fixed
+
+- fixed Nextclade2 Docker auto-update
+
 ### Changed
 
-- updated Nextclade to version 2: CoVpipe2 not comartible with nextclade version `< 2.4.0`
+- updated Nextclade to version 2: CoVpipe2 not compatible with nextclade version `< 2.4.0`
+- updated Pangolin to version 4.1.2
+
+### Removed
+
+- parameter `pangolin_scorpio`, since pangolin default behaviour changed from [v4.1](https://github.com/cov-lineages/pangolin/releases/tag/v4.1)
 
 ## [0.2.6] 2022-07-27
 
