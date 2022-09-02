@@ -10,8 +10,9 @@ process bamclipper {
     tuple val(name), path("${bam.simpleName}.primerclipped.bam"), path("${bam.simpleName}.primerclipped.bam.bai")
 
     script:
+    additional_parameters = params.bamclipper_additional_parameters ? params.bamclipper_additional_parameters : ''
     """
-    bamclipper.sh -b ${bam} -p ${primer_bed} -n ${task.cpus}
+    bamclipper.sh -b ${bam} -p ${primer_bed} -n ${task.cpus} ${additional_parameters}
     """
     stub:
     """
