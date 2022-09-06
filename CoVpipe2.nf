@@ -395,6 +395,9 @@ def helpMSG() {
     --lcs_cutoff             Plot linages above this threshold [default: $params.lcs_cutoff]
 
     ${c_yellow}Primer detection: ${c_reset}
+    --bamclipper_additional_parameters     Additional parameters for BAMClipper [default: $params.bamclipper_additional_parameters]
+                                              ${c_dim}Use -u INT and -d INT to adjust the primer detection window of BAMClipper: extend upstream (-u) or 
+                                              downstream (-d) from the 5' most nt of primer [default from BAMClipper: -u 1 -d 5]${c_reset}
     --primer_bedpe           Provide the path to the primer BEDPE file. [default: $params.primer_bedpe]
                                  ${c_dim}TAB-delimited text file containing at least 6 fields, see here:
                                  https://bedtools.readthedocs.io/en/latest/content/general-usage.html#bedpe-format${c_reset}

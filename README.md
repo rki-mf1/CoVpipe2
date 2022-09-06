@@ -174,6 +174,9 @@ Robert Koch Institute, MF1 Bioinformatics
     --lcs_cutoff             Plot linages above this threshold [default: 0.03]
 
     Primer detection: 
+    --bamclipper_additional_parameters      Additional parameters for BAMClipper [default: false]
+                                                Use -u INT and -d INT to adjust the primer detection window of BAMClipper: extend upstream (-u) or 
+                                                downstream (-d) from the 5' most nt of primer [default from BAMClipper: -u 1 -d 5]
     --primer_bedpe           Provide the path to the primer BEDPE file. [default: false]
                                  TAB-delimited text file containing at least 6 fields, see here:
                                  https://bedtools.readthedocs.io/en/latest/content/general-usage.html#bedpe-format
