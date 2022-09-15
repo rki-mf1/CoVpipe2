@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - '--bamclipper_additional_parameters' option to adjust BAMClipper parameters
+- documentation on how names in the input BED file have to be to automatically generate a BEDPE file
 
 ## [0.2.7] 2022-08-23
 

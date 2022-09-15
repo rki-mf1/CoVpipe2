@@ -402,7 +402,8 @@ def helpMSG() {
                                  ${c_dim}TAB-delimited text file containing at least 6 fields, see here:
                                  https://bedtools.readthedocs.io/en/latest/content/general-usage.html#bedpe-format${c_reset}
     OR
-    --primer_bed             Provide the path to the primer BED file. [default: $params.primer_bed]
+    --primer_bed             Provide the path to the primer BED file. A BEDPE file will be generated automatically.
+                                 The name of each entry has to match this pattern: primerID[_LEFT|_RIGHT]_ampliconID [default: $params.primer_bed]
     OR
     --primer_version         Provide a primer version. Currently supported ARTIC versions: V1, V2, V3, V4, V4.1 [default: $params.primer_version]
 
