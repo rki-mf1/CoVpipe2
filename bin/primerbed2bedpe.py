@@ -9,10 +9,9 @@ version="0.0.1"
 # Author: https://gitlab.com/rekm in the project https://gitlab.com/RKIBioinformaticsPipelines/ncov_minipipe
 # small adaptions from https://gitlab.com/MarieLataretu
 
-def main(cmd=None, snakemake=None):
+def main():
     parser = get_argparser()
-    cmd = from_snakemake(cmd, snakemake)
-    args = parser.parse_args(cmd)
+    args = parser.parse_args()
     reformat_bedpe(args)
 
 
@@ -39,23 +38,29 @@ def get_argparser():
             help="Output file name.  default: primer.bedpe")
     return parser
 
-
-def from_snakemake(cmd, snakemake):
-    return cmd
-
 def reformat_bedpe(args):
     bed_file = args.primer_bed
     outfile = args.output
     for_id = args.forward_identifier
     rev_id = args.reverse_identifier
+
+    with open(bed_file, 'r') as bed:
+        for line in bed:
+            assert len(line.split("\t")) >= 4, "ERROR: Check BED file format. Found less than four tab seperated entries in line."
+
     bed =  pd.read_csv(bed_file, sep="\t",  usecols=[0, 1, 2, 3],
                        names=["chrom","start","end","name"])
     pattern = re.compile("(.+)(%s|%s)(.*)" % (for_id,rev_id))
     func = lambda x: split_pattern(x, pattern, for_id, rev_id)
     parse_bed_ids = pd.concat(list(bed.iloc[:,3].apply(func))) 
     parse_bed_ids = pd.merge(bed, parse_bed_ids,how="left", left_on="name", right_on="key")
+    amplicons = parse_bed_ids.groupby("id")
+    assert amplicons.ngroups > 0, "ERROR: No primer paires to write. Check name foramt in BED file."
     with open(outfile,"w") as o_fh:
-        for group_id, keys in parse_bed_ids.groupby("id"):
+        for amplicon_id, keys in amplicons:
+            assert keys.shape[0] >= 2, f'ERROR: Cloud not find at least two primers for amplicon {amplicon_id}.'
+            if keys.shape[0] > 2:
+                print(f'LOG: Found more than two primers for amplicon {amplicon_id}')
             (left, l_data), (right, r_data) = keys.groupby("reverse") 
             for (idx,(li,ri)) in enumerate([(x,y) for x in range(len(l_data)) for y in range(len(r_data))]):
                 out = []
@@ -63,11 +68,12 @@ def reformat_bedpe(args):
                 r_temp = r_data.iloc[ri,:]
                 out.extend(list(l_temp[["chrom","start","end"]]))
                 out.extend(list(r_temp[["chrom","start","end"]]))
-                out.append(group_id)
+                out.append(amplicon_id)
                 out.append(idx)
                 # out.extend(list(l_temp["strand"])) # not respected by bamclipper
                 # out.extend(list(r_temp["strand"])) # not respected by bamclipper
                 print(*out, sep="\t", file=o_fh)
+    assert sum(1 for line in open(outfile)) >= sum(1 for line in open(bed_file))/2, "ERROR: BED to BEDPE conversion might be corrupted. Wrote less primer pairs than expected."
 
 
 def split_pattern(val, pattern, for_id, rev_id):
@@ -86,4 +92,4 @@ def split_pattern(val, pattern, for_id, rev_id):
 
 
 if __name__ == "__main__":
-    main(cmd=None)
+    main()
