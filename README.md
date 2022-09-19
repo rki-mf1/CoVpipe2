@@ -173,6 +173,10 @@ Robert Koch Institute, MF1 Bioinformatics
                                  (https://github.com/rki-mf1/LCS/blob/master/data/variant_groups.tsv) [default: default]
     --lcs_cutoff             Plot linages above this threshold [default: 0.03]
 
+    Mapping: 
+    --isize_filter           Insert size threshold for mapping. All BAM file entries with an insert size above this threshold 
+                                 are filtered out. Deactivated by default. [default: false]
+
     Primer detection: 
     --bamclipper_additional_parameters      Additional parameters for BAMClipper [default: false]
                                                 Use -u INT and -d INT to adjust the primer detection window of BAMClipper: extend upstream (-u) or 

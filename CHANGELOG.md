@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - '--bamclipper_additional_parameters' option to adjust BAMClipper parameters
 - documentation on how names in the input BED file have to be to automatically generate a BEDPE file
+- added an insert size filter for the BAM file
+
 ### Fixed
 
 - RKI report bug
