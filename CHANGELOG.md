@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+## [0.2.8] 2022-09-19
+
 ### Added
 
 - '--bamclipper_additional_parameters' option to adjust BAMClipper parameters
