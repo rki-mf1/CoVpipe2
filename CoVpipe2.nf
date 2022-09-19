@@ -6,7 +6,7 @@ nextflow.enable.dsl=2
 if (params.help) { exit 0, helpMSG() }
 
 // parameter sanity check
-Set valid_params = ['cores', 'max_cores', 'memory', 'help', 'profile', 'workdir', 'fastq', 'list', 'mode', 'run_id', 'reference', 'ref_genome', 'ref_annotation', 'adapter', 'fastp_additional_parameters', 'kraken', 'kraken_db_custom', 'taxid', 'read_linage', 'lcs_ucsc_version', 'lcs_ucsc_predefined', 'lcs_ucsc_update', 'lcs_ucsc_downsampling', 'lcs_variant_groups', 'lcs_cutoff', 'primer_bed', 'primer_bedpe', 'primer_version', 'vcount', 'frac', 'cov', 'vois', 'var_mqm', 'var_sap', 'var_qual', 'cns_min_cov', 'cns_gt_adjust', 'update', 'pangolin_docker_default', 'nextclade_docker_default', 'pangolin_conda_default', 'nextclade_conda_default', 'output', 'reference_dir', 'read_dir', 'mapping_dir', 'variant_calling_dir', 'consensus_dir', 'linage_dir', 'report_dir', 'rki_dir', 'runinfo_dir', 'singularity_cache_dir', 'conda_cache_dir', 'databases', 'publish_dir_mode', 'cloudProcess', 'cloud-process']
+Set valid_params = ['cores', 'max_cores', 'memory', 'help', 'profile', 'workdir', 'fastq', 'list', 'mode', 'run_id', 'reference', 'ref_genome', 'ref_annotation', 'adapter', 'fastp_additional_parameters', 'kraken', 'kraken_db_custom', 'taxid', 'read_linage', 'lcs_ucsc_version', 'lcs_ucsc_predefined', 'lcs_ucsc_update', 'lcs_ucsc_downsampling', 'lcs_variant_groups', 'lcs_cutoff', 'isize_filter', 'primer_bed', 'primer_bedpe', 'primer_version', 'bamclipper_additional_parameters', 'vcount', 'frac', 'cov', 'vois', 'var_mqm', 'var_sap', 'var_qual', 'cns_min_cov', 'cns_gt_adjust', 'update', 'pangolin_docker_default', 'nextclade_docker_default', 'pangolin_conda_default', 'nextclade_conda_default', 'output', 'reference_dir', 'read_dir', 'mapping_dir', 'variant_calling_dir', 'consensus_dir', 'linage_dir', 'report_dir', 'rki_dir', 'runinfo_dir', 'singularity_cache_dir', 'conda_cache_dir', 'databases', 'publish_dir_mode', 'cloudProcess', 'cloud-process']
 def parameter_diff = params.keySet() - valid_params
 if (parameter_diff.size() != 0){
     exit 1, "ERROR: Parameter(s) $parameter_diff is/are not valid in the pipeline!\n"
@@ -187,8 +187,11 @@ if ( ( workflow.profile.contains('conda') || workflow.profile.contains('mamba') 
     println "\033[0;33mWarning: Running --update might not be CoVpipe compatible!\033[0m"
     if ( internetcheck.toString() == "true" ) { 
         pangolin_latest_conda = 'https://conda.anaconda.org/bioconda/channeldata.json'.toURL().text.split('"pangolin":')[1].split('"version":')[1].split('"')[1]
-        params.pangolin_conda = "bioconda::pangolin=" + pangolin_latest_conda
+        pangolin_data_latest_conda = 'https://conda.anaconda.org/bioconda/channeldata.json'.toURL().text.split('"pangolin-data":')[1].split('"version":')[1].split('"')[1]
+        params.pangolin_conda = "bioconda::pangolin=" + pangolin_latest_conda + " bioconda::pangolin-data=" + pangolin_data_latest_conda
+        
         println "\033[0;32mFound latest pangolin conda, using: " + params.pangolin_conda + " \033[0m" 
+
 
         nexclade_latest_conda = 'https://conda.anaconda.org/bioconda/channeldata.json'.toURL().text.split('"nextclade":')[1].split('"version":')[1].split('"')[1]
         params.nextclade_conda = "bioconda::nextclade=" + nexclade_latest_conda 
@@ -280,7 +283,7 @@ workflow {
     reads_qc_cl_ch = params.kraken ? classify_reads.out.reads : reads_qc_ch
 
     // 4: read mapping
-    mapping(reads_qc_cl_ch, reference_ch)
+    mapping(reads_qc_cl_ch, reference_ch, params.isize_filter)
 
     // 5: primer clipping [optional]
     if (params.primer_version || params.primer_bedpe || params.primer_bed) {
@@ -320,7 +323,7 @@ workflow {
     genome_quality(generate_consensus.out.consensus_ambiguous, reference_ch)
 
     // 12: report
-    summary_report(generate_consensus.out.consensus_ambiguous, read_qc.out.fastp_json, kraken_reports.ifEmpty([]), mapping.out.mapping_stats, mapping.out.fragment_size, mapping.out.coverage, genome_quality.out.report, assign_linages.out.report, annotate_variant.out.nextclade_results, annotate_variant.out.nextclade_version, annotate_variant.out.nextclade_dataset_version, annotate_variant.out.sc2rf_result, vois.ifEmpty([]) )
+    summary_report(generate_consensus.out.consensus_ambiguous, read_qc.out.fastp_json, kraken_reports.ifEmpty([]), mapping.out.mapping_stats, mapping.out.fragment_size, mapping.out.coverage, genome_quality.out.valid.mix(genome_quality.out.invalid), assign_linages.out.report, annotate_variant.out.nextclade_results, annotate_variant.out.nextclade_version, annotate_variant.out.nextclade_dataset_version, annotate_variant.out.sc2rf_result, vois.ifEmpty([]) )
 
     // 13: provide data for DESH upload at RKI
     rki_report_wf(genome_quality.out.valid, genome_quality.out.invalid)
@@ -394,12 +397,20 @@ def helpMSG() {
                                  (https://github.com/rki-mf1/LCS/blob/master/data/variant_groups.tsv) [default: $params.lcs_variant_groups]
     --lcs_cutoff             Plot linages above this threshold [default: $params.lcs_cutoff]
 
+    ${c_yellow}Mapping: ${c_reset}
+    --isize_filter           Insert size threshold for mapping. All BAM file entries with an insert size above this threshold 
+                                 are filtered out. Deactivated by default. [default: $params.isize_filter]
+
     ${c_yellow}Primer detection: ${c_reset}
+    --bamclipper_additional_parameters     Additional parameters for BAMClipper [default: $params.bamclipper_additional_parameters]
+                                              ${c_dim}Use -u INT and -d INT to adjust the primer detection window of BAMClipper: extend upstream (-u) or 
+                                              downstream (-d) from the 5' most nt of primer [default from BAMClipper: -u 1 -d 5]${c_reset}
     --primer_bedpe           Provide the path to the primer BEDPE file. [default: $params.primer_bedpe]
                                  ${c_dim}TAB-delimited text file containing at least 6 fields, see here:
                                  https://bedtools.readthedocs.io/en/latest/content/general-usage.html#bedpe-format${c_reset}
     OR
-    --primer_bed             Provide the path to the primer BED file. [default: $params.primer_bed]
+    --primer_bed             Provide the path to the primer BED file. A BEDPE file will be generated automatically.
+                                 The name of each entry has to match this pattern: primerID[_LEFT|_RIGHT]_ampliconID [default: $params.primer_bed]
     OR
     --primer_version         Provide a primer version. Currently supported ARTIC versions: V1, V2, V3, V4, V4.1 [default: $params.primer_version]
 

@@ -1,4 +1,4 @@
-include { bgzip_compress as bgzip_compress_1; bgzip_compress as bgzip_compress_2 } from '../modules/utils' addParams ( publish_dir: "${params.output}/${params.variant_calling_dir}/" )
+include { bgzip_compress } from '../modules/utils' addParams ( publish_dir: "${params.output}/${params.variant_calling_dir}/" )
 include { adapt_consensus_header; mask_iupac as consensus_masked } from '../modules/utils' addParams ( publish_dir: "${params.output}/${params.consensus_dir}/" )
 include { filter_variants_hard; index_vcf; vcf_filter_dels } from '../modules/bcftools' addParams ( publish_dir: "${params.output}/${params.variant_calling_dir}/" )
 include { consensus_ambiguous } from '../modules/bcftools' addParams ( publish_dir: "${params.output}/${params.consensus_dir}/" )
@@ -16,7 +16,7 @@ workflow generate_consensus{
 
         if (params.cns_gt_adjust > 0) {
             adjust_gt(filter_variants_hard.out, params.cns_gt_adjust) \
-                | bgzip_compress_2
+                | bgzip_compress
                 | set { gt_adjusted_vcf }
         }
         vcf = params.cns_gt_adjust > 0 ? gt_adjusted_vcf : filter_variants_hard.out

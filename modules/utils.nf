@@ -134,6 +134,8 @@ process make_voi_table {
 process bed2bedpe {
   label 'president'
 
+  publishDir "${params.output}/${params.mapping_dir}"
+
   input:
   tuple val(name), path(bed)
   val(forward)

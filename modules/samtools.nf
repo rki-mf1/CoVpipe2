@@ -105,3 +105,26 @@ process get_fragment_size {
     touch ${name}.fragment_size.tsv
     """
 }
+
+process filter_isize_bam {
+    label 'samtools'
+
+    input:
+    tuple val(name), path(bam)
+    val(insert_size_threshold)
+
+    output:
+    tuple val(name), path("${name}_isize_filtered.bam"), emit: bam
+    
+    script:
+    """
+    samtools view -h ${bam} -@ ${task.cpus} | \
+        awk '{ if(\$0 ~ /^@/) {print \$0} else { if(sqrt(\$9^2) < sqrt(${insert_size_threshold}^2)) {print \$0}} }' | \
+        samtools view -Sbh -@ ${task.cpus} | \
+        samtools sort -@ ${task.cpus} > ${name}_isize_filtered.bam
+    """
+    stub:
+    """
+    touch ${name}_isize_filtered.bam
+    """
+}
