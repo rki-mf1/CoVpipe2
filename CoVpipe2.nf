@@ -187,8 +187,11 @@ if ( ( workflow.profile.contains('conda') || workflow.profile.contains('mamba') 
     println "\033[0;33mWarning: Running --update might not be CoVpipe compatible!\033[0m"
     if ( internetcheck.toString() == "true" ) { 
         pangolin_latest_conda = 'https://conda.anaconda.org/bioconda/channeldata.json'.toURL().text.split('"pangolin":')[1].split('"version":')[1].split('"')[1]
-        params.pangolin_conda = "bioconda::pangolin=" + pangolin_latest_conda
+        pangolin_data_latest_conda = 'https://conda.anaconda.org/bioconda/channeldata.json'.toURL().text.split('"pangolin-data":')[1].split('"version":')[1].split('"')[1]
+        params.pangolin_conda = "bioconda::pangolin=" + pangolin_latest_conda + " bioconda::pangolin-data=" + pangolin_data_latest_conda
+        
         println "\033[0;32mFound latest pangolin conda, using: " + params.pangolin_conda + " \033[0m" 
+
 
         nexclade_latest_conda = 'https://conda.anaconda.org/bioconda/channeldata.json'.toURL().text.split('"nextclade":')[1].split('"version":')[1].split('"')[1]
         params.nextclade_conda = "bioconda::nextclade=" + nexclade_latest_conda 
