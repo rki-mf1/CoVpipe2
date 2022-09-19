@@ -8,10 +8,9 @@ process president {
     path(reference_fasta)
     
     output:
-    tuple val(name), path("${name}_valid.fasta"), emit: valid
-    tuple val(name), path("${name}_invalid.fasta"), emit: invalid
-    tuple val(name), path("${name}_report.tsv"), emit: report
-    
+    tuple val(name), path("${name}_report.tsv"), path("${name}_valid.fasta"), emit: valid
+    tuple val(name), path("${name}_report.tsv"), path("${name}_invalid.fasta"), emit: invalid
+        
     script:
     """
     president -r ${reference_fasta} -t ${task.cpus} -q ${fasta} -x 0.90 -n 0.05 -p . -f ${name}_
