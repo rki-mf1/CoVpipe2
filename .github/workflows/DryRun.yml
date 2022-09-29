@@ -5,10 +5,18 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v1
-    - name: Help_test
-      run: curl -s https://get.nextflow.io | bash && ./nextflow run CoVpipe2.nf --help
+    - name: Check out pipeline code
+      uses: actions/checkout@v2
+      
+    - name: Install Nextflow
+      run: |
+        wget -qO- get.nextflow.io | bash
+        sudo mv nextflow /usr/local/bin/
+        
+    - name: Test help
+      run: nextflow run CoVpipe2.nf --help
+      
     - name: dry run
       run: |
           touch reads_1.fastq reads_2.fastq
-          ./nextflow run CoVpipe2.nf --fastq reads_{1,2}.fastq --reference sars-cov-2 --cores 2 --max_cores 2 -stub -profile stub
+          nextflow run CoVpipe2.nf --fastq reads_{1,2}.fastq --reference sars-cov-2 --cores 2 --max_cores 2 -stub -profile stub
