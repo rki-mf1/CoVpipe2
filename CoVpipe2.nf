@@ -44,7 +44,10 @@ defaultMSG()
 if ( !params.fastq ) {
     exit 1, "input missing, use [--fastq]"
 }
-
+Set modes = ['paired', 'single']
+if ( ! (params.mode in modes) ) {
+    exit 1, "Unknown mode. Choose from " + modes
+}
 Set reference = ['sars-cov-2'] // can be extended later on
 if ( !params.reference && !params.ref_genome && !params.ref_annotation ) {
     exit 1, "reference missing, use [--ref_genome] (and [--ref_annotation]) or choose of " + reference + " with [--reference]"
