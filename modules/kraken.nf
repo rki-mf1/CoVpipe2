@@ -38,25 +38,27 @@ process kraken {
     path(db)
 
     output:
-    tuple val(name), file("${name}.classified.R_{1,2}.fastq"),     emit: fastq
+    tuple val(name), file("${name}.classified.R*.fastq"),     emit: fastq
     tuple val(name), file("${name}.kraken.out.txt"),                  emit: kraken_output
     tuple val(name), file("${name}.kraken.report.txt"),               emit: kraken_report
 
     script:
+    set_paired = params.mode == 'paired' ? '--paired' : ''
+    set_out_name = params.mode == 'paired' ? '#' : ''
     """
     kraken2 \
         --threads ${task.cpus} \
         --db ${db} \
-        --paired \
-        --classified-out ${name}.classified.R#.fastq \
+        ${set_paired} \
+        --classified-out ${name}.classified.R${set_out_name}.fastq \
         --output ${name}.kraken.out.txt \
         --report ${name}.kraken.report.txt \
         --gzip-compressed \
-        ${reads[0]} ${reads[1]}
+        ${reads}
     """
     stub:
     """
-    touch ${name}.classified.R_{1,2}.fastq ${name}.kraken.out.txt ${name}.kraken.report.txt
+    touch ${name}.classified.R_{1,2}.fastq ${name}.classified.R.fastq ${name}.kraken.out.txt ${name}.kraken.report.txt
     """
 }
 
@@ -70,15 +72,21 @@ process filter_virus_reads {
     tuple val(name), path(reads)
 
     output:
-    tuple val(name), file("${name}.classified.R{1,2}.fastq.gz"),    emit: fastq
+    tuple val(name), file("${name}.classified.R*.fastq.gz"),    emit: fastq
     tuple val(name), file("${name}.extract.log"),                   emit: kraken_report
 
     script:
-    """
-    set +o pipefail
-    zgrep -A3 'kraken:taxid|${params.taxid}' ${reads[0]} | sed -e 's/^--\$//' | sed '/^\\s*\$/d' | gzip 1> ${name}.classified.R1.fastq.gz 2>> ${name}.extract.log
-    zgrep -A3 'kraken:taxid|${params.taxid}' ${reads[1]} | sed -e 's/^--\$//' | sed '/^\\s*\$/d' | gzip 1> ${name}.classified.R2.fastq.gz 2>> ${name}.extract.log
-    """
+    if ( params.mode == 'paired' )
+        """
+        set +o pipefail
+        zgrep -A3 'kraken:taxid|${params.taxid}' ${reads[0]} | sed -e 's/^--\$//' | sed '/^\\s*\$/d' | gzip 1> ${name}.classified.R1.fastq.gz 2>> ${name}.extract.log
+        zgrep -A3 'kraken:taxid|${params.taxid}' ${reads[1]} | sed -e 's/^--\$//' | sed '/^\\s*\$/d' | gzip 1> ${name}.classified.R2.fastq.gz 2>> ${name}.extract.log
+        """
+    else if ( params.mode == 'single' )
+        """
+        set +o pipefail
+        zgrep -A3 'kraken:taxid|${params.taxid}' ${reads} | sed -e 's/^--\$//' | sed '/^\\s*\$/d' | gzip 1> ${name}.classified.R.fastq.gz 2>> ${name}.extract.log
+        """
     stub:
     """
     touch ${name}.classified.R{1,2}.fastq.gz ${name}.extract.log
