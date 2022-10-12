@@ -4,6 +4,7 @@ output:
   html_document:
     toc: true
 params:
+  mode: "none"
   fastp_table_stats: "none"
   fastp_table_stats_filter: "none"
   kraken_table: "none"
@@ -82,7 +83,6 @@ library("xlsx")
 ```
 
 ```{r get_cmd_line_parameters}
-dt.desh <- as.data.table(ldply(params$desh, fread))
 dt.fastp_table_stats <- as.data.table(ldply(params$fastp_table_stats, fread))
 dt.fastp_table_stats_filter <- as.data.table(ldply(params$fastp_table_stats_filter, fread))
 if(params$kraken_table != 'none'){
@@ -366,53 +366,56 @@ datatable(dt.flagstat_table,
     formatRound(columns=c("mapping.rate"), digits=3)
 ```
 
+`r if(params$mode == "paired"){"
 ## Fragment sizes
 
 Fragment sizes were determined by mapping reads reference genome and extracting the fragment size from the respective bam file.
 Data of forward and reverse mapping reads were used, which leads to a duplicated entry for each paired end mapping.
 The log value of the median is given for comparison with the values shown in the plots.
 
-
 ### Fragment size table
+"}`
 
 ```{r table_fragsizes, fig.cap="Median fragment size determined by the distance of reads after mapping to reference genome."}
+if(params$mode == "paired"){
+  # conditional formatting for fragsizes not between 90 and 110
+  dt.fragment_size_median_table$median.fragsize <- ifelse(dt.fragment_size_median_table$median.fragsize >= 110 | dt.fragment_size_median_table$median.fragsize <= 90,
+                                                cell_spec(dt.fragment_size_median_table$median.fragsize, background = "orange", align = "right"),
+                                                dt.fragment_size_median_table$median.fragsize)
 
-# conditional formatting for fragsizes not between 90 and 110
-dt.fragment_size_median_table$median.fragsize <- ifelse(dt.fragment_size_median_table$median.fragsize >= 110 | dt.fragment_size_median_table$median.fragsize <= 90,
-                                              cell_spec(dt.fragment_size_median_table$median.fragsize, background = "orange", align = "right"),
-                                              dt.fragment_size_median_table$median.fragsize)
-
-datatable(dt.fragment_size_median_table,
-    rownames = FALSE,
-    colnames = c("Sample", "Fragment size (median)", "Fragment size (stdev)"),
-    caption = "Median fragment size determined by the distance of reads after mapping to reference genome. Read distance not between 90 and 110 bp are highlighted in orange.",
-    options = list(order = list(list(0, 'asc'))),
-    escape = FALSE) %>%
-    formatRound(columns=c("sd.fragsize"), digits=2)
+  datatable(dt.fragment_size_median_table,
+      rownames = FALSE,
+      colnames = c("Sample", "Fragment size (median)", "Fragment size (stdev)"),
+      caption = "Median fragment size determined by the distance of reads after mapping to reference genome. Read distance not between 90 and 110 bp are highlighted in orange.",
+      options = list(order = list(list(0, 'asc'))),
+      escape = FALSE) %>%
+      formatRound(columns=c("sd.fragsize"), digits=2)
+}
 ```
 
+`r if(params$mode == "paired"){"
 ### Fragment size plot
 
 Plotting the fragment sizes usually shows a distribution with multiple peaks. Ideally just one peak dominates the plot at around 100bp.
-
+"}`
 <div class=superhighimage>
 
 ```{r plot_fragsizes, fig.width=10, fig.height=plot.height, fig.cap="Fragment size distribution determined by the distance of reads after mapping to reference genome.", error=T}
-
-tryCatch({
-    ggplot(dt.fragment_size_table, aes(fragsize.abs, colour = sample, fill = sample)) +
-    geom_density() +
-    facet_wrap(~sample, ncol = 4, scales = "free_y") +
-    theme(axis.text.x = element_text(angle = 45, hjust = 1),
-          legend.position = "none",
-          plot.title = element_text(hjust = 0.5)) +
-    scale_x_continuous(trans = "log10") +
-    labs(title = "Fragment size histogram",
-         x = "fragment size")
-    }, error = function(e) {
-        message("some error")
-    })
-
+if(params$mode == "paired"){
+  tryCatch({
+      ggplot(dt.fragment_size_table, aes(fragsize.abs, colour = sample, fill = sample)) +
+      geom_density() +
+      facet_wrap(~sample, ncol = 4, scales = "free_y") +
+      theme(axis.text.x = element_text(angle = 45, hjust = 1),
+            legend.position = "none",
+            plot.title = element_text(hjust = 0.5)) +
+      scale_x_continuous(trans = "log10") +
+      labs(title = "Fragment size histogram",
+          x = "fragment size")
+      }, error = function(e) {
+          message("some error")
+      })
+}
 ```
 
 </div>

@@ -28,7 +28,7 @@ workflow summary_report {
         coverage_table(mapping_coverage.map {it -> it[1]}.collect(), params.cov)
 
         // storeDir: "${params.output}/${params.report_dir}/"
-        president_results = president.map {it -> it[1]}.collectFile(name: 'president_results.tsv', skip: 1, keepHeader: true, storeDir: "${params.output}/${params.report_dir}/single_tables")
+        president_results = president.collectFile(name: 'president_results.tsv', skip: 1, keepHeader: true, storeDir: "${params.output}/${params.report_dir}/single_tables")
         
         pangolin_results = pangolin.map {it -> it[1]}.collectFile(name: 'pangolin_results.tsv', skip: 1, keepHeader: true, storeDir: "${params.output}/${params.report_dir}/single_tables")
 

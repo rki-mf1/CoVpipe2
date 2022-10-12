@@ -44,7 +44,10 @@ defaultMSG()
 if ( !params.fastq ) {
     exit 1, "input missing, use [--fastq]"
 }
-
+Set modes = ['paired', 'single']
+if ( ! (params.mode in modes) ) {
+    exit 1, "Unknown mode. Choose from " + modes
+}
 Set reference = ['sars-cov-2'] // can be extended later on
 if ( !params.reference && !params.ref_genome && !params.ref_annotation ) {
     exit 1, "reference missing, use [--ref_genome] (and [--ref_annotation]) or choose of " + reference + " with [--reference]"
@@ -323,7 +326,7 @@ workflow {
     genome_quality(generate_consensus.out.consensus_ambiguous, reference_ch)
 
     // 12: report
-    summary_report(generate_consensus.out.consensus_ambiguous, read_qc.out.fastp_json, kraken_reports.ifEmpty([]), mapping.out.mapping_stats, mapping.out.fragment_size, mapping.out.coverage, genome_quality.out.valid.mix(genome_quality.out.invalid), assign_linages.out.report, annotate_variant.out.nextclade_results, annotate_variant.out.nextclade_version, annotate_variant.out.nextclade_dataset_version, annotate_variant.out.sc2rf_result, vois.ifEmpty([]) )
+    summary_report(generate_consensus.out.consensus_ambiguous, read_qc.out.fastp_json, kraken_reports.ifEmpty([]), mapping.out.mapping_stats, mapping.out.fragment_size, mapping.out.coverage, genome_quality.out.valid.map{it -> it[1]}, assign_linages.out.report, annotate_variant.out.nextclade_results, annotate_variant.out.nextclade_version, annotate_variant.out.nextclade_dataset_version, annotate_variant.out.sc2rf_result, vois.ifEmpty([]) )
 
     // 13: provide data for DESH upload at RKI
     rki_report_wf(genome_quality.out.valid, genome_quality.out.invalid)
