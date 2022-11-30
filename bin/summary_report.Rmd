@@ -459,7 +459,7 @@ Sequence depth on the reference genome is visualized as histograms binning bases
 
 <div class=scroll>
 
-```{r plot_coverage_histogram, fig.width=10, fig.height=plot.height*(sample.count/10), fig.cap="Sequence depth distribution on SARS-CoV-2 genome. The amount of bases is shown dependend on the respective sequence depth. Please watch out for the different axis scaling.", attr.output='style="max-height: 50px;"'}
+```{r plot_coverage_histogram, fig.width=10, fig.height=plot.height, fig.cap="Sequence depth distribution on SARS-CoV-2 genome. The amount of bases is shown dependend on the respective sequence depth. Please watch out for the different axis scaling."}
 
 ggplot(dt.coverage_table[dt.coverage_table$mid.bin == 50,], aes(depth, fill = sample)) +
     geom_histogram(binwidth = 50) +
@@ -467,7 +467,8 @@ ggplot(dt.coverage_table[dt.coverage_table$mid.bin == 50,], aes(depth, fill = sa
     labs(title = "coverage histogram") +
     theme(plot.title = element_text(hjust = 0.5),
           legend.position = "none",
-          axis.text.x = element_text(angle = 45, hjust = 0.5))
+          axis.text.x = element_text(angle = 45, hjust = 0.5)) +
+    facet_wrap(~sample, ncol = 3, scales = "free_y")
 ```
 
 </div>
