@@ -30,7 +30,7 @@ workflow summary_report {
         // storeDir: "${params.output}/${params.report_dir}/"
         president_results = president.collectFile(name: 'president_results.tsv', skip: 1, keepHeader: true, storeDir: "${params.output}/${params.report_dir}/single_tables")
         
-        pangolin_results = pangolin.map {it -> it[1]}.collectFile(name: 'pangolin_results.tsv', skip: 1, keepHeader: true, storeDir: "${params.output}/${params.report_dir}/single_tables")
+        pangolin_results = pangolin.map {it -> it[1]}.collectFile(name: 'pangolin_results.csv', skip: 1, keepHeader: true, storeDir: "${params.output}/${params.report_dir}/single_tables")
 
         nextclade_results = nextclade.map {it -> it[1]}.collectFile(name: 'nextclade_results.tsv', skip: 1, keepHeader: true, storeDir: "${params.output}/${params.report_dir}/single_tables")
 
