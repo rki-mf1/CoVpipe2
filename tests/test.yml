@@ -1,0 +1,28 @@
+- name: test
+  command: nextflow run ./CoVpipe2.nf -c ./tests/nextflow.config -profile singularity,local
+  files:
+    - path: "results/00-Reference"
+    - path: "results/01-Read-QC"
+    - path: "results/02-Mapping"
+    - path: "results/03-Variant-Calling/SAMPLE1_PE/SAMPLE1_PE.filtered.gt_adjust.vcf.gz"
+      contains:
+          - "MN908947.3	241	.	C	T"
+          - "MN908947.3	1875	.	C	T"
+          - "MN908947.3	3037	.	C	T"
+          - "MN908947.3	11719	.	G	A"
+          - "MN908947.3	14408	.	C	T"
+          - "MN908947.3	20268	.	A	G"
+          - "MN908947.3	23403	.	A	G"
+    - path: "results/03-Variant-Calling/SAMPLE2_PE/SAMPLE2_PE.filtered.gt_adjust.vcf.gz"
+      contains:
+          - "MN908947.3	1875	.	C	T"
+          - "MN908947.3	9477	.	T	A"
+          - "MN908947.3	14805	.	C	T"
+          - "MN908947.3	25979	.	G	T"
+          - "MN908947.3	28144	.	T	C"
+          - "MN908947.3	28657	.	C	T"
+          - "MN908947.3	28863	.	C	T"
+    - path: "results/04-Consensus"
+    - path: "results/05-Linages_Mutations"
+    - path: "results/06-RKI-summary"
+    - path: "results/Report"
