@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Report (accumulated sequence depth plot) can handle > 90 input samples
 
+### Changed
+
+- default reference changed from none to 'sars-cov-2'
+
 ## [0.2.9] 2022-11-03
 
 ### Added

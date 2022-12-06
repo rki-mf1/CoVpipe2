@@ -355,7 +355,7 @@ def helpMSG() {
     nextflow run rki-mf1/CoVpipe2 -r <version> --fastq '*R{1,2}.fastq.gz' --ref_genome ref.fasta --cores 4 --max_cores 8
 
     ${c_yellow}Reference, required:${c_reset}
-    ${c_green}--reference ${c_reset}             Currently supported: 'sars-cov-2' (MN908947.3)
+    ${c_green}--reference ${c_reset}             Currently supported: 'sars-cov-2' (MN908947.3) [default: $params.reference]
     OR
     ${c_green}--ref_genome ${c_reset}            Reference FASTA file.
     ${c_green}--ref_annotation ${c_reset}        Reference GFF file.
