@@ -350,7 +350,7 @@ def helpMSG() {
     Workflow: CoVpipe2
 
     ${c_yellow}Usage examples:${c_reset}
-    nextflow run CoVpipe2.nf --fastq '*R{1,2}.fastq.gz' --reference 'sars-cov-2' --cores 4 --max_cores 8
+    nextflow run CoVpipe2.nf --fastq '*R{1,2}.fastq.gz' --cores 4 --max_cores 8
     or
     nextflow run rki-mf1/CoVpipe2 -r <version> --fastq '*R{1,2}.fastq.gz' --ref_genome ref.fasta --cores 4 --max_cores 8
 
@@ -483,6 +483,10 @@ def helpMSG() {
     ${c_reset}
 
     Per default: -profile local,conda is executed. 
+
+    ${c_yellow}Test profile:${c_reset}
+    Test the pipeline with a small test dataset:
+    nextflow run rki-mf1/CoVpipe2 -profile ${c_green}executer${c_reset},${c_blue}engine${c_reset},test
     """
 }
 def defaultMSG(){

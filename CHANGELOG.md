@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unpublished
 
+### Added
+
+- test profile
+
 ### Fixed
 
 - Report (accumulated sequence depth plot) can handle > 90 input samples
