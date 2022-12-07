@@ -465,9 +465,9 @@ def helpMSG() {
     --singularity_cache_dir  Location for storing the singularity images [default: $params.singularity_cache_dir]
     
     ${c_yellow}Execution/Engine profiles:${c_reset}
-    The pipeline supports profiles to run via different ${c_green}Executers${c_reset} and ${c_blue}Engines${c_reset} e.g.: -profile ${c_green}local${c_reset},${c_blue}conda${c_reset}
+    The pipeline supports profiles to run via different ${c_green}Executors${c_reset} and ${c_blue}Engines${c_reset} e.g.: -profile ${c_green}local${c_reset},${c_blue}conda${c_reset}
     
-    ${c_green}Executer${c_reset} (choose one):
+    ${c_green}Executor${c_reset} (choose one):
       local
       slurm
     
@@ -486,7 +486,7 @@ def helpMSG() {
 
     ${c_yellow}Test profile:${c_reset}
     Test the pipeline with a small test dataset:
-    nextflow run rki-mf1/CoVpipe2 -profile ${c_green}executer${c_reset},${c_blue}engine${c_reset},test
+    nextflow run rki-mf1/CoVpipe2 -profile ${c_green}executor${c_reset},${c_blue}engine${c_reset},test
     """
 }
 def defaultMSG(){

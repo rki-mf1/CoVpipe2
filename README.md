@@ -256,9 +256,9 @@ Robert Koch Institute, MF1 Bioinformatics
     --singularity_cache_dir  Location for storing the singularity images [default: singularity]
     
     Execution/Engine profiles:
-    The pipeline supports profiles to run via different Executers and Engines e.g.: -profile local,conda
+    The pipeline supports profiles to run via different Executors and Engines e.g.: -profile local,conda
     
-    Executer (choose one):
+    Executor (choose one):
       local
       slurm
     
@@ -277,7 +277,7 @@ Robert Koch Institute, MF1 Bioinformatics
 
     Test profile:
     Test the pipeline with a small test dataset:
-    nextflow run rki-mf1/CoVpipe2 -profile executer,engine,test
+    nextflow run rki-mf1/CoVpipe2 -profile executor,engine,test
 ```
 
 </details>
