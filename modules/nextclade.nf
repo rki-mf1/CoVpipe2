@@ -1,7 +1,7 @@
 process nextclade {
     label 'nextclade'
     container = params.nextclade_docker
-    if ( workflow.profile.contains('conda') ||  workflow.profile.contains('mamba') ) { conda = params.nextclade_conda }
+    conda ( (workflow.profile.contains('conda') ||  workflow.profile.contains('mamba')) ? params.nextclade_conda : null)
     publishDir "${params.output}/${params.linage_dir}/${name}/", mode: params.publish_dir_mode
 
     input:
