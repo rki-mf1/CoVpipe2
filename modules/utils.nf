@@ -9,7 +9,7 @@ process compress_reads {
 
   script:
   """
-  pigz -f -p ${task.cpus} ${reads}
+  pigz -f -p task.cpus ${reads}
   """
   stub:
   """
@@ -30,7 +30,7 @@ process bgzip_compress {
 
   script:
   """
-  bgzip -@ ${task.cpus} ${file}
+  bgzip -@ task.cpus ${file}
   """
   stub:
   """

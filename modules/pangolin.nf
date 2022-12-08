@@ -1,7 +1,7 @@
 process pangolin {
     label 'pangolin'
     container = params.pangolin_docker
-    if ( workflow.profile.contains('conda') ||  workflow.profile.contains('mamba') ) { conda = params.pangolin_conda }
+    conda ( (workflow.profile.contains('conda') ||  workflow.profile.contains('mamba')) ? params.pangolin_conda : null)
     publishDir "${params.output}/${params.linage_dir}/${name}", mode: params.publish_dir_mode
     
     input:
@@ -12,7 +12,7 @@ process pangolin {
 
     script:
     """
-    pangolin --outfile ${name}_lineage_report.csv --tempdir . --threads ${task.cpus} ${fasta}
+    pangolin --outfile ${name}_lineage_report.csv --tempdir . --threads task.cpus ${fasta}
     """
     stub:
     """

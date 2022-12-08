@@ -23,7 +23,7 @@ process lcs_ucsc_markers_table {
         sed -i "s/NUM_SAMPLE=.*/NUM_SAMPLE=${params.lcs_ucsc_downsampling}/" rules/config.py
         mem=\$(echo ${task.memory} | cut -d' ' -f1)
         ## run pipeline
-        snakemake --cores ${task.cpus} --resources mem_gb=\$mem --config dataset=somestring markers=ucsc -- ucsc_gather_tables
+        snakemake --cores task.cpus --resources mem_gb=\$mem --config dataset=somestring markers=ucsc -- ucsc_gather_tables
         ## output
         mv outputs/variants_table/ucsc-markers-table.tsv outputs/variants_table/ucsc-markers-table-${params.lcs_ucsc}.tsv 
         """
@@ -69,7 +69,7 @@ process lcs {
     
     cd LCS
     mem=\$(echo ${task.memory} | cut -d' ' -f1)
-    snakemake --config markers=ucsc dataset=mypool --cores ${task.cpus} --resources mem_gb=\$mem --set-threads pool_mutect=${task.cpus}
+    snakemake --config markers=ucsc dataset=mypool --cores task.cpus --resources mem_gb=\$mem --set-threads pool_mutect=task.cpus
     cd ..
     cp LCS/outputs/decompose/mypool.out ${name}.lcs.tsv
 
