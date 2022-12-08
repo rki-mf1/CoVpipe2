@@ -19,7 +19,7 @@ process nextclade {
     """
     nextclade_version_curr=\$(nextclade --version)
     nextclade dataset get --name ${nextclade_dataset_name} --output-dir 'data/${nextclade_dataset_name}'
-    nextclade run -j task.cpus --input-dataset data/${nextclade_dataset_name} --output-fasta ${name}.aligned.fasta --output-tsv tmp.tsv ${consensus}
+    nextclade run -j $task.cpus --input-dataset data/${nextclade_dataset_name} --output-fasta ${name}.aligned.fasta --output-tsv tmp.tsv ${consensus}
     cat tmp.tsv | tr -d "\r" > ${name}_clade.tsv
 
     used_nextclade_version=\$nextclade_version_curr

@@ -12,7 +12,7 @@ process pangolin {
 
     script:
     """
-    pangolin --outfile ${name}_lineage_report.csv --tempdir . --threads task.cpus ${fasta}
+    pangolin --outfile ${name}_lineage_report.csv --tempdir . --threads $task.cpus ${fasta}
     """
     stub:
     """

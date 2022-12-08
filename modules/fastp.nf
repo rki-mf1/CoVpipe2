@@ -25,7 +25,7 @@ process fastp {
         ${set_adapters} \
         --low_complexity_filter \
         --overrepresentation_analysis \
-        --thread task.cpus \
+        --thread $task.cpus \
         ${params.fastp_additional_parameters}
     """
     stub:

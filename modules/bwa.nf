@@ -31,12 +31,12 @@ process bwa {
 
     script:
     """
-    bwa mem -t task.cpus \
+    bwa mem -t $task.cpus \
         -R '@RG\\tID:${name}\\tPU:${name}\\tSM:${name}\\tPL:ILLUMINA\\tLB:000' \
         ${reference} \
         ${reads} | \
-        samtools view -Sb -@ task.cpus | \
-        samtools sort -@ task.cpus > ${name}.bam
+        samtools view -Sb -@ $task.cpus | \
+        samtools sort -@ $task.cpus > ${name}.bam
     """
     stub:
     """

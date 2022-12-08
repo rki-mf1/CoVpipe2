@@ -13,7 +13,7 @@ process president {
         
     script:
     """
-    president -r ${reference_fasta} -t task.cpus -q ${fasta} -x 0.90 -n 0.05 -p . -f ${name}_
+    president -r ${reference_fasta} -t $task.cpus -q ${fasta} -x 0.90 -n 0.05 -p . -f ${name}_
     """
     stub:
     """
