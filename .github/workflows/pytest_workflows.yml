@@ -10,7 +10,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        profile: ["docker", "singularity", "conda"]
+        profile: ["docker", "conda"]
     env:
       NXF_ANSI_LOG: false
     steps:
@@ -42,11 +42,6 @@ jobs:
         run: |
           wget -qO- get.nextflow.io | bash
           sudo mv nextflow /usr/local/bin/
-      - name: Set up Singularity
-        if: matrix.profile == 'singularity'
-        uses: eWaterCycle/setup-singularity@v5
-        with:
-          singularity-version: 3.7.1
 
       - name: Set up miniconda
         if: matrix.profile == 'conda'
@@ -63,7 +58,7 @@ jobs:
       # Test the pipeline
       - name: Run pytest-workflow
         # only use one thread for pytest-workflow to avoid race condition on conda cache.
-        run: TMPDIR=~ PROFILE=${{ matrix.profile }} pytest --symlink --kwdof --git-aware --color=yes
+        run: TMPDIR=~ PROFILE=${{ matrix.profile }} pytest -vvv --symlink --kwdof --git-aware --color=yes
 
       - name: Output log on failure
         if: failure()
@@ -84,4 +79,3 @@ jobs:
             /home/runner/pytest_workflow_*/*/work
             /home/runner/pytest_workflow_*/*/results
             !/home/runner/pytest_workflow_*/*/conda
-            !/home/runner/pytest_workflow_*/*/singularity

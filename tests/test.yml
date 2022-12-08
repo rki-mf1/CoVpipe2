@@ -1,5 +1,5 @@
 - name: test
-  command: nextflow run ./CoVpipe2.nf -c ./tests/nextflow.config
+  command: nextflow run ./CoVpipe2.nf -c ./tests/nextflow.config -profile local
   files:
     - path: "results/00-Reference"
     - path: "results/01-Read-QC"
