@@ -9,7 +9,6 @@ process index_bwa {
 
     script:
     """
-    echo $task.cpus
     bwa index ${reference} &> /dev/null
     """
     stub:
