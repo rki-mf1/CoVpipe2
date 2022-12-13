@@ -1,0 +1,255 @@
+- name: test
+  command: nextflow run ./CoVpipe2.nf -c ./tests/nextflow.config -profile local
+  files:
+    - path: "results/00-Reference/MN908947.prepared.fasta"
+      md5sum: d11d06b5d1eb1d85c69e341c3c026e08
+    - path: "results/00-Reference/MN908947.prepared.fasta.fai"
+      md5sum: acd48289601d6ee0b5b82eab8d385456
+    - path: "results/01-Read-QC/SAMPLE1_PE/trimming/SAMPLE1_PE.fastp.html"
+    - path: "results/01-Read-QC/SAMPLE1_PE/trimming/SAMPLE1_PE.fastp.json"
+    - path: "results/01-Read-QC/SAMPLE1_PE/trimming/SAMPLE1_PE.fastp.R1.fastq.gz"
+      md5sum: 3e80754e508f1ce2df7d9215e59537bd
+    - path: "results/01-Read-QC/SAMPLE1_PE/trimming/SAMPLE1_PE.fastp.R2.fastq.gz"
+      md5sum: b10296a118573728a2cfd51e801885cd
+    - path: "results/01-Read-QC/SAMPLE2_PE/trimming/SAMPLE2_PE.fastp.html"
+    - path: "results/01-Read-QC/SAMPLE2_PE/trimming/SAMPLE2_PE.fastp.json"
+    - path: "results/01-Read-QC/SAMPLE2_PE/trimming/SAMPLE2_PE.fastp.R1.fastq.gz"
+      md5sum: c729a7950f186de41adb09052a1c4ac3
+    - path: "results/01-Read-QC/SAMPLE2_PE/trimming/SAMPLE2_PE.fastp.R2.fastq.gz"
+      md5sum: b455e55c05c0367d1e15a0242f714239
+    - path: "results/02-Mapping/V1.bedpe"
+      md5sum: 5a471d9ea010acf60f7917a501253376
+    - path: "results/02-Mapping/SAMPLE1_PE/SAMPLE1_PE.bam"
+    - path: "results/02-Mapping/SAMPLE1_PE/SAMPLE1_PE.bam.bai"
+    - path: "results/02-Mapping/SAMPLE1_PE/SAMPLE1_PE.coverage.tsv"
+      md5sum: 0d980af5917a995cfd67b424302bb642
+    - path: "results/02-Mapping/SAMPLE1_PE/SAMPLE1_PE.stats"
+    - path: "results/02-Mapping/SAMPLE1_PE/SAMPLE1_PE.stats_small"
+      md5sum: 48ba05e0cda31fa3e579ebef6d14be0c
+    - path: "results/02-Mapping/SAMPLE1_PE/clipped/SAMPLE1_PE.primerclipped.bam"
+    - path: "results/02-Mapping/SAMPLE1_PE/clipped/SAMPLE1_PE.primerclipped.bam.bai"
+    - path: "results/02-Mapping/SAMPLE2_PE/SAMPLE2_PE.bam"
+    - path: "results/02-Mapping/SAMPLE2_PE/SAMPLE2_PE.bam.bai"
+    - path: "results/02-Mapping/SAMPLE2_PE/SAMPLE2_PE.coverage.tsv"
+      md5sum: cb9127091027ee22db093da6da41862b
+    - path: "results/02-Mapping/SAMPLE2_PE/SAMPLE2_PE.stats"
+    - path: "results/02-Mapping/SAMPLE2_PE/SAMPLE2_PE.stats_small"
+      md5sum: 079e1c6420842d4b9bc2ac7cd7f802b7
+    - path: "results/02-Mapping/SAMPLE2_PE/clipped/SAMPLE2_PE.primerclipped.bam"
+    - path: "results/02-Mapping/SAMPLE2_PE/clipped/SAMPLE2_PE.primerclipped.bam.bai"
+    - path: "results/03-Variant-Calling/SAMPLE1_PE/SAMPLE1_PE.filtered.vcf.gz"
+    - path: "results/03-Variant-Calling/SAMPLE1_PE/SAMPLE1_PE.vcf.annotation.covered.af.vcf.gz"
+    - path: "results/03-Variant-Calling/SAMPLE1_PE/SAMPLE1_PE.vcf.annotation.covered.af.vcf.gz.csi"
+    - path: "results/03-Variant-Calling/SAMPLE1_PE/SAMPLE1_PE.vcf.annotation.html"
+    - path: "results/03-Variant-Calling/SAMPLE1_PE/SAMPLE1_PE.vcf.gz"
+    - path: "results/03-Variant-Calling/SAMPLE1_PE/SAMPLE1_PE.vcf.gz.csi"
+    - path: "results/03-Variant-Calling/SAMPLE1_PE/SAMPLE1_PE.filtered.gt_adjust.vcf.gz"
+      contains:
+        - "MN908947.3	241	.	C	T"
+        - "MN908947.3	1875	.	C	T"
+        - "MN908947.3	3037	.	C	T"
+        - "MN908947.3	11719	.	G	A"
+        - "MN908947.3	14408	.	C	T"
+        - "MN908947.3	20268	.	A	G"
+        - "MN908947.3	23403	.	A	G"
+    - path: "results/03-Variant-Calling/SAMPLE2_PE/SAMPLE2_PE.filtered.vcf.gz"
+    - path: "results/03-Variant-Calling/SAMPLE2_PE/SAMPLE2_PE.vcf.annotation.covered.af.vcf.gz"
+    - path: "results/03-Variant-Calling/SAMPLE2_PE/SAMPLE2_PE.vcf.annotation.covered.af.vcf.gz.csi"
+    - path: "results/03-Variant-Calling/SAMPLE2_PE/SAMPLE2_PE.vcf.annotation.html"
+    - path: "results/03-Variant-Calling/SAMPLE2_PE/SAMPLE2_PE.vcf.gz"
+    - path: "results/03-Variant-Calling/SAMPLE2_PE/SAMPLE2_PE.vcf.gz.csi"
+    - path: "results/03-Variant-Calling/SAMPLE2_PE/SAMPLE2_PE.filtered.gt_adjust.vcf.gz"
+      contains:
+        - "MN908947.3	1875	.	C	T"
+        - "MN908947.3	9477	.	T	A"
+        - "MN908947.3	14805	.	C	T"
+        - "MN908947.3	25979	.	G	T"
+        - "MN908947.3	28144	.	T	C"
+        - "MN908947.3	28657	.	C	T"
+        - "MN908947.3	28863	.	C	T"
+    - path: "results/04-Consensus/SAMPLE1_PE/SAMPLE1_PE.iupac_consensus.fasta"
+      md5sum: c3a470a00a0edb0a9d3878ede267e42c
+    - path: "results/04-Consensus/SAMPLE1_PE/SAMPLE1_PE.iupac_consensus.gff"
+    - path: "results/04-Consensus/SAMPLE1_PE/SAMPLE1_PE.iupac_consensus_unmapped_features.txt"
+      md5sum: d41d8cd98f00b204e9800998ecf8427e
+    - path: "results/04-Consensus/SAMPLE1_PE/SAMPLE1_PE.lowcov.bed"
+      md5sum: 2bb22cdd54e59da34c011c127f6c8e20
+    - path: "results/04-Consensus/SAMPLE1_PE/SAMPLE1_PE.masked_consensus.fasta"
+      md5sum: fac579bf10a8e3efc1350e4945733eb0
+    - path: "results/04-Consensus/SAMPLE1_PE/SAMPLE1_PE.masked_consensus.gff"
+    - path: "results/04-Consensus/SAMPLE1_PE/SAMPLE1_PE.masked_consensus_unmapped_features.txt"
+      md5sum: d41d8cd98f00b204e9800998ecf8427e
+    - path: "results/04-Consensus/SAMPLE1_PE/SAMPLE1_PE_report.tsv"
+      contains: 
+        - "query_name	reference_name	file_in_query	file_in_ref	ACGT Nucleotide identity	ACGT Nucleotide identity (ignoring Ns)	ACGT Nucleotide identity (ignoring non-ACGTNs)	qc_all_valid	qc_is_empty_query	qc_post_align_pass_threshold	qc_post_aligned	qc_post_aligned_all_valid	qc_valid_length	qc_valid_nucleotides	qc_valid_pass_nthreshold	acgt_bases	iupac_bases	non_iupac_bases	N_bases	length_query	length_reference	LongestNGap	Matches	Mismatches	query_description	query_index	Date"
+    - path: "results/04-Consensus/SAMPLE2_PE/SAMPLE2_PE.iupac_consensus.fasta"
+      md5sum: b25416bd46d1171bc2502fe4e49d608e
+    - path: "results/04-Consensus/SAMPLE2_PE/SAMPLE2_PE.iupac_consensus.gff"
+    - path: "results/04-Consensus/SAMPLE2_PE/SAMPLE2_PE.iupac_consensus_unmapped_features.txt"
+      md5sum: 9c4a339df9dbd559b04766737294f81d
+    - path: "results/04-Consensus/SAMPLE2_PE/SAMPLE2_PE.lowcov.bed"
+      md5sum: c8891d89bfae90fb225eb4a4827f8a71
+    - path: "results/04-Consensus/SAMPLE2_PE/SAMPLE2_PE.masked_consensus.fasta"
+      md5sum: e9797624b23eb72858ba901c94ab4fc1
+    - path: "results/04-Consensus/SAMPLE2_PE/SAMPLE2_PE.masked_consensus.gff"
+    - path: "results/04-Consensus/SAMPLE2_PE/SAMPLE2_PE.masked_consensus_unmapped_features.txt"
+      md5sum: 9c4a339df9dbd559b04766737294f81d
+    - path: "results/04-Consensus/SAMPLE2_PE/SAMPLE2_PE_report.tsv"
+      contains: 
+        - "query_name	reference_name	file_in_query	file_in_ref	ACGT Nucleotide identity	ACGT Nucleotide identity (ignoring Ns)	ACGT Nucleotide identity (ignoring non-ACGTNs)	qc_all_valid	qc_is_empty_query	qc_post_align_pass_threshold	qc_post_aligned	qc_post_aligned_all_valid	qc_valid_length	qc_valid_nucleotides	qc_valid_pass_nthreshold	acgt_bases	iupac_bases	non_iupac_bases	N_bases	length_query	length_reference	LongestNGap	Matches	Mismatches	query_description	query_index	Date"
+    - path: "results/05-Linages_Mutations/SAMPLE1_PE/SAMPLE1_PE.aligned.fasta"
+      md5sum: 59ee3f944dcda28f16c20f00a819aa0e
+    - path: "results/05-Linages_Mutations/SAMPLE1_PE/SAMPLE1_PE_clade.tsv"
+      md5sum: 957bfa0900f18e692fafad3eba29e8f4
+    - path: "results/05-Linages_Mutations/SAMPLE1_PE/SAMPLE1_PE_lineage_report.csv"
+      contains:
+        - "taxon,lineage,conflict,ambiguity_score,scorpio_call,scorpio_support,scorpio_conflict,scorpio_notes,version,pangolin_version,scorpio_version,constellation_version,is_designated,qc_status,qc_notes,note"
+    - path: "results/05-Linages_Mutations/SAMPLE2_PE/SAMPLE2_PE.aligned.fasta"
+      md5sum: e1936924ec8fe26dbc87a2277e4a3dac
+    - path: "results/05-Linages_Mutations/SAMPLE2_PE/SAMPLE2_PE_clade.tsv"
+      md5sum: a5c20762449bb4847a0361f062c7150e
+    - path: "results/05-Linages_Mutations/SAMPLE2_PE/SAMPLE2_PE_lineage_report.csv"
+      contains:
+        - "taxon,lineage,conflict,ambiguity_score,scorpio_call,scorpio_support,scorpio_conflict,scorpio_notes,version,pangolin_version,scorpio_version,constellation_version,is_designated,qc_status,qc_notes,note"
+    - path: "results/06-RKI-summary/Readme.pdf"
+    - path: "results/06-RKI-summary/invalid/invalid_genomes.fasta"
+      md5sum: e1936924ec8fe26dbc87a2277e4a3dac
+    - path: "results/06-RKI-summary/invalid/singletons/SAMPLE2_PE.fasta"
+      md5sum: e1936924ec8fe26dbc87a2277e4a3dac
+    - path: "results/06-RKI-summary/valid/valid_genomes.fasta"
+      md5sum: 562acdee9dd3ad65052fd951db6b1133
+    - path: "results/06-RKI-summary/valid/rki_valid_report.csv"
+      md5sum: b1ed1b6a40867b69ecd4f7b2461c1efb
+    - path: "results/06-RKI-summary/valid/singletons/SAMPLE1_PE.fasta"
+      md5sum: 562acdee9dd3ad65052fd951db6b1133
+    - path: "results/Report"
+    - path: "results/X.Pipeline-Runinfo/execution_report.html"
+    - path: "results/X.Pipeline-Runinfo/execution_timeline.html"
+
+- name: test-update
+  command: nextflow run ./CoVpipe2.nf -c ./tests/nextflow.config -profile local --update
+  files:
+    - path: "results/00-Reference/MN908947.prepared.fasta"
+      md5sum: d11d06b5d1eb1d85c69e341c3c026e08
+    - path: "results/00-Reference/MN908947.prepared.fasta.fai"
+      md5sum: acd48289601d6ee0b5b82eab8d385456
+    - path: "results/01-Read-QC/SAMPLE1_PE/trimming/SAMPLE1_PE.fastp.html"
+    - path: "results/01-Read-QC/SAMPLE1_PE/trimming/SAMPLE1_PE.fastp.json"
+    - path: "results/01-Read-QC/SAMPLE1_PE/trimming/SAMPLE1_PE.fastp.R1.fastq.gz"
+      md5sum: 3e80754e508f1ce2df7d9215e59537bd
+    - path: "results/01-Read-QC/SAMPLE1_PE/trimming/SAMPLE1_PE.fastp.R2.fastq.gz"
+      md5sum: b10296a118573728a2cfd51e801885cd
+    - path: "results/01-Read-QC/SAMPLE2_PE/trimming/SAMPLE2_PE.fastp.html"
+    - path: "results/01-Read-QC/SAMPLE2_PE/trimming/SAMPLE2_PE.fastp.json"
+    - path: "results/01-Read-QC/SAMPLE2_PE/trimming/SAMPLE2_PE.fastp.R1.fastq.gz"
+      md5sum: c729a7950f186de41adb09052a1c4ac3
+    - path: "results/01-Read-QC/SAMPLE2_PE/trimming/SAMPLE2_PE.fastp.R2.fastq.gz"
+      md5sum: b455e55c05c0367d1e15a0242f714239
+    - path: "results/02-Mapping/V1.bedpe"
+      md5sum: 5a471d9ea010acf60f7917a501253376
+    - path: "results/02-Mapping/SAMPLE1_PE/SAMPLE1_PE.bam"
+    - path: "results/02-Mapping/SAMPLE1_PE/SAMPLE1_PE.bam.bai"
+    - path: "results/02-Mapping/SAMPLE1_PE/SAMPLE1_PE.coverage.tsv"
+      md5sum: 0d980af5917a995cfd67b424302bb642
+    - path: "results/02-Mapping/SAMPLE1_PE/SAMPLE1_PE.stats"
+    - path: "results/02-Mapping/SAMPLE1_PE/SAMPLE1_PE.stats_small"
+      md5sum: 48ba05e0cda31fa3e579ebef6d14be0c
+    - path: "results/02-Mapping/SAMPLE1_PE/clipped/SAMPLE1_PE.primerclipped.bam"
+    - path: "results/02-Mapping/SAMPLE1_PE/clipped/SAMPLE1_PE.primerclipped.bam.bai"
+    - path: "results/02-Mapping/SAMPLE2_PE/SAMPLE2_PE.bam"
+    - path: "results/02-Mapping/SAMPLE2_PE/SAMPLE2_PE.bam.bai"
+    - path: "results/02-Mapping/SAMPLE2_PE/SAMPLE2_PE.coverage.tsv"
+      md5sum: cb9127091027ee22db093da6da41862b
+    - path: "results/02-Mapping/SAMPLE2_PE/SAMPLE2_PE.stats"
+    - path: "results/02-Mapping/SAMPLE2_PE/SAMPLE2_PE.stats_small"
+      md5sum: 079e1c6420842d4b9bc2ac7cd7f802b7
+    - path: "results/02-Mapping/SAMPLE2_PE/clipped/SAMPLE2_PE.primerclipped.bam"
+    - path: "results/02-Mapping/SAMPLE2_PE/clipped/SAMPLE2_PE.primerclipped.bam.bai"
+    - path: "results/03-Variant-Calling/SAMPLE1_PE/SAMPLE1_PE.filtered.vcf.gz"
+    - path: "results/03-Variant-Calling/SAMPLE1_PE/SAMPLE1_PE.vcf.annotation.covered.af.vcf.gz"
+    - path: "results/03-Variant-Calling/SAMPLE1_PE/SAMPLE1_PE.vcf.annotation.covered.af.vcf.gz.csi"
+    - path: "results/03-Variant-Calling/SAMPLE1_PE/SAMPLE1_PE.vcf.annotation.html"
+    - path: "results/03-Variant-Calling/SAMPLE1_PE/SAMPLE1_PE.vcf.gz"
+    - path: "results/03-Variant-Calling/SAMPLE1_PE/SAMPLE1_PE.vcf.gz.csi"
+    - path: "results/03-Variant-Calling/SAMPLE1_PE/SAMPLE1_PE.filtered.gt_adjust.vcf.gz"
+      contains:
+        - "MN908947.3	241	.	C	T"
+        - "MN908947.3	1875	.	C	T"
+        - "MN908947.3	3037	.	C	T"
+        - "MN908947.3	11719	.	G	A"
+        - "MN908947.3	14408	.	C	T"
+        - "MN908947.3	20268	.	A	G"
+        - "MN908947.3	23403	.	A	G"
+    - path: "results/03-Variant-Calling/SAMPLE2_PE/SAMPLE2_PE.filtered.vcf.gz"
+    - path: "results/03-Variant-Calling/SAMPLE2_PE/SAMPLE2_PE.vcf.annotation.covered.af.vcf.gz"
+    - path: "results/03-Variant-Calling/SAMPLE2_PE/SAMPLE2_PE.vcf.annotation.covered.af.vcf.gz.csi"
+    - path: "results/03-Variant-Calling/SAMPLE2_PE/SAMPLE2_PE.vcf.annotation.html"
+    - path: "results/03-Variant-Calling/SAMPLE2_PE/SAMPLE2_PE.vcf.gz"
+    - path: "results/03-Variant-Calling/SAMPLE2_PE/SAMPLE2_PE.vcf.gz.csi"
+    - path: "results/03-Variant-Calling/SAMPLE2_PE/SAMPLE2_PE.filtered.gt_adjust.vcf.gz"
+      contains:
+        - "MN908947.3	1875	.	C	T"
+        - "MN908947.3	9477	.	T	A"
+        - "MN908947.3	14805	.	C	T"
+        - "MN908947.3	25979	.	G	T"
+        - "MN908947.3	28144	.	T	C"
+        - "MN908947.3	28657	.	C	T"
+        - "MN908947.3	28863	.	C	T"
+    - path: "results/04-Consensus/SAMPLE1_PE/SAMPLE1_PE.iupac_consensus.fasta"
+      md5sum: c3a470a00a0edb0a9d3878ede267e42c
+    - path: "results/04-Consensus/SAMPLE1_PE/SAMPLE1_PE.iupac_consensus.gff"
+    - path: "results/04-Consensus/SAMPLE1_PE/SAMPLE1_PE.iupac_consensus_unmapped_features.txt"
+      md5sum: d41d8cd98f00b204e9800998ecf8427e
+    - path: "results/04-Consensus/SAMPLE1_PE/SAMPLE1_PE.lowcov.bed"
+      md5sum: 2bb22cdd54e59da34c011c127f6c8e20
+    - path: "results/04-Consensus/SAMPLE1_PE/SAMPLE1_PE.masked_consensus.fasta"
+      md5sum: fac579bf10a8e3efc1350e4945733eb0
+    - path: "results/04-Consensus/SAMPLE1_PE/SAMPLE1_PE.masked_consensus.gff"
+    - path: "results/04-Consensus/SAMPLE1_PE/SAMPLE1_PE.masked_consensus_unmapped_features.txt"
+      md5sum: d41d8cd98f00b204e9800998ecf8427e
+    - path: "results/04-Consensus/SAMPLE1_PE/SAMPLE1_PE_report.tsv"
+      contains: 
+        - "query_name	reference_name	file_in_query	file_in_ref	ACGT Nucleotide identity	ACGT Nucleotide identity (ignoring Ns)	ACGT Nucleotide identity (ignoring non-ACGTNs)	qc_all_valid	qc_is_empty_query	qc_post_align_pass_threshold	qc_post_aligned	qc_post_aligned_all_valid	qc_valid_length	qc_valid_nucleotides	qc_valid_pass_nthreshold	acgt_bases	iupac_bases	non_iupac_bases	N_bases	length_query	length_reference	LongestNGap	Matches	Mismatches	query_description	query_index	Date"
+    - path: "results/04-Consensus/SAMPLE2_PE/SAMPLE2_PE.iupac_consensus.fasta"
+      md5sum: b25416bd46d1171bc2502fe4e49d608e
+    - path: "results/04-Consensus/SAMPLE2_PE/SAMPLE2_PE.iupac_consensus.gff"
+    - path: "results/04-Consensus/SAMPLE2_PE/SAMPLE2_PE.iupac_consensus_unmapped_features.txt"
+      md5sum: 9c4a339df9dbd559b04766737294f81d
+    - path: "results/04-Consensus/SAMPLE2_PE/SAMPLE2_PE.lowcov.bed"
+      md5sum: c8891d89bfae90fb225eb4a4827f8a71
+    - path: "results/04-Consensus/SAMPLE2_PE/SAMPLE2_PE.masked_consensus.fasta"
+      md5sum: e9797624b23eb72858ba901c94ab4fc1
+    - path: "results/04-Consensus/SAMPLE2_PE/SAMPLE2_PE.masked_consensus.gff"
+    - path: "results/04-Consensus/SAMPLE2_PE/SAMPLE2_PE.masked_consensus_unmapped_features.txt"
+      md5sum: 9c4a339df9dbd559b04766737294f81d
+    - path: "results/04-Consensus/SAMPLE2_PE/SAMPLE2_PE_report.tsv"
+      contains: 
+        - "query_name	reference_name	file_in_query	file_in_ref	ACGT Nucleotide identity	ACGT Nucleotide identity (ignoring Ns)	ACGT Nucleotide identity (ignoring non-ACGTNs)	qc_all_valid	qc_is_empty_query	qc_post_align_pass_threshold	qc_post_aligned	qc_post_aligned_all_valid	qc_valid_length	qc_valid_nucleotides	qc_valid_pass_nthreshold	acgt_bases	iupac_bases	non_iupac_bases	N_bases	length_query	length_reference	LongestNGap	Matches	Mismatches	query_description	query_index	Date"
+    - path: "results/05-Linages_Mutations/SAMPLE1_PE/SAMPLE1_PE.aligned.fasta"
+      md5sum: 59ee3f944dcda28f16c20f00a819aa0e
+    - path: "results/05-Linages_Mutations/SAMPLE1_PE/SAMPLE1_PE_clade.tsv"
+      md5sum: 90b94c9146c99f8a0bcb39404435090e
+    - path: "results/05-Linages_Mutations/SAMPLE1_PE/SAMPLE1_PE_lineage_report.csv"
+      contains:
+        - "taxon,lineage,conflict,ambiguity_score,scorpio_call,scorpio_support,scorpio_conflict,scorpio_notes,version,pangolin_version,scorpio_version,constellation_version,is_designated,qc_status,qc_notes,note"
+    - path: "results/05-Linages_Mutations/SAMPLE2_PE/SAMPLE2_PE.aligned.fasta"
+      md5sum: e1936924ec8fe26dbc87a2277e4a3dac
+    - path: "results/05-Linages_Mutations/SAMPLE2_PE/SAMPLE2_PE_clade.tsv"
+      md5sum: 97dfec10e533a6dea69c4afa353ddc1e
+    - path: "results/05-Linages_Mutations/SAMPLE2_PE/SAMPLE2_PE_lineage_report.csv"
+      contains:
+        - "taxon,lineage,conflict,ambiguity_score,scorpio_call,scorpio_support,scorpio_conflict,scorpio_notes,version,pangolin_version,scorpio_version,constellation_version,is_designated,qc_status,qc_notes,note"
+    - path: "results/06-RKI-summary/Readme.pdf"
+    - path: "results/06-RKI-summary/invalid/invalid_genomes.fasta"
+      md5sum: e1936924ec8fe26dbc87a2277e4a3dac
+    - path: "results/06-RKI-summary/invalid/singletons/SAMPLE2_PE.fasta"
+      md5sum: e1936924ec8fe26dbc87a2277e4a3dac
+    - path: "results/06-RKI-summary/valid/valid_genomes.fasta"
+      md5sum: 562acdee9dd3ad65052fd951db6b1133
+    - path: "results/06-RKI-summary/valid/rki_valid_report.csv"
+      md5sum: b1ed1b6a40867b69ecd4f7b2461c1efb
+    - path: "results/06-RKI-summary/valid/singletons/SAMPLE1_PE.fasta"
+      md5sum: 562acdee9dd3ad65052fd951db6b1133
+    - path: "results/Report"
+    - path: "results/X.Pipeline-Runinfo/execution_report.html"
+    - path: "results/X.Pipeline-Runinfo/execution_timeline.html"

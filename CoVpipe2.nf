@@ -165,7 +165,7 @@ static boolean DockernetIsAvailable() {
 
 def internetcheck = DockernetIsAvailable()
 
-if ( ( workflow.profile.contains('singularity') || workflow.profile.contains('docker') ) && params.update) {
+if ( workflow.containerEngine && params.update ) {
     println "\033[0;33mWarning: Running --update might not be CoVpipe compatible!\033[0m"
     if ( internetcheck.toString() == "true" ) { 
         tagname = 'https://registry.hub.docker.com/v2/repositories/rkimf1/pangolin/tags/'.toURL().text.split(',"name":"')[1].split('","')[0]

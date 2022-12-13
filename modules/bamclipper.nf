@@ -12,7 +12,7 @@ process bamclipper {
     script:
     additional_parameters = params.bamclipper_additional_parameters ? params.bamclipper_additional_parameters : ''
     """
-    bamclipper.sh -b ${bam} -p ${primer_bed} -n ${task.cpus} ${additional_parameters}
+    bamclipper.sh -b ${bam} -p ${primer_bed} -n $task.cpus ${additional_parameters}
     """
     stub:
     """
