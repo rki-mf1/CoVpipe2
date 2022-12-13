@@ -122,7 +122,18 @@
       md5sum: b1ed1b6a40867b69ecd4f7b2461c1efb
     - path: "results/06-RKI-summary/valid/singletons/SAMPLE1_PE.fasta"
       md5sum: 562acdee9dd3ad65052fd951db6b1133
-    - path: "results/Report"
+    - path: "results/Report/report.html"
+    - path: "results/Report/report_datatable.csv"
+      md5sum: 6a6a6740550df7eff681f7a8f06c4e42
+    - path: "results/Report/report_datatable.xlsx"
+      md5sum: b16b440bd007c64f1d5bb54bfb1fb382
+    - path: "results/Report/single_tables/nextclade_results.tsv"
+      md5sum: eed39e4c11657a7b8f92f6f8c41d44fd
+    - path: "results/Report/single_tables/pangolin_results.csv"
+      md5sum: 72cb106d52fb00d80778f50746fcf684
+    - path: "results/Report/single_tables/president_results.tsv"
+    - path: "results/Report/single_tables/sc2rf_results.csv"
+      md5sum: d02d8ab1b54d11b1aa16edc719b75796
     - path: "results/X.Pipeline-Runinfo/execution_report.html"
     - path: "results/X.Pipeline-Runinfo/execution_timeline.html"
 
@@ -250,6 +261,13 @@
       md5sum: b1ed1b6a40867b69ecd4f7b2461c1efb
     - path: "results/06-RKI-summary/valid/singletons/SAMPLE1_PE.fasta"
       md5sum: 562acdee9dd3ad65052fd951db6b1133
-    - path: "results/Report"
+    - path: "results/Report/report.html"
+    - path: "results/Report/report_datatable.csv"
+    - path: "results/Report/report_datatable.xlsx"
+    - path: "results/Report/single_tables/nextclade_results.tsv"
+    - path: "results/Report/single_tables/pangolin_results.csv"
+    - path: "results/Report/single_tables/president_results.tsv"
+    - path: "results/Report/single_tables/sc2rf_results.csv"
+      md5sum: d02d8ab1b54d11b1aa16edc719b75796
     - path: "results/X.Pipeline-Runinfo/execution_report.html"
     - path: "results/X.Pipeline-Runinfo/execution_timeline.html"
