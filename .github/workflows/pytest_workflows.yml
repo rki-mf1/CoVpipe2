@@ -10,7 +10,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        profile: ["docker", "conda"]
+        profile: ["docker"]
     env:
       NXF_ANSI_LOG: false
     steps:
@@ -43,22 +43,6 @@ jobs:
           wget -qO- get.nextflow.io | bash
           sudo mv nextflow /usr/local/bin/
 
-      - name: Set up miniconda
-        if: matrix.profile == 'conda'
-        uses: conda-incubator/setup-miniconda@v2
-        with:
-          auto-update-conda: true
-          channels: conda-forge,bioconda,defaults
-          python-version: ${{ matrix.python-version }}
-
-      - name: Conda clean
-        if: matrix.profile == 'conda'
-        run: conda clean -a
-
-      - name: Install mamba
-        if: matrix.profile == 'conda'
-        run: conda install mamba -n base -c conda-forge
-
       # Test the pipeline
       - name: Run pytest-workflow
         # only use one thread for pytest-workflow to avoid race condition on conda cache.
@@ -81,4 +65,3 @@ jobs:
             /home/runner/pytest_workflow_*/*/log.out
             /home/runner/pytest_workflow_*/*/log.err
             /home/runner/pytest_workflow_*/*/work
-            !/home/runner/pytest_workflow_*/*/work/conda
