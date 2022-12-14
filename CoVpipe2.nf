@@ -52,9 +52,6 @@ Set reference = ['sars-cov-2'] // can be extended later on
 if ( !params.reference && !params.ref_genome && !params.ref_annotation ) {
     exit 1, "reference missing, use [--ref_genome] (and [--ref_annotation]) or choose of " + reference + " with [--reference]"
 }
-if ( params.reference && params.ref_genome ) {
-    exit 1, "too many references, use either [--ref_genome] (and [--ref_annotation]), or [--reference]"
-}
 if ( params.reference && ! (params.reference in reference) ) {
     exit 1, "unknown reference, currently supported: " + reference
 }
@@ -68,17 +65,20 @@ if (params.kraken && ! params.taxid) {
 **************************/
 
 // load reference
-if ( params.reference ) {
-    if ( params.reference == 'sars-cov-2' ) {
-        ref_genome_file = file( workflow.projectDir + '/data/reference/SARS-CoV-2/MN908947.3.fasta' , checkIfExists: true )
-        ref_annotation_file = file( workflow.projectDir + '/data/reference/SARS-CoV-2/MN908947.3.gff3' , checkIfExists: true )
-    }
-} else {
+// set custom reference fasta, else load default
+if ( params.ref_genome ) {
     if ( params.ref_genome ) {
         ref_genome_file = file( params.ref_genome, checkIfExists: true )
     }
     if ( params.ref_annotation ) {
         ref_annotation_file = file( params.ref_annotation, checkIfExists: true )
+    } else {
+        ref_annotation_file = false
+    }
+} else {
+    if (  params.reference && params.reference == 'sars-cov-2' ) {
+        ref_genome_file = file( workflow.projectDir + '/data/reference/SARS-CoV-2/MN908947.3.fasta' , checkIfExists: true )
+        ref_annotation_file = file( workflow.projectDir + '/data/reference/SARS-CoV-2/MN908947.3.gff3' , checkIfExists: true )
     }
 }
 
@@ -306,7 +306,7 @@ workflow {
     generate_consensus(variant_calling.out.vcf, reference_ch, mapping_ch.map{ it[0,1]})
 
     // 8: annotate consensus [optional]
-    if (params.reference || params.ref_annotation) {
+    if ( ref_annotation_file ) {
         annotate_consensus(generate_consensus.out.consensus_ambiguous.mix(generate_consensus.out.consensus_masked), reference_ch, ref_annotation_file)
     }
 
