@@ -11,19 +11,28 @@ process sc2rf {
     """
     git clone https://github.com/lenaschimmel/sc2rf.git
     cd sc2rf
-    python3 sc2rf.py --csvfile ../${name}_sc2rf.csv --parents 1-35 --breakpoints 1-2 \
+    # --clades can't be the last argument before the fasta input, else script fails without an error, see https://github.com/lenaschimmel/sc2rf/issues/35
+    python3 sc2rf.py --csvfile ../${name}_sc2rf.csv --parents 1-1000 --breakpoints 1-2 \
                         --max-intermission-count 3 --max-intermission-length 1 \
+                        --clades 'all' \
                         --unique 1 --max-ambiguous 10000 --max-name-length 55 \
-                        ../${fasta} > /dev/null 2>&1
+                         ../${fasta}
     cd ..
 
-    # add empty csv line, if no output
-    if [[ \$(wc -l <${name}_sc2rf.csv) -eq 1 ]] 
+    if [[ \$(wc -l <${name}_sc2rf.csv) -eq 0 ]] 
     then
+        # add empty csv line, if no output at all (e.g. script teminates with parameter problem, but exits with 0)
         echo ${name},,,, >> ${name}_sc2rf.csv
+    elif [[ \$(wc -l <${name}_sc2rf.csv) -eq 1 ]] 
+    then
+        # only header as output
+        # remove header because of weired newline character after header that breaks the R report
+        # overwrite with empty csv line
+        echo ${name},,,, > ${name}_sc2rf.csv
+    else
+        # remove header because of weired newline character after header that breaks the R report
+        sed -i 1d ${name}_sc2rf.csv
     fi
-    # remove header because of weired newline character after header that breaks the R report
-    sed -i 1d ${name}_sc2rf.csv
     """
     stub:
     """

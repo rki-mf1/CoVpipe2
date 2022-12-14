@@ -52,9 +52,6 @@ Set reference = ['sars-cov-2'] // can be extended later on
 if ( !params.reference && !params.ref_genome && !params.ref_annotation ) {
     exit 1, "reference missing, use [--ref_genome] (and [--ref_annotation]) or choose of " + reference + " with [--reference]"
 }
-if ( params.reference && params.ref_genome ) {
-    exit 1, "too many references, use either [--ref_genome] (and [--ref_annotation]), or [--reference]"
-}
 if ( params.reference && ! (params.reference in reference) ) {
     exit 1, "unknown reference, currently supported: " + reference
 }
@@ -68,17 +65,20 @@ if (params.kraken && ! params.taxid) {
 **************************/
 
 // load reference
-if ( params.reference ) {
-    if ( params.reference == 'sars-cov-2' ) {
-        ref_genome_file = file( workflow.projectDir + '/data/reference/SARS-CoV-2/MN908947.3.fasta' , checkIfExists: true )
-        ref_annotation_file = file( workflow.projectDir + '/data/reference/SARS-CoV-2/MN908947.3.gff3' , checkIfExists: true )
-    }
-} else {
+// set custom reference fasta, else load default
+if ( params.ref_genome ) {
     if ( params.ref_genome ) {
         ref_genome_file = file( params.ref_genome, checkIfExists: true )
     }
     if ( params.ref_annotation ) {
         ref_annotation_file = file( params.ref_annotation, checkIfExists: true )
+    } else {
+        ref_annotation_file = false
+    }
+} else {
+    if (  params.reference && params.reference == 'sars-cov-2' ) {
+        ref_genome_file = file( workflow.projectDir + '/data/reference/SARS-CoV-2/MN908947.3.fasta' , checkIfExists: true )
+        ref_annotation_file = file( workflow.projectDir + '/data/reference/SARS-CoV-2/MN908947.3.gff3' , checkIfExists: true )
     }
 }
 
@@ -165,7 +165,7 @@ static boolean DockernetIsAvailable() {
 
 def internetcheck = DockernetIsAvailable()
 
-if ( ( workflow.profile.contains('singularity') || workflow.profile.contains('docker') ) && params.update) {
+if ( workflow.containerEngine && params.update ) {
     println "\033[0;33mWarning: Running --update might not be CoVpipe compatible!\033[0m"
     if ( internetcheck.toString() == "true" ) { 
         tagname = 'https://registry.hub.docker.com/v2/repositories/rkimf1/pangolin/tags/'.toURL().text.split(',"name":"')[1].split('","')[0]
@@ -306,7 +306,7 @@ workflow {
     generate_consensus(variant_calling.out.vcf, reference_ch, mapping_ch.map{ it[0,1]})
 
     // 8: annotate consensus [optional]
-    if (params.reference || params.ref_annotation) {
+    if ( ref_annotation_file ) {
         annotate_consensus(generate_consensus.out.consensus_ambiguous.mix(generate_consensus.out.consensus_masked), reference_ch, ref_annotation_file)
     }
 
@@ -350,12 +350,12 @@ def helpMSG() {
     Workflow: CoVpipe2
 
     ${c_yellow}Usage examples:${c_reset}
-    nextflow run CoVpipe2.nf --fastq '*R{1,2}.fastq.gz' --reference 'sars-cov-2' --cores 4 --max_cores 8
+    nextflow run CoVpipe2.nf --fastq '*R{1,2}.fastq.gz' --cores 4 --max_cores 8
     or
     nextflow run rki-mf1/CoVpipe2 -r <version> --fastq '*R{1,2}.fastq.gz' --ref_genome ref.fasta --cores 4 --max_cores 8
 
     ${c_yellow}Reference, required:${c_reset}
-    ${c_green}--reference ${c_reset}             Currently supported: 'sars-cov-2' (MN908947.3)
+    ${c_green}--reference ${c_reset}             Currently supported: 'sars-cov-2' (MN908947.3) [default: $params.reference]
     OR
     ${c_green}--ref_genome ${c_reset}            Reference FASTA file.
     ${c_green}--ref_annotation ${c_reset}        Reference GFF file.
@@ -465,9 +465,9 @@ def helpMSG() {
     --singularity_cache_dir  Location for storing the singularity images [default: $params.singularity_cache_dir]
     
     ${c_yellow}Execution/Engine profiles:${c_reset}
-    The pipeline supports profiles to run via different ${c_green}Executers${c_reset} and ${c_blue}Engines${c_reset} e.g.: -profile ${c_green}local${c_reset},${c_blue}conda${c_reset}
+    The pipeline supports profiles to run via different ${c_green}Executors${c_reset} and ${c_blue}Engines${c_reset} e.g.: -profile ${c_green}local${c_reset},${c_blue}conda${c_reset}
     
-    ${c_green}Executer${c_reset} (choose one):
+    ${c_green}Executor${c_reset} (choose one):
       local
       slurm
     
@@ -483,6 +483,10 @@ def helpMSG() {
     ${c_reset}
 
     Per default: -profile local,conda is executed. 
+
+    ${c_yellow}Test profile:${c_reset}
+    Test the pipeline with a small test dataset:
+    nextflow run rki-mf1/CoVpipe2 -profile ${c_green}executor${c_reset},${c_blue}engine${c_reset},test
     """
 }
 def defaultMSG(){

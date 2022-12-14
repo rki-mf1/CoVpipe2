@@ -47,7 +47,7 @@ process kraken {
     set_out_name = params.mode == 'paired' ? '#' : ''
     """
     kraken2 \
-        --threads ${task.cpus} \
+        --threads $task.cpus \
         --db ${db} \
         ${set_paired} \
         --classified-out ${name}.classified.R${set_out_name}.fastq \

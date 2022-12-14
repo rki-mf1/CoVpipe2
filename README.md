@@ -7,13 +7,14 @@ CoVpipe2 is a Nextflow pipeline for reference-based genome reconstruction of SAR
 - [CoVpipe2](#covpipe2)
   - [Quick installation](#quick-installation)
     - [Call help](#call-help)
+    - [Test run](#test-run)
     - [Update the pipeline](#update-the-pipeline)
     - [Use a certain release](#use-a-certain-release)
   - [Quick run examples](#quick-run-examples)
     - [Example 1:](#example-1)
     - [Example 2:](#example-2)
     - [Example sample sheet](#example-sample-sheet)
-  - [Manual / help](#manual--help)
+  - [Manual](#manual)
   - [Changes to CoVpipe](#changes-to-covpipe)
   - [Workflow](#workflow)
   - [Acknowledgement, props and inspiration](#acknowledgement-props-and-inspiration)
@@ -56,6 +57,23 @@ All other dependencies and tools will be installed within the pipeline via `cond
 ```bash
 nextflow run rki-mf1/CoVpipe2 --help
 ```
+
+### Test run
+
+Validate your installation with a test run:
+
+```bash
+# for a Conda installation
+nextflow run rki-mf1/CoVpipe2 -profile local,conda,test --cores 4 --max_cores 8
+
+# for a Singularity installation
+nextflow run rki-mf1/CoVpipe2 -profile local,singularity,test --cores 4 --max_cores 8
+
+# for a Docker installation
+nextflow run rki-mf1/CoVpipe2 -profile local,docker,test --cores 4 --max_cores 8
+```
+
+For more configuration options, see [here](#manual).
 
 ### Update the pipeline
 
@@ -113,7 +131,7 @@ sample4,/path/to/reads/id4_1.fastq.gz,/path/to/reads/id4_2.fastq.gz
 
 The header is required. Pay attention the set unique sample names!
 
-## Manual / help
+## Manual
 
 <details><summary>click here to see the complete help message</summary>
 
@@ -123,12 +141,12 @@ Robert Koch Institute, MF1 Bioinformatics
     Workflow: CoVpipe2
 
     Usage examples:
-    nextflow run CoVpipe2.nf --fastq '*R{1,2}.fastq.gz' --reference 'sars-cov-2' --cores 4 --max_cores 8
+    nextflow run CoVpipe2.nf --fastq '*R{1,2}.fastq.gz' --cores 4 --max_cores 8
     or
     nextflow run rki-mf1/CoVpipe2 -r <version> --fastq '*R{1,2}.fastq.gz' --ref_genome ref.fasta --cores 4 --max_cores 8
 
     Reference, required:
-    --reference              Currently supported: 'sars-cov-2' (MN908947.3)
+    --reference              Currently supported: 'sars-cov-2' (MN908947.3) [default: sars-cov-2]
     OR
     --ref_genome             Reference FASTA file.
     --ref_annotation         Reference GFF file.
@@ -238,9 +256,9 @@ Robert Koch Institute, MF1 Bioinformatics
     --singularity_cache_dir  Location for storing the singularity images [default: singularity]
     
     Execution/Engine profiles:
-    The pipeline supports profiles to run via different Executers and Engines e.g.: -profile local,conda
+    The pipeline supports profiles to run via different Executors and Engines e.g.: -profile local,conda
     
-    Executer (choose one):
+    Executor (choose one):
       local
       slurm
     
@@ -255,7 +273,11 @@ Robert Koch Institute, MF1 Bioinformatics
                              Has to be combine with an engine and an executor.
     
 
-    Per default: -profile local,conda is executed.
+    Per default: -profile local,conda is executed. 
+
+    Test profile:
+    Test the pipeline with a small test dataset:
+    nextflow run rki-mf1/CoVpipe2 -profile executor,engine,test
 ```
 
 </details>

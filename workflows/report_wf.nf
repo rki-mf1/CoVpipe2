@@ -28,15 +28,15 @@ workflow summary_report {
         coverage_table(mapping_coverage.map {it -> it[1]}.collect(), params.cov)
 
         // storeDir: "${params.output}/${params.report_dir}/"
-        president_results = president.collectFile(name: 'president_results.tsv', skip: 1, keepHeader: true, storeDir: "${params.output}/${params.report_dir}/single_tables")
+        president_results = president.collectFile(name: 'president_results.tsv', skip: 1, keepHeader: true, storeDir: "${params.output}/${params.report_dir}/single_tables", sort: { it.baseName })
         
-        pangolin_results = pangolin.map {it -> it[1]}.collectFile(name: 'pangolin_results.tsv', skip: 1, keepHeader: true, storeDir: "${params.output}/${params.report_dir}/single_tables")
+        pangolin_results = pangolin.map {it -> it[1]}.collectFile(name: 'pangolin_results.csv', skip: 1, keepHeader: true, storeDir: "${params.output}/${params.report_dir}/single_tables", sort: { it.baseName })
 
-        nextclade_results = nextclade.map {it -> it[1]}.collectFile(name: 'nextclade_results.tsv', skip: 1, keepHeader: true, storeDir: "${params.output}/${params.report_dir}/single_tables")
+        nextclade_results = nextclade.map {it -> it[1]}.collectFile(name: 'nextclade_results.tsv', skip: 1, keepHeader: true, storeDir: "${params.output}/${params.report_dir}/single_tables", sort: { it.baseName })
 
-        sc2rf_results = sc2rf.map {it -> it[1]}.collectFile(name: 'sc2rf_results.csv', storeDir: "${params.output}/${params.report_dir}/single_tables")
+        sc2rf_results = sc2rf.map {it -> it[1]}.collectFile(name: 'sc2rf_results.csv', storeDir: "${params.output}/${params.report_dir}/single_tables", sort: { it.baseName })
         
-        vois_results = vois_tsv.map {it -> it[1]}.collectFile(name: 'vois_results.tsv', skip: 1, keepHeader: true, storeDir: "${params.output}/${params.report_dir}/single_tables")
+        vois_results = vois_tsv.map {it -> it[1]}.collectFile(name: 'vois_results.tsv', skip: 1, keepHeader: true, storeDir: "${params.output}/${params.report_dir}/single_tables", sort: { it.baseName })
 
         template = file("$baseDir/bin/summary_report.Rmd", checkIfExists: true)
         rmarkdown_report(template, fastp_table.out.stats, fastp_table.out.stats_filter, kraken_table.out.ifEmpty([]), mapping_stats_table.out, fragment_size_table.out.size, fragment_size_table.out.median, coverage_table.out.coverage_table, coverage_table.out.positive, coverage_table.out.negative, coverage_table.out.sample_cov, president_results, pangolin_results, nextclade_results, nextclade_version, nextclade_dataset_version, sc2rf_results, vois_results.ifEmpty([]))
