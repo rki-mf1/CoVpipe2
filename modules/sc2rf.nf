@@ -9,15 +9,16 @@ process sc2rf {
 
     script:
     """
-    git clone https://github.com/lenaschimmel/sc2rf.git
-    cd sc2rf
+    git clone https://github.com/ktmeaton/ncov-recombinant.git
+    cd ncov-recombinant/sc2rf
     # --clades can't be the last argument before the fasta input, else script fails without an error, see https://github.com/lenaschimmel/sc2rf/issues/35
-    python3 sc2rf.py --csvfile ../${name}_sc2rf.csv --parents 1-1000 --breakpoints 1-2 \
+    python3 sc2rf.py --csvfile ../../${name}_sc2rf.csv --parents 1-1000 --breakpoints 1-2 \
+                        --ansi \
                         --max-intermission-count 3 --max-intermission-length 1 \
                         --clades 'all' \
                         --unique 1 --max-ambiguous 10000 --max-name-length 55 \
-                         ../${fasta}
-    cd ..
+                         ../../${fasta}
+    cd ../..
 
     if [[ \$(wc -l <${name}_sc2rf.csv) -eq 0 ]] 
     then
