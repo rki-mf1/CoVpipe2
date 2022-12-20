@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Unreleased
 
+### Added
+
+- added license (GPL3)
+
 ### Changed
 
 - `sc2rf` resources from https://github.com/ktmeaton/ncov-recombinant instead of https://github.com/lenaschimmel/sc2rf
