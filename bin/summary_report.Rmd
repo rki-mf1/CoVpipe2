@@ -244,11 +244,11 @@ dt.overview$sc2rf_potential_recombinant <- ifelse(dt.overview$sc2rf_potential_re
                                     dt.overview$sc2rf_potential_recombinant)
 
 if(params$kraken_table != 'none'){
-  col <- c("sample", '# total reads', '# filtered reads', "kraken2_ratio_sarscov2", "president_QC_pass", "president_identity", "pangolin_lineage","scorpio_constellation", "nextclade_frameshifts","nextclade_privateMutations_status", 'sc2rf_potential_recombinant')
-  col_names <- c("Sample", '# total reads', '# filtered reads', "Severe acute respiratory syndrome coronavirus 2 (ratio)", "Genome QC", "%N", "Linage", "Scorpio call", "Frameshifts", "Private mutations QC", 'Potential recombinant')
+  col <- c("sample", '# total reads', '# filtered reads', "kraken2_ratio_sarscov2", "president_QC_pass", "president_identity", "president_percentN", "pangolin_lineage","scorpio_constellation", "nextclade_frameshifts","nextclade_privateMutations_status", 'sc2rf_potential_recombinant')
+  col_names <- c("Sample", '# total reads', '# filtered reads', "Severe acute respiratory syndrome coronavirus 2 (ratio)", "Genome QC", "%Identity", "%N", "Linage", "Scorpio call", "Frameshifts", "Private mutations QC", 'Potential recombinant')
 } else {
-  col <- c("sample", '# total reads', '# filtered reads', "president_QC_pass", "president_identity", "pangolin_lineage","scorpio_constellation", "nextclade_frameshifts","nextclade_privateMutations_status", 'sc2rf_potential_recombinant')
-  col_names <- c("Sample", '# total reads', '# filtered reads', "Genome QC", "%N", "Linage", "Scorpio call", "Frameshifts", "Private mutations QC", 'Potential recombinant')
+  col <- c("sample", '# total reads', '# filtered reads', "president_QC_pass", "president_identity", "president_percentN", "pangolin_lineage", "scorpio_constellation", "nextclade_frameshifts","nextclade_privateMutations_status", 'sc2rf_potential_recombinant')
+  col_names <- c("Sample", '# total reads', '# filtered reads', "Genome QC", "%Identity", "%N", "Linage", "Scorpio call", "Frameshifts", "Private mutations QC", 'Potential recombinant')
 }
 
 datatable(dt.overview[, col, with=FALSE], 
