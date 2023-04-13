@@ -2,5 +2,4 @@ channels:
  - bioconda
  - conda-forge
 dependencies:
- - president
- - pandas=1.3.4
+ - president=0.6.8
