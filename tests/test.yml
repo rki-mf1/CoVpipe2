@@ -124,7 +124,7 @@
       md5sum: 562acdee9dd3ad65052fd951db6b1133
     - path: "results/Report/report.html"
     - path: "results/Report/report_datatable.csv"
-      md5sum: 6a6a6740550df7eff681f7a8f06c4e42
+      md5sum: b649f9400fe6842b2f8a2537e137f66a
     - path: "results/Report/report_datatable.xlsx"
     - path: "results/Report/single_tables/nextclade_results.tsv"
       md5sum: 89448e56d4d8f32cf6695038cb1f1d4b
@@ -260,7 +260,7 @@
       md5sum: 562acdee9dd3ad65052fd951db6b1133
     - path: "results/Report/report.html"
     - path: "results/Report/report_datatable.csv"
-      md5sum: c81f0439b2b139b3ff77c909173fbc74
+      md5sum: b649f9400fe6842b2f8a2537e137f66a
     - path: "results/Report/report_datatable.xlsx"
     - path: "results/Report/single_tables/nextclade_results.tsv"
       md5sum: 89448e56d4d8f32cf6695038cb1f1d4b
