@@ -5,6 +5,29 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.4] 2023-04-13
+
+### Changed
+
+- updated default nextclade version to 2.13.1
+- updated default pangolin version to 4.2 with pangolin-data version 1.18.1.1
+
+### Fixed
+
+- corrected column name in summary report table
+
+## [0.3.3] 2023-03-10
+
+### Added
+
+- timestamp in report name
+
+## [0.3.2] 2023-02-08
+
+### Fixed
+
+- updated conda config
+
 ## [0.3.1] 2022-12-20
 
 ### Added

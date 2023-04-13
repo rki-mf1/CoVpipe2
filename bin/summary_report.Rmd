@@ -189,7 +189,7 @@ if(params$kraken_table != 'none'){
   dt.overview <- merge(x=dt.overview, y=dt.kraken_table, by='sample')
 }
 
-dt.president_results$N_percent <- (dt.president_results$N_bases / dt.president_results$length_query) * 100
+dt.president_results$N_percent <- (dt.president_results$N_bases / dt.president_results$length_query)
 dt.president_results <- dt.president_results[,c("query_name", "qc_all_valid", "ACGT Nucleotide identity", "N_bases", "N_percent", "Mismatches")]
 colnames(dt.president_results)[1] <- 'sample'
 dt.overview <- merge(x=dt.overview, y=dt.president_results, by='sample')
@@ -244,11 +244,11 @@ dt.overview$sc2rf_potential_recombinant <- ifelse(dt.overview$sc2rf_potential_re
                                     dt.overview$sc2rf_potential_recombinant)
 
 if(params$kraken_table != 'none'){
-  col <- c("sample", '# total reads', '# filtered reads', "kraken2_ratio_sarscov2", "president_QC_pass", "president_identity", "pangolin_lineage","scorpio_constellation", "nextclade_frameshifts","nextclade_privateMutations_status", 'sc2rf_potential_recombinant')
-  col_names <- c("Sample", '# total reads', '# filtered reads', "Severe acute respiratory syndrome coronavirus 2 (ratio)", "Genome QC", "%N", "Linage", "Scorpio call", "Frameshifts", "Private mutations QC", 'Potential recombinant')
+  col <- c("sample", '# total reads', '# filtered reads', "kraken2_ratio_sarscov2", "president_QC_pass", "president_identity", "president_percentN", "pangolin_lineage","scorpio_constellation", "nextclade_frameshifts","nextclade_privateMutations_status", 'sc2rf_potential_recombinant')
+  col_names <- c("Sample", '# total reads', '# filtered reads', "Severe acute respiratory syndrome coronavirus 2 (ratio)", "Genome QC", "%Identity", "%N", "Linage", "Scorpio call", "Frameshifts", "Private mutations QC", 'Potential recombinant')
 } else {
-  col <- c("sample", '# total reads', '# filtered reads', "president_QC_pass", "president_identity", "pangolin_lineage","scorpio_constellation", "nextclade_frameshifts","nextclade_privateMutations_status", 'sc2rf_potential_recombinant')
-  col_names <- c("Sample", '# total reads', '# filtered reads', "Genome QC", "%N", "Linage", "Scorpio call", "Frameshifts", "Private mutations QC", 'Potential recombinant')
+  col <- c("sample", '# total reads', '# filtered reads', "president_QC_pass", "president_identity", "president_percentN", "pangolin_lineage", "scorpio_constellation", "nextclade_frameshifts","nextclade_privateMutations_status", 'sc2rf_potential_recombinant')
+  col_names <- c("Sample", '# total reads', '# filtered reads', "Genome QC", "%Identity", "%N", "Linage", "Scorpio call", "Frameshifts", "Private mutations QC", 'Potential recombinant')
 }
 
 datatable(dt.overview[, col, with=FALSE], 
@@ -256,7 +256,7 @@ datatable(dt.overview[, col, with=FALSE],
       rownames = FALSE,
       caption = "Short overview over the pipeline run. Please see below or pipeline results for more extensive output.",
       options = list(scrollX = TRUE, order = list(list(0, 'asc')), columnDefs = list(list(targets="_all", render = JS("function(data, type, row, meta) {return data === null || data === '' ? 'n/a' : data;}")))),
-      escape = FALSE)
+      escape = FALSE) %>% formatPercentage(columns=c('president_identity','president_percentN'), digits=2)
 ```
 
 ## Trimming statistics
@@ -280,7 +280,7 @@ datatable(dt.table,
     caption = "Counts of reads before and after clipping as well as base count of >=Q30. Read counts before and after clipping augmented with bar chart for visual aid.",
     options = list(order = list(list(0, 'asc'))),
     escape = F) %>%
-    formatRound(columns=c("ratio.clip", "q30.before.clip", "q30.after.clip"), digits=2)
+    formatPercentage(columns=c("ratio.clip", "q30.before.clip", "q30.after.clip"), digits=2)
 
 rm(dt.table)
 ```
@@ -363,7 +363,7 @@ datatable(dt.flagstat_table,
     caption = "Amount of reads subjected to reference genome mapping (after the optional Kraken filtering) and the respective numbers of mapped reads. In paired end sequencing each DNA fragment is counted twice. Input and mapped read counts augmented with bar chart for visual aid.",
     options = list(order = list(list(0, 'asc'))),
     escape = F) %>%
-    formatRound(columns=c("mapping.rate"), digits=3)
+    formatPercentage(columns=c("mapping.rate"), digits=3)
 ```
 
 `r if(params$mode == "paired"){"
@@ -487,8 +487,9 @@ dt.sample_cov_table <- rbind(dt.sample_cov, df.tmp)
 rm(df.tmp)
 
 # conditional formatting for reference coverage >95%
+dt.sample_cov_table$genome.coverage <- dt.sample_cov_table$genome.coverage * 100
 dt.sample_cov_table$genome.coverage <- round(dt.sample_cov_table$genome.coverage, 2)
-dt.sample_cov_table$genome.coverage <- ifelse(dt.sample_cov_table$genome.coverage >= 0.95,
+dt.sample_cov_table$genome.coverage <- ifelse(dt.sample_cov_table$genome.coverage >= 95,
                                     cell_spec(dt.sample_cov_table$genome.coverage, background = "lightgreen", align = "right"),
                                     dt.sample_cov_table$genome.coverage)
 # coverage bar
@@ -526,7 +527,8 @@ datatable(dt.president_results,
       rownames = FALSE,
       caption = "Quality statistics by PRESIDENT.",
       options = list(scrollX = TRUE, order = list(list(0, 'asc')), columnDefs = list(list(targets="_all", render = JS("function(data, type, row, meta) {return data === null ? 'NA' : data;}")))),
-      escape = FALSE)
+      escape = FALSE) %>%
+      formatPercentage(columns=c("ACGT Nucleotide identity", "N_percent"), digits=2)
 ```
 
 ## Lineage overview

@@ -100,14 +100,14 @@
     - path: "results/05-Linages_Mutations/SAMPLE1_PE/SAMPLE1_PE.aligned.fasta"
       md5sum: 59ee3f944dcda28f16c20f00a819aa0e
     - path: "results/05-Linages_Mutations/SAMPLE1_PE/SAMPLE1_PE_clade.tsv"
-      md5sum: 957bfa0900f18e692fafad3eba29e8f4
+      md5sum: a8946eb6e4f94378f20234e2f4fb5bba
     - path: "results/05-Linages_Mutations/SAMPLE1_PE/SAMPLE1_PE_lineage_report.csv"
       contains:
         - "taxon,lineage,conflict,ambiguity_score,scorpio_call,scorpio_support,scorpio_conflict,scorpio_notes,version,pangolin_version,scorpio_version,constellation_version,is_designated,qc_status,qc_notes,note"
     - path: "results/05-Linages_Mutations/SAMPLE2_PE/SAMPLE2_PE.aligned.fasta"
       md5sum: e1936924ec8fe26dbc87a2277e4a3dac
     - path: "results/05-Linages_Mutations/SAMPLE2_PE/SAMPLE2_PE_clade.tsv"
-      md5sum: a5c20762449bb4847a0361f062c7150e
+      md5sum: 1e05b125b8e32249610a84f664e9f02d
     - path: "results/05-Linages_Mutations/SAMPLE2_PE/SAMPLE2_PE_lineage_report.csv"
       contains:
         - "taxon,lineage,conflict,ambiguity_score,scorpio_call,scorpio_support,scorpio_conflict,scorpio_notes,version,pangolin_version,scorpio_version,constellation_version,is_designated,qc_status,qc_notes,note"
@@ -124,12 +124,12 @@
       md5sum: 562acdee9dd3ad65052fd951db6b1133
     - path: "results/Report/report.html"
     - path: "results/Report/report_datatable.csv"
-      md5sum: 6a6a6740550df7eff681f7a8f06c4e42
+      md5sum: b649f9400fe6842b2f8a2537e137f66a
     - path: "results/Report/report_datatable.xlsx"
     - path: "results/Report/single_tables/nextclade_results.tsv"
-      md5sum: eed39e4c11657a7b8f92f6f8c41d44fd
+      md5sum: 89448e56d4d8f32cf6695038cb1f1d4b
     - path: "results/Report/single_tables/pangolin_results.csv"
-      md5sum: c07feeb1b6dcef19a00d460f6173d2ae
+      md5sum: df49cfb48015c8df2ce402aac0ce7a98
     - path: "results/Report/single_tables/president_results.tsv"
     - path: "results/Report/single_tables/sc2rf_results.csv"
       md5sum: d02d8ab1b54d11b1aa16edc719b75796
@@ -236,14 +236,14 @@
     - path: "results/05-Linages_Mutations/SAMPLE1_PE/SAMPLE1_PE.aligned.fasta"
       md5sum: 59ee3f944dcda28f16c20f00a819aa0e
     - path: "results/05-Linages_Mutations/SAMPLE1_PE/SAMPLE1_PE_clade.tsv"
-      md5sum: 3e77cdc3e071722a20f69ba4d4b31ba0
+      md5sum: a8946eb6e4f94378f20234e2f4fb5bba
     - path: "results/05-Linages_Mutations/SAMPLE1_PE/SAMPLE1_PE_lineage_report.csv"
       contains:
         - "taxon,lineage,conflict,ambiguity_score,scorpio_call,scorpio_support,scorpio_conflict,scorpio_notes,version,pangolin_version,scorpio_version,constellation_version,is_designated,qc_status,qc_notes,note"
     - path: "results/05-Linages_Mutations/SAMPLE2_PE/SAMPLE2_PE.aligned.fasta"
       md5sum: e1936924ec8fe26dbc87a2277e4a3dac
     - path: "results/05-Linages_Mutations/SAMPLE2_PE/SAMPLE2_PE_clade.tsv"
-      md5sum: bdf1c0cf1d72fc739190ac0bfca1ecc2
+      md5sum: 1e05b125b8e32249610a84f664e9f02d
     - path: "results/05-Linages_Mutations/SAMPLE2_PE/SAMPLE2_PE_lineage_report.csv"
       contains:
         - "taxon,lineage,conflict,ambiguity_score,scorpio_call,scorpio_support,scorpio_conflict,scorpio_notes,version,pangolin_version,scorpio_version,constellation_version,is_designated,qc_status,qc_notes,note"
@@ -260,11 +260,11 @@
       md5sum: 562acdee9dd3ad65052fd951db6b1133
     - path: "results/Report/report.html"
     - path: "results/Report/report_datatable.csv"
-      md5sum: c81f0439b2b139b3ff77c909173fbc74
+      md5sum: b649f9400fe6842b2f8a2537e137f66a
     - path: "results/Report/report_datatable.xlsx"
     - path: "results/Report/single_tables/nextclade_results.tsv"
+      md5sum: 89448e56d4d8f32cf6695038cb1f1d4b
     - path: "results/Report/single_tables/pangolin_results.csv"
-      md5sum: df49cfb48015c8df2ce402aac0ce7a98
     - path: "results/Report/single_tables/president_results.tsv"
     - path: "results/Report/single_tables/sc2rf_results.csv"
       md5sum: d02d8ab1b54d11b1aa16edc719b75796
