@@ -127,9 +127,9 @@
       md5sum: 6a6a6740550df7eff681f7a8f06c4e42
     - path: "results/Report/report_datatable.xlsx"
     - path: "results/Report/single_tables/nextclade_results.tsv"
-      md5sum: eed39e4c11657a7b8f92f6f8c41d44fd
+      md5sum: 89448e56d4d8f32cf6695038cb1f1d4b
     - path: "results/Report/single_tables/pangolin_results.csv"
-      md5sum: c07feeb1b6dcef19a00d460f6173d2ae
+      md5sum: df49cfb48015c8df2ce402aac0ce7a98
     - path: "results/Report/single_tables/president_results.tsv"
     - path: "results/Report/single_tables/sc2rf_results.csv"
       md5sum: d02d8ab1b54d11b1aa16edc719b75796
@@ -263,8 +263,8 @@
       md5sum: c81f0439b2b139b3ff77c909173fbc74
     - path: "results/Report/report_datatable.xlsx"
     - path: "results/Report/single_tables/nextclade_results.tsv"
+      md5sum: 89448e56d4d8f32cf6695038cb1f1d4b
     - path: "results/Report/single_tables/pangolin_results.csv"
-      md5sum: df49cfb48015c8df2ce402aac0ce7a98
     - path: "results/Report/single_tables/president_results.tsv"
     - path: "results/Report/single_tables/sc2rf_results.csv"
       md5sum: d02d8ab1b54d11b1aa16edc719b75796
