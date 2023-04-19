@@ -52,6 +52,29 @@ OR
 
 All other dependencies and tools will be installed within the pipeline via `conda`, `Docker` or `Singularity`.
 
+:warning: Important for `conda`/`mamba` users: Make sure that your `conda` channels are configured according to the `bioconda` [usage](https://bioconda.github.io/#usage):
+
+  <details><summary>Check your current channel list:</summary>
+    
+  ```bash
+  conda config --show channels
+  ```
+  
+  </details>
+
+  <details><summary>Change you channel list:</summary>
+  
+  ```bash
+  conda config --add channels defaults
+  conda config --add channels bioconda
+  conda config --add channels conda-forge
+  conda config --set channel_priority strict
+  ```
+
+  Check `bioconda` [usage](https://bioconda.github.io/#usage) for the latest configuration!
+
+  </details>
+
 ### Call help
 
 ```bash
