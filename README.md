@@ -71,7 +71,7 @@ All other dependencies and tools will be installed within the pipeline via `cond
   conda config --set channel_priority strict
   ```
 
-  Check `bioconda` [usage](https://bioconda.github.io/#usage) for the latest configuration!
+  Please, check `bioconda` [usage](https://bioconda.github.io/#usage) for the latest configuration!
 
   </details>
 
@@ -87,6 +87,7 @@ Validate your installation with a test run:
 
 ```bash
 # for a Conda installation
+# the Conda channel configuration needs to be bioconda conform
 nextflow run rki-mf1/CoVpipe2 -profile local,conda,test --cores 4 --max_cores 8
 
 # for a Singularity installation
