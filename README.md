@@ -17,6 +17,7 @@ CoVpipe2 is a Nextflow pipeline for reference-based genome reconstruction of SAR
   - [Manual](#manual)
   - [Changes to CoVpipe](#changes-to-covpipe)
   - [Workflow](#workflow)
+  - [Citations](#citations)
   - [Acknowledgement, props and inspiration](#acknowledgement-props-and-inspiration)
 
 </details>
@@ -348,6 +349,10 @@ Workflow overview:
 <sub><sub>Components originally designed by James A. Fellows Yates & nf-core under a CC0 license (public domain)</sub></sub>
 
 </details>
+
+## Citations
+
+An extensive list of references for the tools used by the pipeline can be found in the [`CITATIONS.md`](CITATIONS.md) file.
 
 ## Acknowledgement, props and inspiration
 
