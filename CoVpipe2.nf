@@ -450,7 +450,7 @@ def helpMSG() {
     --nextclade_docker_default Default container tag for nextclade [default: $params.nextclade_docker_default]
     --pangolin_conda_default   Default conda packages for pangolin [default: $params.pangolin_conda_default]
     --nextclade_conda_default  Default conda packages for nextclade [default: $params.nextclade_conda_default]
-    --nextclade_dataset_name    Default dataset name for nextclade [default: $params.nextclade_dataset_name]
+    --nextclade_dataset_name   Default dataset name for nextclade [default: $params.nextclade_dataset_name]
     --nextclade_dataset_tag    Default dataset tag for nextclade [default: $params.nextclade_dataset_tag]
 
     ${c_yellow}Computing options:${c_reset}
