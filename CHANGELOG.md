@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- fixed conda execution in standard profile
+- fixed conda/mamba execution in standard profile
 
 ### Changed
 
@@ -19,8 +19,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- updated default nextclade version to 2.13.1
-- updated default pangolin version to 4.2 with pangolin-data version 1.18.1.1
+- updated default `nextclade` version to 2.13.1
+- updated default `pangolin` version to 4.2 with `pangolin-data` version 1.18.1.1
 
 ### Fixed
 
