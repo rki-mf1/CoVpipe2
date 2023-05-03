@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## unreleased
 
+## Added
+
+- new parameters `nextclade_dataset_name` and `nextclade_dataset_tag` for better `nextclade` fine tuning
+  - with `--update` the latest dataset tag is selected
+
 ### Fixed
 
 - fixed conda/mamba execution in standard profile
