@@ -261,8 +261,12 @@ Robert Koch Institute, MF1 Bioinformatics
     --update                   Update pangolin and nextclade [default: false]
                                   Depending on the chosen profile either the conda environment (profiles 'standard', 'conda', 'mamba') 
                                   or the container (profiles 'docker', 'singularity') is updated.
-    --pangolin_docker_default  Default container tag for pangolin [default: rkimf1/pangolin:3.1.20--3bb06db]
-    --nextclade_docker_default Default container tag for nextclade [default: rkimf1/nextclade:1.10.2--1764691]
+    --pangolin_docker_default  Default container tag for pangolin [default: rkimf1/pangolin:4.2-1.18.1.1--e24af6d]
+    --nextclade_docker_default Default container tag for nextclade [default: rkimf1/nextclade2:2.13.1--ddb9e60]
+    --pangolin_conda_default   Default conda packages for pangolin [default: bioconda::pangolin=4.2 bioconda::pangolin-data=1.18.1.1]
+    --nextclade_conda_default  Default conda packages for nextclade [default: bioconda::nextclade=2.13.1]
+    --nextclade_dataset_name   Default dataset name for nextclade [default: sars-cov-2]
+    --nextclade_dataset_tag    Default dataset tag for nextclade [default: 2023-04-18T12:00:00Z]
 
     Computing options:
     --cores                  Max cores per process for local use [default: 4]
