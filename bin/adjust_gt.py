@@ -22,13 +22,6 @@ def parse_args(CMD=None):
     parser.add_argument('--version', action='version', version='%(prog)s ' + VERSION)
     return parser.parse_args(CMD)
 
-def get_cmd_from_snake(snakemake):
-    cmd = ["-o", snakemake.output[0],
-           "--vf", snakemake.params.frac,
-          "--gz", snakemake.input[0]]
-    cmd = [str(arg) for arg in cmd]
-    return cmd
-
 # open file handles considering compression state
 def get_filehandle(in_fname, gz):
     if not gz:
@@ -119,11 +112,8 @@ def bgzip_outname(_file, outfile=None):
             ret = bg_proc.wait() 
                 
 def main(CMD=None):
-        args = parse_args(CMD)
-        process(args.vcf, args.o, args.vf, args.ao, args.dp, args.gt, args.gz)
+    args = parse_args(CMD)
+    process(args.vcf, args.o, args.vf, args.ao, args.dp, args.gt, args.gz)
 
 if __name__ == "__main__":
-        CMD = None
-        if "snakemake" in globals(): 
-            CMD = get_cmd_from_snake(snakemake)
-        main(CMD=CMD)
+    main()
