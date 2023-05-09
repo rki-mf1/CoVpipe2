@@ -256,6 +256,10 @@ Robert Koch Institute, MF1 Bioinformatics
     --cns_gt_adjust          Minimum fraction of reads supporting a variant which leads to an explicit call of this 
                                  variant (genotype adjustment). The value has to be greater than 0.5 but not greater than 1. 
                                  To turn genotype adjustment off, set the value to 0. [default: 0.9]
+    --cns_indel_filter       Minimum fraction of reads supporting an indel which leads to an integration to the consensus sequence.
+                                 Low frequency indels can be false positives introducing frameshifts. Since the IUPAC code is not able
+                                 to model a base-or-gap case, those indels would be integrated in the IUPAC and masked consensus.
+                                 To turn indel filtering off, set the value to 0. [default: 0.6]
 
     Updated for linage assignment and mutation calling:
     --update                   Update pangolin and nextclade [default: false]
