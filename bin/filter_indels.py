@@ -55,7 +55,7 @@ def process(in_fname, out_fname, min_vf, ao_tag="AO", dp_tag="DP", type_tag="TYP
                 #find TYPE
                 info = { i.split('=')[0]: i.split('=')[1] for i in fields[7].split(";") }
 
-                if not ( 'ins' in info[type_tag] or 'del' in info[type_tag] ):
+                if not ( 'ins' in info[type_tag] or 'del' in info[type_tag] or 'complex' in info[type_tag] ):
                     # not a indel
                     outhandle.write(line)
                     continue
