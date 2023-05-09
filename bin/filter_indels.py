@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-#author: Stephan Fuchs (Robert Koch Institute, MF-1, fuchss@rki.de)
+#author: Marie Lataretu (Robert Koch Institute, MF-1, lataretum@rki.de)
+#adapted from: Stephan Fuchs (Robert Koch Institute, MF-1, fuchss@rki.de)
 
 VERSION = "0.0.9"
 import os
@@ -15,10 +16,10 @@ def parse_args(CMD=None):
     parser.add_argument('vcf', metavar="FILE", help="vcf file", type=str)
     parser.add_argument('--ao', metavar="STR", help="tag for read count supporting the respective variant (default: AO)", type=str, default="AO")
     parser.add_argument('--dp', metavar="STR", help="tag for total read count at the repsective position (default: DP)", type=str, default="DP")
-    parser.add_argument('--gt', metavar="STR", help="tag for genotype (default: GT)", type=str, default="GT")
+    parser.add_argument('--tt', metavar="STR", help="tag for type (default: TYPE)", type=str, default="TYPE")
     parser.add_argument('-o', help="output file (will be overwritten!)", type=str, required=True)
     parser.add_argument('--gz', help="bgzip compressed input", action="store_true")
-    parser.add_argument('--vf', metavar="FLOAT", help="minimal variant fraction to set a homogeneous genotype (default: 0.9)", type=float, default=0.9)
+    parser.add_argument('--vf', metavar="FLOAT", help="minimal variant fraction to set include an indel into the consensus (default: 0.9)", type=float, default=0.9)
     parser.add_argument('--version', action='version', version='%(prog)s ' + VERSION)
     return parser.parse_args(CMD)
 
@@ -30,22 +31,20 @@ def get_filehandle(in_fname, gz):
         inhandle = gzip.open(in_fname, "rt")
     return inhandle
                 
-def process(in_fname, out_fname, min_vf, ao_tag="AO", dp_tag="DP", gt_tag="GT", gz=False):
+def process(in_fname, out_fname, min_vf, ao_tag="AO", dp_tag="DP", type_tag="TYPE", gz=False):
     #sanity checks
-    if min_vf <= 0.5:
-        sys.exit("error: min_vf has to be greater than 0.5")
+    if min_vf <= 0:
+        sys.exit("error: min_vf has to be greater than 0")
     out_gz = out_fname.endswith(".gz")
     intermediate = re.sub("\.gz$","", out_fname)
 
     #regex generation
     ao_pattern = re.compile(r"(?:^|\t|;)" + re.escape(ao_tag) + "=([0-9,]+)(?:$|\t|;)")
     dp_pattern = re.compile(r"(?:^|\t|;)" + re.escape(dp_tag) + "=([0-9]+)(?:$|\t|;)")
-    gt_pattern = re.compile(r"(?:^|\t|;)" + re.escape(gt_tag) + "=([0-9]+/[0-9]+)(?:$|\t|;)")
 
     with get_filehandle(in_fname, gz) as inhandle: 
         with open(intermediate, "w") as outhandle: 
             for l, line in enumerate(inhandle):
-       
                 #skip empty or comment lines
                 if len(line.strip()) == 0 or line.startswith("#"):
                     outhandle.write(line)
@@ -53,19 +52,14 @@ def process(in_fname, out_fname, min_vf, ao_tag="AO", dp_tag="DP", gt_tag="GT", 
 
                 fields = line.split("\t")
                 
-                #find GT position
-                gt_pos = fields[8].split(":").index(gt_tag)
-                
-                #replacing GT info (considering line eventual breaks at end)
-                cols = fields[9].split(":")
+                #find TYPE
+                info = { i.split('=')[0]: i.split('=')[1] for i in fields[7].split(";") }
 
-                # check line for homo/herterozygot
-                gt1, gt2 = cols[gt_pos].split('/')
-                if gt1 == gt2:
-                    # homozygot
+                if not ( 'ins' in info[type_tag] or 'del' in info[type_tag] or 'complex' in info[type_tag] ):
+                    # not a indel
                     outhandle.write(line)
                     continue
-                
+
                 #find ao and dp
                 ao = ao_pattern.findall(fields[7])
                 dp = dp_pattern.findall(fields[7])
@@ -79,22 +73,9 @@ def process(in_fname, out_fname, min_vf, ao_tag="AO", dp_tag="DP", gt_tag="GT", 
                 fracs = [int(x)/int(dp[0]) for x in ao[0].split(",")]
                 m = max(fracs)
                 
-                if m < min_vf:
+                if m > min_vf:
                     outhandle.write(line)
                     continue
-                
-                #generate new GT
-                gt = str(fracs.index(m) + 1) # REF == 0 -> ++1
-                gt = gt + "/" + gt
-                
-                #find GT position
-                gt_pos = fields[8].split(":").index(gt_tag)
-                
-                #replacing GT info (considering line eventual breaks at end)
-                if gt_pos == len(cols)-1:
-                    cols[gt_pos] += "\n"
-                fields[9] = ":".join(cols)
-                outhandle.write("\t".join(fields))
         if out_gz:
             bgzip_outname(intermediate, out_fname)
         
@@ -113,7 +94,7 @@ def bgzip_outname(_file, outfile=None):
                 
 def main(CMD=None):
     args = parse_args(CMD)
-    process(args.vcf, args.o, args.vf, args.ao, args.dp, args.gt, args.gz)
+    process(args.vcf, args.o, args.vf, args.ao, args.dp, args.tt, args.gz)
 
 if __name__ == "__main__":
     main()

@@ -52,6 +52,29 @@ OR
 
 All other dependencies and tools will be installed within the pipeline via `conda`, `Docker` or `Singularity`.
 
+:warning: Important for `conda`/`mamba` users: Make sure that your `conda` channels are configured according to the `bioconda` [usage](https://bioconda.github.io/#usage):
+
+  <details><summary>Check your current channel list:</summary>
+    
+  ```bash
+  conda config --show channels
+  ```
+  
+  </details>
+
+  <details><summary>Change you channel list:</summary>
+  
+  ```bash
+  conda config --add channels defaults
+  conda config --add channels bioconda
+  conda config --add channels conda-forge
+  conda config --set channel_priority strict
+  ```
+
+  Please, check `bioconda` [usage](https://bioconda.github.io/#usage) for the latest configuration!
+
+  </details>
+
 ### Call help
 
 ```bash
@@ -64,6 +87,7 @@ Validate your installation with a test run:
 
 ```bash
 # for a Conda installation
+# the Conda channel configuration needs to be bioconda conform
 nextflow run rki-mf1/CoVpipe2 -profile local,conda,test --cores 4 --max_cores 8
 
 # for a Singularity installation
@@ -232,13 +256,21 @@ Robert Koch Institute, MF1 Bioinformatics
     --cns_gt_adjust          Minimum fraction of reads supporting a variant which leads to an explicit call of this 
                                  variant (genotype adjustment). The value has to be greater than 0.5 but not greater than 1. 
                                  To turn genotype adjustment off, set the value to 0. [default: 0.9]
+    --cns_indel_filter       Minimum fraction of reads supporting an indel which leads to an integration to the consensus sequence.
+                                 Low frequency indels can be false positives introducing frameshifts. Since the IUPAC code is not able
+                                 to model a base-or-gap case, those indels would be integrated in the IUPAC and masked consensus.
+                                 To turn indel filtering off, set the value to 0. [default: 0.6]
 
     Updated for linage assignment and mutation calling:
     --update                   Update pangolin and nextclade [default: false]
                                   Depending on the chosen profile either the conda environment (profiles 'standard', 'conda', 'mamba') 
                                   or the container (profiles 'docker', 'singularity') is updated.
-    --pangolin_docker_default  Default container tag for pangolin [default: rkimf1/pangolin:3.1.20--3bb06db]
-    --nextclade_docker_default Default container tag for nextclade [default: rkimf1/nextclade:1.10.2--1764691]
+    --pangolin_docker_default  Default container tag for pangolin [default: rkimf1/pangolin:4.2-1.18.1.1--e24af6d]
+    --nextclade_docker_default Default container tag for nextclade [default: rkimf1/nextclade2:2.13.1--ddb9e60]
+    --pangolin_conda_default   Default conda packages for pangolin [default: bioconda::pangolin=4.2 bioconda::pangolin-data=1.18.1.1]
+    --nextclade_conda_default  Default conda packages for nextclade [default: bioconda::nextclade=2.13.1]
+    --nextclade_dataset_name   Default dataset name for nextclade [default: sars-cov-2]
+    --nextclade_dataset_tag    Default dataset tag for nextclade [default: 2023-04-18T12:00:00Z]
 
     Computing options:
     --cores                  Max cores per process for local use [default: 4]

@@ -1,7 +1,7 @@
 process pangolin {
     label 'pangolin'
-    container = params.pangolin_docker
-    conda ( (workflow.profile.contains('conda') ||  workflow.profile.contains('mamba')) ? params.pangolin_conda : null)
+    conda params.pangolin_conda
+    container params.pangolin_docker
     publishDir "${params.output}/${params.linage_dir}/${name}", mode: params.publish_dir_mode
     
     input:

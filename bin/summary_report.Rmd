@@ -19,7 +19,7 @@ params:
   pangolin_results: "none"
   nextclade_results: "none"
   nextclade_version: "none"
-  nextclade_dataset_version: "none"
+  nextclade_dataset_info: "none"
   sc2rf_results: "none"
   vois_results: "none"
   cns_min_cov: "none"
@@ -556,7 +556,7 @@ datatable(dt.pangolin_results[,c("taxon", "lineage", "conflict", "scorpio_call",
 ## Mutations
 Clade, mutations, deletions, insertions and frameshifts were determined with Nextclade (https://clades.nextstrain.org/).
 
-Versions: `r params$nextclade_version` with dataset tag `r params$nextclade_dataset_version`
+Versions: `r params$nextclade_version` with dataset `r params$nextclade_dataset_info`
 ```{r nextclade}
 datatable(dt.nextclade_results[,c("seqName", "aaSubstitutions", "aaDeletions", "aaInsertions", "frameShifts")], 
       colnames = c("Sample", " AA substitutions", "AA deletions", "AA insertions", "Frameshifts"),

@@ -9,6 +9,7 @@ workflow annotate_variant {
         vcf
         consensus
         nextclade_dataset_name
+        nextclade_dataset_info
         snpeff_dataset_id
 
     main:
@@ -18,7 +19,7 @@ workflow annotate_variant {
         bgzip_compress(snpeff.out.vcf) \
             | index_vcf
 
-        nextclade(consensus, nextclade_dataset_name)
+        nextclade(consensus, nextclade_dataset_name, nextclade_dataset_info)
 
         sc2rf(nextclade.out.fasta_algn)
 
@@ -27,6 +28,6 @@ workflow annotate_variant {
         vcf = snpeff.out.vcf
         nextclade_results = nextclade.out.results
         nextclade_version = nextclade.out.version
-        nextclade_dataset_version = nextclade.out.dataset_version
+        nextclade_dataset_info = nextclade.out.dataset_info
         sc2rf_result = sc2rf.out.csv
 }
