@@ -18,3 +18,24 @@ process adjust_gt {
     touch ${name}.filtered.gt_adjust.vcf
     """
 }
+
+process filter_indels {
+    label 'python'
+    label 'smallTask'
+
+    input:
+    tuple val(name), path(vcf)
+    val(indel_threshold)
+
+    output:
+    tuple val(name), path("${name}.filtered.gt_adjust.filtered_indels.vcf")
+
+    script:
+    """
+    filter_indels.py --vf ${indel_threshold} --gz ${vcf} -o ${name}.filtered.gt_adjust.filtered_indels.vcf
+    """
+    stub:
+    """
+    touch ${name}.filtered.gt_adjust.filtered_indels.vcf
+    """
+}

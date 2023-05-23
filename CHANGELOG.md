@@ -5,18 +5,28 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## unreleased
+## [0.4.0] 2023-05-09
 
-## Changed
+### Added
 
-- updated smallest required `nextflow` version to `20.04.0`
+- new parameters `nextclade_dataset_name` and `nextclade_dataset_tag` for better `nextclade` fine tuning
+  - with `--update` the latest dataset tag is selected
+- new filter for indels for consensus generation based on their frequency `--cns_indel_filter`
+
+### Fixed
+
+- fixed conda/mamba execution in standard profile
+
+### Changed
+
+- updated smallest required `nextflow` version to `22.10.0`
 
 ## [0.3.4] 2023-04-13
 
 ### Changed
 
-- updated default nextclade version to 2.13.1
-- updated default pangolin version to 4.2 with pangolin-data version 1.18.1.1
+- updated default `nextclade` version to 2.13.1
+- updated default `pangolin` version to 4.2 with `pangolin-data` version 1.18.1.1
 
 ### Fixed
 

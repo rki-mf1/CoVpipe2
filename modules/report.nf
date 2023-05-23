@@ -343,7 +343,7 @@ process rmarkdown_report {
     path(pangolin_results)
     path(nextclade_results)
     val(nextclade_version)
-    val(nextclade_dataset_version)
+    val(nextclade_dataset_info)
     path(sc2rf_results)
     path(vois_results)
 
@@ -359,7 +359,7 @@ process rmarkdown_report {
     pipeline_version = workflow.repository != null ? "$workflow.repository - $workflow.revision [$workflow.commitId]" : 'none'
     """
     cp -L ${rmd} report.Rmd
-    Rscript -e "rmarkdown::render('report.Rmd', params=list(mode='${params.mode}', fastp_table_stats='${fastp_table_stats}', fastp_table_stats_filter='${fastp_table_stats_filter}', kraken_table='${kraken_table_optional}', flagstat_table='${flagstat_table}', fragment_size_table='${fragment_size_table}', fragment_size_median_table='${fragment_size_median_table}', coverage_table='${coverage_table}', positive='${positive}', negative='${negative}', sample_cov='${sample_cov}', president_results='${president_results}', pangolin_results='${pangolin_results}', nextclade_results='${nextclade_results}', nextclade_version='${nextclade_version}',  nextclade_dataset_version='${nextclade_dataset_version}', sc2rf_results='${sc2rf_results}', vois_results='${vois_results_optional}', cns_min_cov='${params.cns_min_cov}', run_id='${run_id}', pipeline_version='${pipeline_version}'), output_file='report.html')"
+    Rscript -e "rmarkdown::render('report.Rmd', params=list(mode='${params.mode}', fastp_table_stats='${fastp_table_stats}', fastp_table_stats_filter='${fastp_table_stats_filter}', kraken_table='${kraken_table_optional}', flagstat_table='${flagstat_table}', fragment_size_table='${fragment_size_table}', fragment_size_median_table='${fragment_size_median_table}', coverage_table='${coverage_table}', positive='${positive}', negative='${negative}', sample_cov='${sample_cov}', president_results='${president_results}', pangolin_results='${pangolin_results}', nextclade_results='${nextclade_results}', nextclade_version='${nextclade_version}',  nextclade_dataset_info='${nextclade_dataset_info}', sc2rf_results='${sc2rf_results}', vois_results='${vois_results_optional}', cns_min_cov='${params.cns_min_cov}', run_id='${run_id}', pipeline_version='${pipeline_version}'), output_file='report.html')"
     """
     stub:
     """
