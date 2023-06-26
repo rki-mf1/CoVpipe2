@@ -26,7 +26,7 @@ process nextclade {
 
     used_nextclade_version=\$nextclade_version_curr
     used_nextcladedataset_tag=\$(grep -Po '"tag":.*' data/${nextclade_dataset_name}/tag.json | cut -d' ' -f 2 | tr -d '"')
-    used_nextcladedataset_info="${nextclade_dataset_name}, ${nextclade_dataset_tag}"
+    used_nextcladedataset_info="${nextclade_dataset_name}, \$used_nextcladedataset_tag"
     """
     stub:
     """
