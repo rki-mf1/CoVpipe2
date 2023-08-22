@@ -494,7 +494,7 @@ def helpMSG() {
 
     ${c_yellow}Test profile:${c_reset}
     Test the pipeline with a small test dataset:
-    nextflow run rki-mf1/CoVpipe2 -profile ${c_green}executor${c_reset},${c_blue}engine${c_reset},test
+    nextflow run rki-mf1/CoVpipe2 -r <version> -profile ${c_green}executor${c_reset},${c_blue}engine${c_reset},test
     """
 }
 def defaultMSG(){

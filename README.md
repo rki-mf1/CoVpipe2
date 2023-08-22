@@ -87,7 +87,7 @@ All other dependencies and tools will be installed within the pipeline via `cond
 ### Call help
 
 ```bash
-nextflow run rki-mf1/CoVpipe2 --help
+nextflow run rki-mf1/CoVpipe2 -r <version> --help
 ```
 
 ### Test run
@@ -97,13 +97,13 @@ Validate your installation with a test run:
 ```bash
 # for a Conda installation
 # the Conda channel configuration needs to be bioconda conform
-nextflow run rki-mf1/CoVpipe2 -profile local,conda,test --cores 4 --max_cores 8
+nextflow run rki-mf1/CoVpipe2 -r <version> -profile local,conda,test --cores 4 --max_cores 8
 
 # for a Singularity installation
-nextflow run rki-mf1/CoVpipe2 -profile local,singularity,test --cores 4 --max_cores 8
+nextflow run rki-mf1/CoVpipe2 -r <version> -profile local,singularity,test --cores 4 --max_cores 8
 
 # for a Docker installation
-nextflow run rki-mf1/CoVpipe2 -profile local,docker,test --cores 4 --max_cores 8
+nextflow run rki-mf1/CoVpipe2 -r <version> -profile local,docker,test --cores 4 --max_cores 8
 ```
 
 For more configuration options, see [here](#manual).
@@ -126,7 +126,7 @@ nextflow pull rki-mf1/CoVpipe2 -r <RELEASE>
 
 ### Example 1:
 ```bash
-nextflow run rki-mf1/CoVpipe2 \
+nextflow run rki-mf1/CoVpipe2 -r <version> \
       --reference 'sars-cov-2' \
       --fastq my_samples.csv --list \
       --kraken \
@@ -138,7 +138,7 @@ nextflow run rki-mf1/CoVpipe2 \
 
 ### Example 2:
 ```bash
-nextflow run rki-mf1/CoVpipe2 \
+nextflow run rki-mf1/CoVpipe2 -r <version> \
       --reference 'sars-cov-2' \
       --fastq '*R{1,2}.fastq.gz' \
       --adapter /path/to/repo/data/adapters/NexteraTransposase.fasta \
@@ -318,7 +318,7 @@ Robert Koch Institute, MF1 Bioinformatics
 
     Test profile:
     Test the pipeline with a small test dataset:
-    nextflow run rki-mf1/CoVpipe2 -profile executor,engine,test
+    nextflow run rki-mf1/CoVpipe2 -r <version> -profile executor,engine,test
 ```
 
 </details>
