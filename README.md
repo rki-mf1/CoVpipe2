@@ -7,6 +7,7 @@
 [![run with docker](https://img.shields.io/badge/run%20with-docker-0db7ed?labelColor=000000&logo=docker)](https://www.docker.com/)
 [![run with singularity](https://img.shields.io/badge/run%20with-singularity-1d355c.svg?labelColor=000000)](https://sylabs.io/docs/)
 ![](https://img.shields.io/badge/licence-GPL--3.0-lightgrey.svg)
+[![](https://img.shields.io/badge/awaiting%20peer%20review-F1000Research-ef8336.svg)](https://doi.org/10.12688/f1000research.136683.1)
 
 CoVpipe2 is a Nextflow pipeline for reference-based genome reconstruction of SARS-CoV-2 from NGS data. In principle it can be used also for other viruses.
 
@@ -368,7 +369,15 @@ Workflow overview:
 
 ## Citations
 
-An extensive list of references for the tools used by the pipeline can be found in the [`CITATIONS.md`](CITATIONS.md) file.
+If you use `CoVpipe2` in your work, please consider citing our publication:
+ 
+> Lataretu, M., Drechsel, O., Kmiecinski, R., Trappe, K., Hölzer, M., & Fuchs, S
+> 
+> Lessons learned: overcoming common challenges in reconstructing the SARS-CoV-2 genome from short-read sequencing data via CoVpipe2 [version 1; peer review: awaiting peer review].
+> 
+> F1000Research 2023, 12:1091 (https://doi.org/10.12688/f1000research.136683.1) 
+
+Additionally, an extensive list of references for the tools used by the pipeline can be found in the [`CITATIONS.md`](CITATIONS.md) file.
 
 ## Acknowledgement, props and inspiration
 
