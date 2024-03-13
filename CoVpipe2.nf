@@ -172,8 +172,8 @@ if ( workflow.containerEngine && params.update ) {
         params.pangolin_docker = "rkimf1/pangolin:" + tagname
         println "\033[0;32mFound latest pangolin container, using: " + params.pangolin_docker + " \033[0m" 
 
-        tagname = 'https://registry.hub.docker.com/v2/repositories/rkimf1/nextclade2/tags/'.toURL().text.split(',"name":"')[1].split('","')[0]
-        params.nextclade_docker = "rkimf1/nextclade2:" + tagname 
+        tagname = 'https://registry.hub.docker.com/v2/repositories/rkimf1/nextclade3/tags/'.toURL().text.split(',"name":"')[1].split('","')[0]
+        params.nextclade_docker = "rkimf1/nextclade3:" + tagname 
         println "\033[0;32mFound latest nextclade container, using: " + params.nextclade_docker + " \033[0m"
     } 
     if ( internetcheck.toString() == "false" ) { 
