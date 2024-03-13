@@ -129,7 +129,7 @@
     - path: "results/Report/single_tables/nextclade_results.tsv"
       md5sum: 58b42101676f5fab5d82c94b8dd91671
     - path: "results/Report/single_tables/pangolin_results.csv"
-      md5sum: df49cfb48015c8df2ce402aac0ce7a98
+      md5sum: fcf7e3bc0b3c852a08a8ba801c406920
     - path: "results/Report/single_tables/president_results.tsv"
     - path: "results/Report/single_tables/sc2rf_results.csv"
       md5sum: d02d8ab1b54d11b1aa16edc719b75796
