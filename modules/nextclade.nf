@@ -25,7 +25,7 @@ process nextclade {
     cat tmp.tsv | tr -d "\r" > ${name}_clade.tsv
 
     used_nextclade_version=\$nextclade_version_curr
-    used_nextcladedataset_tag=\$(grep -Po '"tag":.*' data/${nextclade_dataset_name}/tag.json | cut -d' ' -f 2 | tr -d '"')
+    used_nextcladedataset_tag=\$(grep -Po '"tag":.*' data/${nextclade_dataset_name}/pathogen.json | cut -d' ' -f 2 | tr -d '"' | tr -d ',')
     used_nextcladedataset_info="${nextclade_dataset_name}, \$used_nextcladedataset_tag"
     """
     stub:

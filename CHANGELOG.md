@@ -5,6 +5,34 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.5.0] 2024-03-13
+
+### Changed
+
+- updated default `nextclade` version to `3.3.1`
+  - default dataset version `2024-02-16--04-00-32Z`
+- updated default `pangolin` version to `4.3`
+  - default `pangolin-data` version 1.25.1
+
+## [0.4.3] 2023-06-26
+
+### Fixed
+
+- fixed conda channel order
+- enhanced nextclade dataset provenance
+
+## [0.4.2] 2023-06-08
+
+### Added
+
+- added a DOI
+
+## [0.4.1] 2023-05-23
+
+### Changed
+
+- update documentation
+
 ## [0.4.0] 2023-05-09
 
 ### Added
