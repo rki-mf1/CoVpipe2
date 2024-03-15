@@ -6,6 +6,8 @@ process president {
     input:
     tuple val(name), path(fasta)
     path(reference_fasta)
+    val(seq_threshold)
+    val(n_threshold)
     
     output:
     tuple val(name), path("${name}_report.tsv"), path("${name}_valid.fasta"), emit: valid
@@ -13,7 +15,7 @@ process president {
         
     script:
     """
-    president -r ${reference_fasta} -t $task.cpus -q ${fasta} -x 0.90 -n 0.05 -p . -f ${name}_
+    president -r ${reference_fasta} -t $task.cpus -q ${fasta} -x ${seq_threshold} -n ${n_threshold} -p . -f ${name}_
     """
     stub:
     """
