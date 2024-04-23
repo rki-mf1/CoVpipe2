@@ -61,14 +61,7 @@ jobs:
             echo "sample,fastq_1,fastq_2" > samplesheet.csv
             for s in $(seq 1 $NB_SAMPLES); do echo "hap${s},cievad/results/simulated_hap${s}.NGSWGS.R1.fastq,cievad/results/simulated_hap${s}.NGSWGS.R2.fastq" >> samplesheet.csv; done
             cat samplesheet.csv
-            nextflow run rki-mf1/CoVpipe2 \
-              -r v0.4.2 \
-              -profile local,conda \
-              -w work \
-              --output results \
-              --reference 'sars-cov-2' \
-              --fastq samplesheet.csv --list \
-              --primer_version V3
+            nextflow run rki-mf1/CoVpipe2 -r v0.4.2 -profile local,conda -w work --output results --reference 'sars-cov-2' --fastq samplesheet.csv --list --primer_version V3
             ls -la results/03-Variant-Calling/simulated_hap*/simulated_hap*.filtered.gt_adjust.filtered_indels.vcf.gz
 
 
