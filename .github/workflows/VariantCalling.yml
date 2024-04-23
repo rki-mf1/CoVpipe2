@@ -49,10 +49,16 @@ jobs:
 
       - name: Run CIEVaD hap
         run: |
+            NB_SAMPLES=3
             pushd cievad
-            nextflow run hap.nf -profile local,conda --reference MN908947.3.fasta
+            nextflow run hap.nf -profile local,conda --n $NB_SAMPLES --reference MN908947.3.fasta
             ls -la results/simulated_hap*NGSWGS*.fastq
             popd
+
+      - name: Run CovPipe2
+        run: |
+            echo "sample,fastq_1,fastq_2" > samplesheet.csv
+            ech $NB_SAMPLES
 
 
   #    - name: dry run
