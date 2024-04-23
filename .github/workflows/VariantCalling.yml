@@ -78,6 +78,6 @@ jobs:
       - name: Run CIEVaD eval
         run: |
             pushd cievad
-            nextflow run eval.nf -profile local,conda --callsets_dir callsets
+            nextflow run eval.nf -profile local,conda --callsets_dir callsets --reference MN908947.3.fasta
             cat results/*sompy.stats.csv
             popd
