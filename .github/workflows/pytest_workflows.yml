@@ -1,6 +1,8 @@
 name: Pytest-workflow
 
-on: [push]
+on:
+  push:
+    branches: [dhhgfgdsaashg]
 
 jobs:
   test:

@@ -1,6 +1,9 @@
 name: DryRun
 
-on: [push]
+on:
+  push:
+    branches: [dhhgfgdsaashg]
+
 jobs:
   build:
     runs-on: ubuntu-latest
