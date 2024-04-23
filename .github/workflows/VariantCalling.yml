@@ -41,10 +41,11 @@ jobs:
         run: |
             eval `ssh-agent -s`
             ssh-add - <<< '${{ secrets.PRIVATE_SSH_KEY }}'
-
             git clone git@github.com:rki-mf1/cievad.git
             pushd cievad
-            nextflow run hap.nf -profile local,conda
+            wget https://www.ebi.ac.uk/ena/browser/api/fasta/MN908947.3
+            sed 's/>ENA|MN908947|MN908947.3 Severe acute respiratory syndrome coronavirus 2 isolate Wuhan-Hu-1, complete genome./>MN908947.3/g' MN908947.3 > MN908947.3.fasta
+            nextflow run hap.nf -profile local,conda --reference MN908947.3.fasta
             ls -la results/simulated_hap*NGSWGS*.fastq
             popd
 
