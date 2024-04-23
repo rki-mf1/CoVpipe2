@@ -1,4 +1,4 @@
-name: Variantcalling
+name: VariantCalling
 
 on:
   push:
@@ -7,8 +7,8 @@ on:
     branches: [main]
 
 jobs:
-  Variantcalling:
-    name: Variantcalling CI
+  VariantCalling:
+    name: VariantCalling CI
     runs-on: ubuntu-latest
     defaults:
       run:
