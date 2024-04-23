@@ -68,7 +68,8 @@ jobs:
               --reference 'sars-cov-2' \
               --fastq samplesheet.csv --list \
               --primer_version V3
-            ls -la results/03-Variant-Calling/simulated_hap*/simulated_hap*.filtered.gt_adjust.filtered_indels.vcf.gz
+            ls -la results/
+            tree results
 
 
 
