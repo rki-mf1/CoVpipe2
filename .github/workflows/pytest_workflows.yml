@@ -2,7 +2,7 @@ name: Pytest-workflow
 
 on:
   push:
-    branches: [dhhgfgdsaashg]
+    branches: ["dhhgfgdsaashg"]
 
 jobs:
   test:

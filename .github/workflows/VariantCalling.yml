@@ -2,9 +2,9 @@ name: VariantCalling
 
 on:
   push:
-    branches: [main, dev, ci]
+    branches: ["main", "dev", "ci"]
   pull_request:
-    branches: [main]
+    branches: ["main"]
 
 jobs:
   VariantCalling:
