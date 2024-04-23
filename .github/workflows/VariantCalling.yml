@@ -58,7 +58,7 @@ jobs:
       - name: Run CovPipe2
         run: |
             echo "sample,fastq_1,fastq_2" > samplesheet.csv
-            ech $NB_SAMPLES
+            echo $NB_SAMPLES
 
 
   #    - name: dry run
