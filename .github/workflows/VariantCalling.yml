@@ -39,6 +39,9 @@ jobs:
         
       - name: Git checkout CIEVaD
         run: |
+            eval `ssh-agent -s`
+            ssh-add - <<< '${{ secrets.PRIVATE_SSH_KEY }}'
+            
             git clone https://github.com/rki-mf1/cievad.git
             pushd cievad
             nextflow run hap.nf -profile local,conda
