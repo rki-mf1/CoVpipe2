@@ -49,16 +49,28 @@ jobs:
 
       - name: Run CIEVaD hap
         run: |
-            NB_SAMPLES=3
             pushd cievad
-            nextflow run hap.nf -profile local,conda --n $NB_SAMPLES --reference MN908947.3.fasta
+            nextflow run hap.nf -profile local,conda --reference MN908947.3.fasta
             ls -la results/simulated_hap*NGSWGS*.fastq
             popd
 
       - name: Run CovPipe2
         run: |
+            # BECAUSE CIEVAD'S DEFAULT IS N=3 SAMPLES
+            NB_SAMPLES=3
             echo "sample,fastq_1,fastq_2" > samplesheet.csv
-            echo $NB_SAMPLES
+            for s in $(seq 1 $NB_SAMPLES); do echo "hap${s},cievad/results/simulated_hap${s}.NGSWGS.R1.fastq,cievad/results/simulated_hap${s}.NGSWGS.R2.fastq" >> samplesheet.csv; done
+            cat samplesheet.csv
+            nextflow run rki-mf1/CoVpipe2 \
+              -r v0.4.2 \
+              -profile local,conda \
+              -w work \
+              --output results \
+              --reference 'sars-cov-2' \
+              --fastq samplesheet.csv --list \
+              --primer_version V3
+            ls -la results/03-Variant-Calling/simulated_hap*/simulated_hap*.filtered.gt_adjust.filtered_indels.vcf.gz
+
 
 
   #    - name: dry run
