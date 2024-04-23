@@ -74,6 +74,7 @@ jobs:
             NB_SAMPLES=3
             mkdir -p cievad/callsets
             for s in $(seq 1 $NB_SAMPLES); do ln -s results/03-Variant-Calling/hap${s}/hap${s}.filtered.gt_adjust.filtered_indels.vcf.gz cievad/callsets/callset_${s}.vcf.gz; done
+            tree .
 
       - name: Run CIEVaD eval
         run: |
