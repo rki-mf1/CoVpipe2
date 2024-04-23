@@ -11,14 +11,13 @@ jobs:
   
     runs-on: ubuntu-latest
     steps:
-    - name: Setup CovPipe2 and conda
-      uses: actions/checkout@v4
-      uses: conda-incubator/setup-miniconda@v3
-      with:
-        miniconda-version: "latest"
-        channels: defaults,bioconda,conda-forge
-        channel-priority: true
-        auto-activate-base: true
+      - uses: actions/checkout@v4
+      - uses: conda-incubator/setup-miniconda@v3
+        with:
+          miniconda-version: "latest"
+          channels: defaults,bioconda,conda-forge
+          channel-priority: true
+          auto-activate-base: true
 
     - name: Check conda installation
       run: |
