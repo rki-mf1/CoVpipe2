@@ -41,7 +41,7 @@ jobs:
         run: |
             git clone https://github.com/rki-mf1/cievad.git
             pushd cievad
-            nextflow run hap.py -profile local,conda
+            nextflow run hap.nf -profile local,conda
             ls -la results/simulated_hap*NGSWGS*.fastq
             popd
 
