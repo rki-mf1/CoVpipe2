@@ -37,7 +37,7 @@ jobs:
       - name: Check CovPipe2 presence
         run: nextflow run CoVpipe2.nf --help
         
-      - name: Git checkout CIEVaD
+      - name: Git checkout CIEVaD + REF
         run: |
             eval `ssh-agent -s`
             ssh-add - <<< '${{ secrets.PRIVATE_SSH_KEY }}'
@@ -45,6 +45,11 @@ jobs:
             pushd cievad
             wget https://www.ebi.ac.uk/ena/browser/api/fasta/MN908947.3
             sed 's/>ENA|MN908947|MN908947.3 Severe acute respiratory syndrome coronavirus 2 isolate Wuhan-Hu-1, complete genome./>MN908947.3/g' MN908947.3 > MN908947.3.fasta
+            popd
+
+      - name: Run CIEVaD hap
+        run: |
+            pushd cievad
             nextflow run hap.nf -profile local,conda --reference MN908947.3.fasta
             ls -la results/simulated_hap*NGSWGS*.fastq
             popd
