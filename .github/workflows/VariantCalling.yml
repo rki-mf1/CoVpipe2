@@ -18,7 +18,7 @@ jobs:
       - uses: conda-incubator/setup-miniconda@v3
         with:
           miniconda-version: "latest"
-          channels: defaults,bioconda,conda-forge
+          channels: bioconda,conda-forge,defaults
           channel-priority: true
           auto-activate-base: true
 
