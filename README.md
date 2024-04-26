@@ -8,6 +8,7 @@
 [![run with singularity](https://img.shields.io/badge/run%20with-singularity-1d355c.svg?labelColor=000000)](https://sylabs.io/docs/)
 ![](https://img.shields.io/badge/licence-GPL--3.0-lightgrey.svg)
 [![](https://img.shields.io/badge/awaiting%20peer%20review-F1000Research-ef8336.svg)](https://doi.org/10.12688/f1000research.136683.1)
+![badge](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/krannich479/4a0fffafb6e8969ddb31b3100926e9cf/raw/cievad.json)
 
 CoVpipe2 is a Nextflow pipeline for reference-based genome reconstruction of SARS-CoV-2 from NGS data. In principle it can be used also for other viruses.
 
