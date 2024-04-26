@@ -82,3 +82,13 @@ jobs:
             nextflow run eval.nf -profile local,conda --callsets_dir callsets --reference MN908947.3.fasta
             tree results
             popd
+
+      - name: Create Badge
+        uses: schneegans/dynamic-badges-action@v1.7.0
+        with:
+          auth: ${{ secrets.GIST_SECRET_CIEVAD_GH_ACTIONS }}
+          gistID: 4a0fffafb6e8969ddb31b3100926e9cf
+          filename: cievad.json # Use test.svg if you want to use the SVG mode.
+          label: Hello
+          message: World
+          color: orange
