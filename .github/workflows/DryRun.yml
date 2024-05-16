@@ -2,7 +2,7 @@ name: DryRun
 
 on:
   push:
-    branches: ["dhhgfgdsaashg"]
+    branches: ["main"]
 
 jobs:
   build:
