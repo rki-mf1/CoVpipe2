@@ -117,7 +117,7 @@ jobs:
           gistID: 87db7a851147867bc3e8857dc643dd15
           filename: cievad_covpipe2_SNV.json # Use test.svg if you want to use the SVG mode.
           namedLogo: GitHub
-          label: Indels F1-score
+          label: SNV F1-score
           message: ${{ env.SNV_SCORE }}%
           valColorRange: ${{ env.SNV_SCORE }}
           minColorRange: 0
