@@ -100,6 +100,8 @@ jobs:
           label: Indels F1-score
           message: ${{ env.INDELS_SCORE }}%
           valColorRange: ${{ env.INDELS_SCORE }}
+          minColorRange: 0
+          maxColorRange: 100
 
       - name: Create Badge variable for average SNV F1-score
         run: |
