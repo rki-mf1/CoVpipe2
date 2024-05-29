@@ -91,7 +91,7 @@ jobs:
             echo "INDELS_SCORE=$INDELS_AVG_F1_INT" >> $GITHUB_ENV
             echo $INDELS_AVG_F1_ABS
             echo $INDELS_AVG_F1_INT
-            exit $(( ($INDELS_AVG_F1_INT >= 94) 0 : 1 ))
+            exit $(( ($INDELS_AVG_F1_INT >= 94) ? 0 : 1 ))
 
       #- name: Create Indels Badge
       #  uses: schneegans/dynamic-badges-action@v1.7.0
@@ -114,7 +114,7 @@ jobs:
             echo "SNV_SCORE=$SNV_AVG_F1_INT" >> $GITHUB_ENV
             echo $SNV_AVG_F1_ABS
             echo $SNV_AVG_F1_INT
-            exit $(( ($SNV_AVG_F1_INT >= 97) 0 : 1 ))
+            exit $(( ($SNV_AVG_F1_INT >= 97) ? 0 : 1 ))
 
       #- name: Create SNV Badge
       #  uses: schneegans/dynamic-badges-action@v1.7.0
