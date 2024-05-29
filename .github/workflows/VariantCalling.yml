@@ -90,18 +90,18 @@ jobs:
             INDELS_AVG_F1_INT=$(echo $INDELS_AVG_F1_ABS | cut -f 1 -d '.')
             echo "INDELS_SCORE=$INDELS_AVG_F1_INT" >> $GITHUB_ENV
 
-      - name: Create Indels Badge
-        uses: schneegans/dynamic-badges-action@v1.7.0
-        with:
-          auth: ${{ secrets.GIST_SECRET_CIEVAD_GH_ACTIONS }}
-          gistID: 4a0fffafb6e8969ddb31b3100926e9cf
-          filename: cievad_covpipe2_indels.json # Use test.svg if you want to use the SVG mode.
-          namedLogo: GitHub
-          label: Indels F1-score
-          message: ${{ env.INDELS_SCORE }}%
-          valColorRange: ${{ env.INDELS_SCORE }}
-          minColorRange: 0
-          maxColorRange: 100
+      #- name: Create Indels Badge
+      #  uses: schneegans/dynamic-badges-action@v1.7.0
+      #  with:
+      #    auth: ${{ secrets.GIST_SECRET_CIEVAD_GH_ACTIONS }}
+      #    gistID: 4a0fffafb6e8969ddb31b3100926e9cf
+      #    filename: cievad_covpipe2_indels.json # Use test.svg if you want to use the SVG mode.
+      #    namedLogo: GitHub
+      #    label: Indels F1-score
+      #    message: ${{ env.INDELS_SCORE }}%
+      #    valColorRange: ${{ env.INDELS_SCORE }}
+      #    minColorRange: 0
+      #    maxColorRange: 100
 
       - name: Create Badge variable for average SNV F1-score
         run: |
@@ -110,15 +110,15 @@ jobs:
             SNV_AVG_F1_INT=$(echo $SNV_AVG_F1_ABS | cut -f 1 -d '.')
             echo "SNV_SCORE=$SNV_AVG_F1_INT" >> $GITHUB_ENV
 
-      - name: Create SNV Badge
-        uses: schneegans/dynamic-badges-action@v1.7.0
-        with:
-          auth: ${{ secrets.GIST_SECRET_CIEVAD_GH_ACTIONS }}
-          gistID: 87db7a851147867bc3e8857dc643dd15
-          filename: cievad_covpipe2_SNV.json # Use test.svg if you want to use the SVG mode.
-          namedLogo: GitHub
-          label: SNV F1-score
-          message: ${{ env.SNV_SCORE }}%
-          valColorRange: ${{ env.SNV_SCORE }}
-          minColorRange: 0
-          maxColorRange: 100
+      #- name: Create SNV Badge
+      #  uses: schneegans/dynamic-badges-action@v1.7.0
+      #  with:
+      #    auth: ${{ secrets.GIST_SECRET_CIEVAD_GH_ACTIONS }}
+      #    gistID: 87db7a851147867bc3e8857dc643dd15
+      #    filename: cievad_covpipe2_SNV.json # Use test.svg if you want to use the SVG mode.
+      #    namedLogo: GitHub
+      #    label: SNV F1-score
+      #    message: ${{ env.SNV_SCORE }}%
+      #    valColorRange: ${{ env.SNV_SCORE }}
+      #    minColorRange: 0
+      #    maxColorRange: 100
