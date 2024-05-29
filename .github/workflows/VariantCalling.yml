@@ -39,7 +39,7 @@ jobs:
         
       - name: Git checkout CIEVaD + REF
         run: |
-            git clone git@github.com:rki-mf1/cievad.git
+            git clone https://github.com/rki-mf1/cievad.git
             pushd cievad
             wget https://www.ebi.ac.uk/ena/browser/api/fasta/MN908947.3
             sed 's/>ENA|MN908947|MN908947.3 Severe acute respiratory syndrome coronavirus 2 isolate Wuhan-Hu-1, complete genome./>MN908947.3/g' MN908947.3 > MN908947.3.fasta
