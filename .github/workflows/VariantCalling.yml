@@ -91,7 +91,12 @@ jobs:
             echo "INDELS_SCORE=$INDELS_AVG_F1_INT" >> $GITHUB_ENV
             echo $INDELS_AVG_F1_ABS
             echo $INDELS_AVG_F1_INT
-            exit $(( ($INDELS_AVG_F1_INT >= 94) ? 0 : 1 ))
+            if [ "$INDELS_AVG_F1_INT" -lt 94 ]; then
+              echo "Indels benchmark value decreased since last test! Exiting with status 1."
+              exit 1
+            else
+              echo "Indels benchmark did not drop since last test."
+            fi
 
       #- name: Create Indels Badge
       #  uses: schneegans/dynamic-badges-action@v1.7.0
@@ -114,7 +119,12 @@ jobs:
             echo "SNV_SCORE=$SNV_AVG_F1_INT" >> $GITHUB_ENV
             echo $SNV_AVG_F1_ABS
             echo $SNV_AVG_F1_INT
-            exit $(( ($SNV_AVG_F1_INT >= 97) ? 0 : 1 ))
+            if [ "$SNV_AVG_F1_INT" -lt 97 ]; then
+              echo "SNV benchmark value decreased since last test! Exiting with status 1."
+              exit 1
+            else
+              echo "SNV benchmark did not drop since last test."
+            fi
 
       #- name: Create SNV Badge
       #  uses: schneegans/dynamic-badges-action@v1.7.0
