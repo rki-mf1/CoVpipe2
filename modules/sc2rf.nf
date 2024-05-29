@@ -23,13 +23,13 @@ process sc2rf {
     if [[ \$(wc -l <${name}_sc2rf.csv) -eq 0 ]] 
     then
         # add empty csv line, if no output at all (e.g. script teminates with parameter problem, but exits with 0)
-        echo ${name},,,, >> ${name}_sc2rf.csv
+        echo ${name},,,,,, >> ${name}_sc2rf.csv
     elif [[ \$(wc -l <${name}_sc2rf.csv) -eq 1 ]] 
     then
         # only header as output
         # remove header because of weired newline character after header that breaks the R report
         # overwrite with empty csv line
-        echo ${name},,,, > ${name}_sc2rf.csv
+        echo ${name},,,,,, > ${name}_sc2rf.csv
     else
         # remove header because of weired newline character after header that breaks the R report
         sed -i 1d ${name}_sc2rf.csv

@@ -101,7 +101,7 @@ dt.president_results <- as.data.table(ldply(params$president_results, fread, sep
 dt.pangolin_results <- as.data.table(ldply(params$pangolin_results, fread))
 dt.nextclade_results <- as.data.table(ldply(params$nextclade_results, fread, sep='\t'))
 dt.sc2rf_results <- as.data.table(ldply(params$sc2rf_results, fread, sep=','))
-names(dt.sc2rf_results) <- c('sample','examples','intermissions','breakpoints','regions')
+names(dt.sc2rf_results) <- c('sample','examples','intermissions','breakpoints','regions','unique_subs','alleles')
 if(params$vois_results != 'none'){
   dt.vois_results <- as.data.table(ldply(params$vois_results, fread))
 }

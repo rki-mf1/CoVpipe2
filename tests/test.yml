@@ -132,7 +132,7 @@
       md5sum: fcf7e3bc0b3c852a08a8ba801c406920
     - path: "results/Report/single_tables/president_results.tsv"
     - path: "results/Report/single_tables/sc2rf_results.csv"
-      md5sum: d02d8ab1b54d11b1aa16edc719b75796
+      md5sum: 5b14f5ad4a6ffd092c351f6260e3fade
 
 - name: test-update
   command: nextflow run ./CoVpipe2.nf -c ./tests/nextflow.config -profile local --update
@@ -267,4 +267,4 @@
     - path: "results/Report/single_tables/pangolin_results.csv"
     - path: "results/Report/single_tables/president_results.tsv"
     - path: "results/Report/single_tables/sc2rf_results.csv"
-      md5sum: d02d8ab1b54d11b1aa16edc719b75796
+      md5sum: 5b14f5ad4a6ffd092c351f6260e3fade
