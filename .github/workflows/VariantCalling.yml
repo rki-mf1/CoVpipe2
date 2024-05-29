@@ -83,12 +83,15 @@ jobs:
             tree results
             popd
 
-      - name: Create Badge variable for average indel F1-score
+      - name: Create Badge variable for average indel F1-score # in personal (non-organisational) git repos the score can be visualized via schneegans' dynamic badge action
         run: |
             INDELS_AVG_F1=$(cut -f 2,21 -d ',' cievad/results/summary.sompy.stats.csv | grep "indels" | sed 's/indels,//g')
             INDELS_AVG_F1_ABS=$(echo $INDELS_AVG_F1*100 | bc)
             INDELS_AVG_F1_INT=$(echo $INDELS_AVG_F1_ABS | cut -f 1 -d '.')
             echo "INDELS_SCORE=$INDELS_AVG_F1_INT" >> $GITHUB_ENV
+            echo $INDELS_AVG_F1_ABS
+            echo $INDELS_AVG_F1_INT
+            exit $(( ($INDELS_AVG_F1_INT >= 94) 0 : 1 ))
 
       #- name: Create Indels Badge
       #  uses: schneegans/dynamic-badges-action@v1.7.0
@@ -109,6 +112,9 @@ jobs:
             SNV_AVG_F1_ABS=$(echo $SNV_AVG_F1*100 | bc)
             SNV_AVG_F1_INT=$(echo $SNV_AVG_F1_ABS | cut -f 1 -d '.')
             echo "SNV_SCORE=$SNV_AVG_F1_INT" >> $GITHUB_ENV
+            echo $SNV_AVG_F1_ABS
+            echo $SNV_AVG_F1_INT
+            exit $(( ($SNV_AVG_F1_INT >= 97) 0 : 1 ))
 
       #- name: Create SNV Badge
       #  uses: schneegans/dynamic-badges-action@v1.7.0
