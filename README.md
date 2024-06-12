@@ -7,7 +7,7 @@
 [![run with docker](https://img.shields.io/badge/run%20with-docker-0db7ed?labelColor=000000&logo=docker)](https://www.docker.com/)
 [![run with singularity](https://img.shields.io/badge/run%20with-singularity-1d355c.svg?labelColor=000000)](https://sylabs.io/docs/)
 ![](https://img.shields.io/badge/licence-GPL--3.0-lightgrey.svg)
-[![](https://img.shields.io/badge/manuscript-F1000Research-ef8336.svg)](https://doi.org/10.12688/f1000research.136683.1)
+[![](https://img.shields.io/badge/manuscript-F1000Research-ef8336.svg)](https://doi.org/10.12688/f1000research.136683.2)
 [![VariantCallingBenchmark](https://github.com/rki-mf1/CoVpipe2/actions/workflows/VariantCalling.yml/badge.svg)](https://github.com/rki-mf1/CoVpipe2/actions/workflows/VariantCalling.yml)
 
 CoVpipe2 is a Nextflow pipeline for reference-based genome reconstruction of SARS-CoV-2 from NGS data. In principle it can be used also for other viruses.
