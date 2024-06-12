@@ -1,0 +1,140 @@
+name: VariantCallingBenchmark
+
+on:
+  push:
+    branches: ["main", "dev", "ci"]
+  pull_request:
+    branches: ["main"]
+
+jobs:
+  VariantCallingBenchmark:
+    name: CIEVaD benchmarks
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash -el {0}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: conda-incubator/setup-miniconda@v3
+        with:
+          miniconda-version: "latest"
+          channels: bioconda,conda-forge,defaults
+          channel-priority: true
+          auto-activate-base: true
+
+      - name: Check conda installation
+        run: |
+          conda info
+          conda list
+          conda config --show-sources
+          conda config --show
+
+      - name: Install nextflow
+        run: |
+          conda install -c bioconda nextflow
+          nextflow -version
+
+      - name: Check CovPipe2 presence
+        run: nextflow run CoVpipe2.nf --help
+        
+      - name: Git checkout CIEVaD + REF
+        run: |
+            git clone https://github.com/rki-mf1/cievad.git
+            pushd cievad
+            nextflow run hap.nf --help
+            nextflow run eval.nf --help
+            wget https://www.ebi.ac.uk/ena/browser/api/fasta/MN908947.3
+            sed 's/>ENA|MN908947|MN908947.3 Severe acute respiratory syndrome coronavirus 2 isolate Wuhan-Hu-1, complete genome./>MN908947.3/g' MN908947.3 > MN908947.3.fasta
+            popd
+
+      - name: Run CIEVaD hap
+        run: |
+            pushd cievad
+            nextflow run hap.nf -profile local,conda --reference MN908947.3.fasta
+            ls -la results/simulated_hap*NGSWGS*.fastq
+            popd
+
+      - name: Run CovPipe2
+        run: |
+            # BECAUSE CIEVAD'S DEFAULT IS N=3 SAMPLES
+            NB_SAMPLES=3
+            echo "sample,fastq_1,fastq_2" > samplesheet.csv
+            for s in $(seq 1 $NB_SAMPLES); do echo "hap${s},cievad/results/simulated_hap${s}.NGSWGS.R1.fastq,cievad/results/simulated_hap${s}.NGSWGS.R2.fastq" >> samplesheet.csv; done
+            cat samplesheet.csv
+            nextflow run CoVpipe2.nf \
+              -profile local,conda \
+              -w work \
+              --output results \
+              --reference 'sars-cov-2' \
+              --fastq samplesheet.csv --list \
+              --primer_version V3
+
+      - name: Prep CIEVaD input
+        run: |
+            NB_SAMPLES=3
+            mkdir -p cievad/callsets
+            for s in $(seq 1 $NB_SAMPLES); do ln -sr results/03-Variant-Calling/hap${s}/hap${s}.filtered.gt_adjust.filtered_indels.vcf.gz cievad/callsets/callset_${s}.vcf.gz; done
+
+      - name: Run CIEVaD eval
+        run: |
+            pushd cievad
+            tree .
+            nextflow run eval.nf -profile local,conda --callsets_dir callsets --reference MN908947.3.fasta
+            tree results
+            popd
+
+      - name: Create Badge variable for average indel F1-score # in personal (non-organisational) git repos the score can be visualized via schneegans' dynamic badge action
+        run: |
+            INDELS_AVG_F1=$(cut -f 2,21 -d ',' cievad/results/summary.sompy.stats.csv | grep "indels" | sed 's/indels,//g')
+            INDELS_AVG_F1_ABS=$(echo $INDELS_AVG_F1*100 | bc)
+            INDELS_AVG_F1_INT=$(echo $INDELS_AVG_F1_ABS | cut -f 1 -d '.')
+            echo "INDELS_SCORE=$INDELS_AVG_F1_INT" >> $GITHUB_ENV
+            echo $INDELS_AVG_F1_ABS
+            echo $INDELS_AVG_F1_INT
+            if [ "$INDELS_AVG_F1_INT" -lt 91 ]; then
+              echo "Indels benchmark value decreased since last test! Exiting with status 1."
+              exit 1
+            else
+              echo "Indels benchmark did not drop since last test."
+            fi
+
+      #- name: Create Indels Badge
+      #  uses: schneegans/dynamic-badges-action@v1.7.0
+      #  with:
+      #    auth: ${{ secrets.GIST_SECRET_CIEVAD_GH_ACTIONS }}
+      #    gistID: 4a0fffafb6e8969ddb31b3100926e9cf
+      #    filename: cievad_covpipe2_indels.json # Use test.svg if you want to use the SVG mode.
+      #    namedLogo: GitHub
+      #    label: Indels F1-score
+      #    message: ${{ env.INDELS_SCORE }}%
+      #    valColorRange: ${{ env.INDELS_SCORE }}
+      #    minColorRange: 0
+      #    maxColorRange: 100
+
+      - name: Create Badge variable for average SNV F1-score
+        run: |
+            SNV_AVG_F1=$(cut -f 2,21 -d ',' cievad/results/summary.sompy.stats.csv | grep "SNVs" | sed 's/SNVs,//g')
+            SNV_AVG_F1_ABS=$(echo $SNV_AVG_F1*100 | bc)
+            SNV_AVG_F1_INT=$(echo $SNV_AVG_F1_ABS | cut -f 1 -d '.')
+            echo "SNV_SCORE=$SNV_AVG_F1_INT" >> $GITHUB_ENV
+            echo $SNV_AVG_F1_ABS
+            echo $SNV_AVG_F1_INT
+            if [ "$SNV_AVG_F1_INT" -lt 96 ]; then
+              echo "SNV benchmark value decreased since last test! Exiting with status 1."
+              exit 1
+            else
+              echo "SNV benchmark did not drop since last test."
+            fi
+
+      #- name: Create SNV Badge
+      #  uses: schneegans/dynamic-badges-action@v1.7.0
+      #  with:
+      #    auth: ${{ secrets.GIST_SECRET_CIEVAD_GH_ACTIONS }}
+      #    gistID: 87db7a851147867bc3e8857dc643dd15
+      #    filename: cievad_covpipe2_SNV.json # Use test.svg if you want to use the SVG mode.
+      #    namedLogo: GitHub
+      #    label: SNV F1-score
+      #    message: ${{ env.SNV_SCORE }}%
+      #    valColorRange: ${{ env.SNV_SCORE }}
+      #    minColorRange: 0
+      #    maxColorRange: 100
