@@ -6,7 +6,7 @@ nextflow.enable.dsl=2
 if (params.help) { exit 0, helpMSG() }
 
 // parameter sanity check
-Set valid_params = ['cores', 'max_cores', 'memory', 'help', 'profile', 'workdir', 'fastq', 'list', 'mode', 'run_id', 'reference', 'ref_genome', 'ref_annotation', 'adapter', 'fastp_additional_parameters', 'kraken', 'kraken_db_custom', 'taxid', 'read_linage', 'lcs_ucsc_version', 'lcs_ucsc_predefined', 'lcs_ucsc_update', 'lcs_ucsc_downsampling', 'lcs_variant_groups', 'lcs_cutoff', 'isize_filter', 'primer_bed', 'primer_bedpe', 'primer_version', 'bamclipper_additional_parameters', 'vcount', 'frac', 'cov', 'vois', 'var_mqm', 'var_sap', 'var_qual', 'cns_min_cov', 'cns_gt_adjust', 'cns_indel_filter', 'n_threshold', 'seq_threshold', 'update', 'pangolin_docker_default', 'nextclade_docker_default', 'pangolin_conda_default', 'nextclade_conda_default', 'nextclade_dataset_name', 'nextclade_dataset_tag', 'output', 'reference_dir', 'read_dir', 'mapping_dir', 'variant_calling_dir', 'consensus_dir', 'linage_dir', 'report_dir', 'rki_dir', 'runinfo_dir', 'singularity_cache_dir', 'conda_cache_dir', 'databases', 'publish_dir_mode', 'cloudProcess', 'cloud-process']
+Set valid_params = ['cores', 'max_cores', 'memory', 'help', 'profile', 'workdir', 'fastq', 'list', 'mode', 'run_id', 'reference', 'ref_genome', 'ref_annotation', 'adapter', 'fastp_additional_parameters', 'kraken', 'kraken_db_custom', 'taxid', 'read_linage', 'lcs_ucsc_version', 'lcs_ucsc_predefined', 'lcs_ucsc_update', 'lcs_ucsc_downsampling', 'lcs_variant_groups', 'lcs_cutoff', 'isize_filter', 'primer_bed', 'primer_bedpe', 'primer_version', 'bamclipper_additional_parameters', 'vcount', 'frac', 'cov', 'vois', 'var_mqm', 'var_sap', 'var_qual', 'cns_min_cov', 'cns_gt_adjust_ao', 'cns_gt_adjust_ro', 'cns_indel_filter', 'n_threshold', 'seq_threshold', 'update', 'pangolin_docker_default', 'nextclade_docker_default', 'pangolin_conda_default', 'nextclade_conda_default', 'nextclade_dataset_name', 'nextclade_dataset_tag', 'output', 'reference_dir', 'read_dir', 'mapping_dir', 'variant_calling_dir', 'consensus_dir', 'linage_dir', 'report_dir', 'rki_dir', 'runinfo_dir', 'singularity_cache_dir', 'conda_cache_dir', 'databases', 'publish_dir_mode', 'cloudProcess', 'cloud-process']
 def parameter_diff = params.keySet() - valid_params
 if (parameter_diff.size() != 0){
     exit 1, "ERROR: Parameter(s) $parameter_diff is/are not valid in the pipeline!\n"
@@ -438,9 +438,12 @@ def helpMSG() {
     ${c_yellow}Consensus generation:${c_reset}
     --cns_min_cov            Minimum number of reads required so that the respective position in the consensus sequence 
                                  is NOT hard masked. [default: $params.cns_min_cov]
-    --cns_gt_adjust          Minimum fraction of reads supporting a variant which leads to an explicit call of this 
-                                 variant (genotype adjustment). The value has to be greater than 0.5 but not greater than 1. 
-                                 To turn genotype adjustment off, set the value to 0. [default: $params.cns_gt_adjust]
+    --cns_gt_adjust_ao       Genotype adjustment for heterozygous variants: minimum fraction of reads supporting an alternative which leads to an explicit
+                                 of the most dominant alternative. The value should be greater than 0.5 but not greater than 1. 
+                                 To turn off, set the value to 0. [default: $params.cns_gt_adjust_ao]
+    --cns_gt_adjust_ro       Genotype adjustment for heterozygous variants: maximal fraction of reads supporting the reference which leads to dropping 
+                                 the reference from the reference from the heterozygote genotype. The value should be smaller than 0.5 but not greater than 0.
+                                 To turn off, set the value to 0. [default: $params.cns_gt_adjust_ro]
     --cns_indel_filter       Minimum fraction of reads supporting an indel which leads to an integration to the consensus sequence.
                                  Low frequency indels can be false positives introducing frameshifts. Since the IUPAC code is not able
                                  to model a base-or-gap case, those indels would be integrated in the IUPAC and masked consensus.

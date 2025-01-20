@@ -24,7 +24,7 @@ def parse_args(CMD=None):
         help="tag for read count supporting the respective variant (default: AO)",
         type=str,
         default="AO",
-    )    
+    )
     parser.add_argument(
         "--ro",
         metavar="STR",
@@ -62,7 +62,7 @@ def parse_args(CMD=None):
         metavar="FLOAT",
         help="maximal reference fraction to set a homozygous genotype (default: 0.1)",
         type=float,
-        default=0.1,
+        default=0,
     )
     parser.add_argument("--version", action="version", version="%(prog)s " + VERSION)
     return parser.parse_args(CMD)
@@ -78,14 +78,22 @@ def get_filehandle(in_fname, gz):
 
 
 def process(
-    in_fname, out_fname, min_vf, max_rf, ao_tag="AO", ro_tag="RO",dp_tag="DP", gt_tag="GT", gz=False
+    in_fname,
+    out_fname,
+    min_vf,
+    max_rf,
+    ao_tag="AO",
+    ro_tag="RO",
+    dp_tag="DP",
+    gt_tag="GT",
+    gz=False,
 ):
     # sanity checks
-    if min_vf <= 0.5:
+    if min_vf > 0 and min_vf <= 0.5:
         warnings.warn(
             f"[WARNING] Minimal variant fraction to set a homozygous genotype (--vf) is below 0.5 ({min_vf}). Assuming you know what you are doing."
         )
-    if max_rf >= 0.5:
+    if max_rf > 0 and max_rf >= 0.5:
         warnings.warn(
             f"[WARNING] Maximal reference fraction to set a homozygous genotype (--rf) is below 0.5 ({max_rf}). Assuming you know what you are doing."
         )
@@ -150,35 +158,32 @@ def process(
                 alt_fracs = [int(x) / int(dp[0]) for x in ao[0].split(",")]
                 max_alt_fraq = max(alt_fracs)
 
-                ref_frac = int(ro[0])/int(dp[0])
+                ref_frac = int(ro[0]) / int(dp[0])
 
-                if max_alt_fraq >= min_vf:
-                    # generate new GT
-                    gt = str(alt_fracs.index(max_alt_fraq) + 1)  # REF == 0 -> ++1
-                    gt = gt + "/" + gt
-
-                    # replacing GT info (considering line eventual breaks at end)
-                    cols[gt_pos] = gt
-                    if gt_pos == len(cols) - 1:
-                        cols[gt_pos] += "\n"
-                    fields[9] = ":".join(cols)
-                    outhandle.write("\t".join(fields))
-                elif ref_frac <= max_rf and "0" in cols[gt_pos]:
-                    # generate new GT
-                    if "," in fields[4]:
-                        gt = "1/2"
-                    else:
-                        gt = "1/1"
-
-                    # replacing GT info (considering line eventual breaks at end)1
-                    cols[gt_pos] = gt
-                    if gt_pos == len(cols) - 1:
-                        cols[gt_pos] += "\n"
-                    fields[9] = ":".join(cols)
-                    outhandle.write("\t".join(fields))
-                else:   
-                    outhandle.write(line)
-                    continue
+                # old GT, possibly overwritten
+                gt = cols[gt_pos]
+                if max_rf > 0:
+                    # gt adjustment for RO activated
+                    if ref_frac <= max_rf and "0" in cols[gt_pos]:
+                        # RO low -> remove from GT
+                        # generate new GT
+                        if "," in fields[4]:
+                            gt = "1/2"
+                        else:
+                            gt = "1/1"
+                if min_vf > 0:
+                    # gt adjustment for AO activated
+                    if max_alt_fraq >= min_vf:
+                        # adjust GT to homozygous call of highest AO
+                        # generate new GT
+                        gt = str(alt_fracs.index(max_alt_fraq) + 1)  # REF == 0 -> ++1
+                        gt = gt + "/" + gt
+                # replacing GT info (considering line eventual breaks at end)
+                cols[gt_pos] = gt
+                if gt_pos == len(cols) - 1:
+                    cols[gt_pos] += "\n"
+                fields[9] = ":".join(cols)
+                outhandle.write("\t".join(fields))
         if out_gz:
             bgzip_outname(intermediate, out_fname)
 
@@ -197,7 +202,9 @@ def bgzip_outname(_file, outfile=None):
 
 def main(CMD=None):
     args = parse_args(CMD)
-    process(args.vcf, args.o, args.vf, args.rf, args.ao, args.ro, args.dp, args.gt, args.gz)
+    process(
+        args.vcf, args.o, args.vf, args.rf, args.ao, args.ro, args.dp, args.gt, args.gz
+    )
 
 
 if __name__ == "__main__":
