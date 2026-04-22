@@ -76,7 +76,6 @@ All other dependencies and tools will be installed within the pipeline via `cond
   <details><summary>Change you channel list:</summary>
   
   ```bash
-  conda config --add channels defaults
   conda config --add channels bioconda
   conda config --add channels conda-forge
   conda config --set channel_priority strict
