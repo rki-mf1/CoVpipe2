@@ -4,7 +4,7 @@ on: [push]
 
 jobs:
   test:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
 
     name: ${{ matrix.profile }}
     strategy:
@@ -39,6 +39,7 @@ jobs:
       - name: Install Nextflow
         env:
           CAPSULE_LOG: none
+          NFX_VER: 22.10.1
         run: |
           wget -qO- get.nextflow.io | bash
           sudo mv nextflow /usr/local/bin/

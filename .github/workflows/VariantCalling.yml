@@ -31,7 +31,7 @@ jobs:
 
       - name: Install nextflow
         run: |
-          conda install -c bioconda nextflow
+          conda install -c bioconda nextflow=22.10.1
           nextflow -version
 
       - name: Check CovPipe2 presence
