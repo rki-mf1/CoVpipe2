@@ -10,7 +10,7 @@ jobs:
       
     - name: Install Nextflow
       env:
-        NFX_VER: 22.10.1
+        NXF_VER: 22.10.1
       run: |
         wget -qO- get.nextflow.io | bash
         sudo mv nextflow /usr/local/bin/
