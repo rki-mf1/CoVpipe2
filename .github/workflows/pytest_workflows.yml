@@ -4,7 +4,7 @@ on: [push]
 
 jobs:
   test:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
 
     name: ${{ matrix.profile }}
     strategy:
@@ -14,14 +14,14 @@ jobs:
     env:
       NXF_ANSI_LOG: false
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4.2.2
 
       - name: Set up Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v5.3.0
         with:
           python-version: "3.x"
 
-      - uses: actions/cache@v2
+      - uses: actions/cache@v4.2.0
         with:
           path: ~/.cache/pip
           key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
@@ -30,7 +30,7 @@ jobs:
       - name: Install Python dependencies
         run: python -m pip install --upgrade pip pytest-workflow
 
-      - uses: actions/cache@v2
+      - uses: actions/cache@v4.2.0
         with:
           path: /usr/local/bin/nextflow
           key: ${{ runner.os }}
@@ -39,6 +39,7 @@ jobs:
       - name: Install Nextflow
         env:
           CAPSULE_LOG: none
+          NXF_VER: 22.10.1
         run: |
           wget -qO- get.nextflow.io | bash
           sudo mv nextflow /usr/local/bin/
@@ -57,7 +58,7 @@ jobs:
 
       - name: Upload logs on failure
         if: failure()
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4.5.0
         with:
           name: logs-${{ matrix.profile }}
           path: |
