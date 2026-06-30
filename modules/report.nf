@@ -320,6 +320,167 @@ process coverage_table {
     """
 }
 
+process nextclade_spike_n_table {
+    label 'r'
+
+    input:
+    path(tsv)
+
+    output:
+    path("nextclade_spike_n_table.csv")
+
+    script:
+    name_list = tsv.collect { "\"${it.getSimpleName()}\"" }.join(",")
+    file_list = tsv.collect { "\"${it}\"" }.join(",")
+
+    """
+    #!/usr/bin/env Rscript
+
+    library("data.table")
+    library("plyr")
+
+    f.list <- c(${file_list})
+    names(f.list) <- c(${name_list})
+
+    # read all nextclade TSVs
+    dt.nextclade <- as.data.table(ldply(f.list, fread, sep = "\\t"))
+
+    # spike region (1-based reference coordinates)
+    spike_start <- 21563
+    spike_end   <- 25384
+    positions_of_interest <- spike_start:spike_end
+
+    # function to compute % missing in spike
+    get_percent_N_in_spike <- function(missing_str) {
+        if (is.na(missing_str) || missing_str == "") {
+            return(NA_real_)
+        }
+
+        regions <- unlist(strsplit(missing_str, ","))
+        missing_positions <- integer(0)
+
+        for (region in regions) {
+            if (grepl("-", region)) {
+                bounds <- as.integer(unlist(strsplit(region, "-")))
+                missing_positions <- c(missing_positions, bounds[1]:bounds[2])
+            } else {
+                missing_positions <- c(missing_positions, as.integer(region))
+            }
+        }
+
+        n_in_spike <- length(intersect(missing_positions, positions_of_interest))
+        return(n_in_spike / length(positions_of_interest) * 100)
+    }
+
+    # compute metric per sample
+    if ("missing" %in% colnames(dt.nextclade)) {
+        dt.nextclade[, nextclade_percentN_spike := sapply(missing, get_percent_N_in_spike)]
+    } else {
+        dt.nextclade[, nextclade_percentN_spike := NA_real_]
+    }
+
+    # output table (one row per sample)
+    dt.output <- dt.nextclade[, .(
+        sample = seqName,
+        nextclade_percentN_spike
+    )]
+
+    write.csv(
+        x = dt.output,
+        row.names = FALSE,
+        file = file.path("nextclade_spike_n_table.csv")
+    )
+    """
+    stub:
+    """
+    touch nextclade_spike_n_table.csv
+    """
+}
+
+process num_mixed_sites_table {
+    label 'r'
+
+    input:
+    path(vcf)
+
+    output:
+    path("num_mixed_sites_table.csv")
+
+    script:
+    name_list = vcf.collect { "\"${it.getSimpleName()}\"" }.join(",")
+    file_list = vcf.collect { "\"${it}\"" }.join(",")
+
+    """
+    #!/usr/bin/env Rscript
+
+    library(data.table)
+    library(plyr)
+
+    f.list <- c(${file_list})
+    names(f.list) <- c(${name_list})
+
+    # Read all VCFs
+    read_vcf <- function(path) {
+        lines <- readLines(path)
+        lines <- lines[!grepl("^#", lines)]
+        return(lines)
+    }
+
+    compute_mixed <- function(vcf_path, sample_name) {
+
+        lines <- read_vcf(vcf_path)
+
+        mixed <- 0
+
+        for (line in lines) {
+            cols <- strsplit(line, "\\t")[[1]]
+            if (length(cols) < 8) next
+
+            info <- strsplit(cols[8], ";")[[1]]
+
+            info_map <- list()
+            for (x in info) {
+                if (grepl("=", x)) {
+                    kv <- strsplit(x, "=")[[1]]
+                    info_map[[kv[1]]] <- kv[2]
+                }
+            }
+
+            af <- info_map[["AF"]]
+            if (is.null(af)) next
+
+            af <- as.numeric(af)
+            if (is.na(af)) next
+
+            if (af >= 0.3 && af <= 0.8) {
+                mixed <- mixed + 1
+            }
+        }
+
+        return(data.table(
+            sample = sample_name,
+            num_mixed_sites = mixed
+        ))
+    }
+
+    dt.num_mixed_sites <- rbindlist(
+        Map(compute_mixed, f.list, names(f.list))
+    )
+
+    dt.num_mixed_sites <- dt.num_mixed_sites[order(sample)]
+
+    write.csv(
+        dt.num_mixed_sites,
+        file = "num_mixed_sites_table.csv",
+        row.names = FALSE
+    )
+    """
+    stub:
+    """
+    touch num_mixed_sites_table.csv
+    """
+}
+
 process rmarkdown_report {
     // rmarkdown::render does not respect symlinks https://github.com/rstudio/rmarkdown/issues/1508
     label 'r'
@@ -346,6 +507,8 @@ process rmarkdown_report {
     val(nextclade_dataset_info)
     path(sc2rf_results)
     path(vois_results)
+    path(percent_n_spike)
+    path(num_mixed_sites)
 
     output:
     path("report.html")
@@ -359,7 +522,7 @@ process rmarkdown_report {
     pipeline_version = workflow.repository != null ? "$workflow.repository - $workflow.revision [$workflow.commitId]" : 'none'
     """
     cp -L ${rmd} report.Rmd
-    Rscript -e "rmarkdown::render('report.Rmd', params=list(mode='${params.mode}', fastp_table_stats='${fastp_table_stats}', fastp_table_stats_filter='${fastp_table_stats_filter}', kraken_table='${kraken_table_optional}', flagstat_table='${flagstat_table}', fragment_size_table='${fragment_size_table}', fragment_size_median_table='${fragment_size_median_table}', coverage_table='${coverage_table}', positive='${positive}', negative='${negative}', sample_cov='${sample_cov}', president_results='${president_results}', pangolin_results='${pangolin_results}', nextclade_results='${nextclade_results}', nextclade_version='${nextclade_version}',  nextclade_dataset_info='${nextclade_dataset_info}', sc2rf_results='${sc2rf_results}', vois_results='${vois_results_optional}', cns_min_cov='${params.cns_min_cov}', run_id='${run_id}', pipeline_version='${pipeline_version}'), output_file='report.html')"
+    Rscript -e "rmarkdown::render('report.Rmd', params=list(mode='${params.mode}', fastp_table_stats='${fastp_table_stats}', fastp_table_stats_filter='${fastp_table_stats_filter}', kraken_table='${kraken_table_optional}', flagstat_table='${flagstat_table}', fragment_size_table='${fragment_size_table}', fragment_size_median_table='${fragment_size_median_table}', coverage_table='${coverage_table}', positive='${positive}', negative='${negative}', sample_cov='${sample_cov}', president_results='${president_results}', pangolin_results='${pangolin_results}', nextclade_results='${nextclade_results}', nextclade_version='${nextclade_version}',  nextclade_dataset_info='${nextclade_dataset_info}', sc2rf_results='${sc2rf_results}', vois_results='${vois_results_optional}', nextclade_percentN_spike='${percent_n_spike}', num_mixed_sites='${num_mixed_sites}', cns_min_cov='${params.cns_min_cov}', run_id='${run_id}', pipeline_version='${pipeline_version}'), output_file='report.html')"
     """
     stub:
     """

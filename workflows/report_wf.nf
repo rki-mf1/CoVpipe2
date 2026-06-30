@@ -1,4 +1,4 @@
-include { mapping_stats_table; fragment_size_table; fastp_table; kraken_table; coverage_table; rmarkdown_report } from '../modules/report'
+include { mapping_stats_table; fragment_size_table; fastp_table; kraken_table; coverage_table; nextclade_spike_n_table; num_mixed_sites_table; rmarkdown_report } from '../modules/report'
 
 workflow summary_report {
     take:
@@ -15,6 +15,7 @@ workflow summary_report {
         nextclade_dataset_info
         sc2rf
         vois_tsv
+        vcf
         
     main:
         fastp_table(fastq_json.map {it -> it[1]}.collect())
@@ -27,6 +28,10 @@ workflow summary_report {
         
         coverage_table(mapping_coverage.map {it -> it[1]}.collect(), params.cov)
 
+        nextclade_spike_n_table(nextclade.map { it -> it[1] }.collect())
+
+        num_mixed_sites_table(vcf.map { it -> it[1] }.collect())
+        
         // storeDir: "${params.output}/${params.report_dir}/"
         president_results = president.collectFile(name: 'president_results.tsv', skip: 1, keepHeader: true, storeDir: "${params.output}/${params.report_dir}/single_tables", sort: { it.baseName })
         
@@ -39,6 +44,6 @@ workflow summary_report {
         vois_results = vois_tsv.map {it -> it[1]}.collectFile(name: 'vois_results.tsv', skip: 1, keepHeader: true, storeDir: "${params.output}/${params.report_dir}/single_tables", sort: { it.baseName })
 
         template = file("$baseDir/bin/summary_report.Rmd", checkIfExists: true)
-        rmarkdown_report(template, fastp_table.out.stats, fastp_table.out.stats_filter, kraken_table.out.ifEmpty([]), mapping_stats_table.out, fragment_size_table.out.size, fragment_size_table.out.median, coverage_table.out.coverage_table, coverage_table.out.positive, coverage_table.out.negative, coverage_table.out.sample_cov, president_results, pangolin_results, nextclade_results, nextclade_version, nextclade_dataset_info, sc2rf_results, vois_results.ifEmpty([]))
+        rmarkdown_report(template, fastp_table.out.stats, fastp_table.out.stats_filter, kraken_table.out.ifEmpty([]), mapping_stats_table.out, fragment_size_table.out.size, fragment_size_table.out.median, coverage_table.out.coverage_table, coverage_table.out.positive, coverage_table.out.negative, coverage_table.out.sample_cov, president_results, pangolin_results, nextclade_results, nextclade_version, nextclade_dataset_info, sc2rf_results, vois_results.ifEmpty([]), nextclade_spike_n_table.out, num_mixed_sites_table.out)
 
 }
