@@ -327,7 +327,7 @@ process nextclade_spike_n_table {
     path(tsv)
 
     output:
-    path("nextclade_spike_n_table.csv")
+    path("nextclade_spike_n_table.csv"), emit: csv
 
     script:
     name_list = tsv.collect { "\"${it.getSimpleName()}\"" }.join(",")
