@@ -404,7 +404,7 @@ process num_mixed_sites_table {
     path(vcf)
 
     output:
-    path("num_mixed_sites_table.csv")
+    path("num_mixed_sites_table.csv"), emit: csv
 
     script:
     name_list = vcf.collect { "\"${it.getSimpleName()}\"" }.join(",")
