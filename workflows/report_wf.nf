@@ -44,6 +44,6 @@ workflow summary_report {
         vois_results = vois_tsv.map {it -> it[1]}.collectFile(name: 'vois_results.tsv', skip: 1, keepHeader: true, storeDir: "${params.output}/${params.report_dir}/single_tables", sort: { it.baseName })
 
         template = file("$baseDir/bin/summary_report.Rmd", checkIfExists: true)
-        rmarkdown_report(template, fastp_table.out.stats, fastp_table.out.stats_filter, kraken_table.out.ifEmpty([]), mapping_stats_table.out, fragment_size_table.out.size, fragment_size_table.out.median, coverage_table.out.coverage_table, coverage_table.out.positive, coverage_table.out.negative, coverage_table.out.sample_cov, president_results, pangolin_results, nextclade_results, nextclade_version, nextclade_dataset_info, sc2rf_results, vois_results.ifEmpty([]), nextclade_spike_n_table.out, num_mixed_sites_table.out)
+        rmarkdown_report(template, fastp_table.out.stats, fastp_table.out.stats_filter, kraken_table.out.ifEmpty([]), mapping_stats_table.out, fragment_size_table.out.size, fragment_size_table.out.median, coverage_table.out.coverage_table, coverage_table.out.positive, coverage_table.out.negative, coverage_table.out.sample_cov, president_results, pangolin_results, nextclade_results, nextclade_version, nextclade_dataset_info, sc2rf_results, vois_results.ifEmpty([]), nextclade_spike_n_table.out.csv, num_mixed_sites_table.out.csv)
 
 }
