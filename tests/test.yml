@@ -124,7 +124,7 @@
       md5sum: 562acdee9dd3ad65052fd951db6b1133
     - path: "results/Report/report.html"
     - path: "results/Report/report_datatable.csv"
-      md5sum: b649f9400fe6842b2f8a2537e137f66a
+      md5sum: c0995cd6f6bc75026b7b48344cbeced6
     - path: "results/Report/report_datatable.xlsx"
     - path: "results/Report/single_tables/nextclade_results.tsv"
       md5sum: 7823b5b56e31a5412263384f10d7f204
@@ -236,14 +236,14 @@
     - path: "results/05-Linages_Mutations/SAMPLE1_PE/SAMPLE1_PE.aligned.fasta"
       md5sum: 59ee3f944dcda28f16c20f00a819aa0e
     - path: "results/05-Linages_Mutations/SAMPLE1_PE/SAMPLE1_PE_clade.tsv"
-      md5sum: 26f80e141a4be65c9810ba488c3eb97d
+      md5sum: f3dcc3041c84234ca14b0d618420bc23
     - path: "results/05-Linages_Mutations/SAMPLE1_PE/SAMPLE1_PE_lineage_report.csv"
       contains:
         - "taxon,lineage,conflict,ambiguity_score,scorpio_call,scorpio_support,scorpio_conflict,scorpio_notes,version,pangolin_version,scorpio_version,constellation_version,is_designated,qc_status,qc_notes,note"
     - path: "results/05-Linages_Mutations/SAMPLE2_PE/SAMPLE2_PE.aligned.fasta"
       md5sum: e1936924ec8fe26dbc87a2277e4a3dac
     - path: "results/05-Linages_Mutations/SAMPLE2_PE/SAMPLE2_PE_clade.tsv"
-      md5sum: d190d4d8e6c93261e6364280f085fdaf
+      md5sum: 6698460f894100254c7606f6a24d840a
     - path: "results/05-Linages_Mutations/SAMPLE2_PE/SAMPLE2_PE_lineage_report.csv"
       contains:
         - "taxon,lineage,conflict,ambiguity_score,scorpio_call,scorpio_support,scorpio_conflict,scorpio_notes,version,pangolin_version,scorpio_version,constellation_version,is_designated,qc_status,qc_notes,note"
@@ -260,10 +260,10 @@
       md5sum: 562acdee9dd3ad65052fd951db6b1133
     - path: "results/Report/report.html"
     - path: "results/Report/report_datatable.csv"
-      md5sum: 7f95d32a6d75adbc718eb126e2ef2b13
+      md5sum: c0995cd6f6bc75026b7b48344cbeced6
     - path: "results/Report/report_datatable.xlsx"
     - path: "results/Report/single_tables/nextclade_results.tsv"
-      md5sum: 773553fc21b9282883c66b59fe925c1d
+      md5sum: 16dca032f8c125643f923cad75b34423
     - path: "results/Report/single_tables/pangolin_results.csv"
     - path: "results/Report/single_tables/president_results.tsv"
     - path: "results/Report/single_tables/sc2rf_results.csv"
