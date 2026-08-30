@@ -10,7 +10,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        profile: ["docker"]
+        profile: [docker, conda]
     env:
       NXF_ANSI_LOG: false
     steps:
@@ -27,6 +27,16 @@ jobs:
           key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
           restore-keys: |
             ${{ runner.os }}-pip-
+      
+      - name: Conda setup
+        uses: conda-incubator/setup-miniconda@505e6394dae86d6a5c7fbb6e3fb8938e3e863830 # v3
+        with:
+          auto-update-conda: true
+          conda-solver: libmamba
+          channels: conda-forge
+          channel-priority: strict
+          conda-remove-defaults: true
+
       - name: Install Python dependencies
         run: python -m pip install --upgrade pip pytest-workflow
 

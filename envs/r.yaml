@@ -2,7 +2,6 @@ channels:
  - r
  - conda-forge
  - bioconda
- - defaults
 dependencies:
  - pandoc=2.2.3.2
  - pango=1.42.4
