@@ -50,7 +50,7 @@ jobs:
       - name: Run CIEVaD hap
         run: |
             pushd cievad
-            nextflow run hap.nf -profile local,conda --reference MN908947.3.fasta
+            nextflow run hap.nf -profile local,docker --reference MN908947.3.fasta
             ls -la results/simulated_hap*NGSWGS*.fastq
             popd
 
@@ -62,7 +62,7 @@ jobs:
             for s in $(seq 1 $NB_SAMPLES); do echo "hap${s},cievad/results/simulated_hap${s}.NGSWGS.R1.fastq,cievad/results/simulated_hap${s}.NGSWGS.R2.fastq" >> samplesheet.csv; done
             cat samplesheet.csv
             nextflow run CoVpipe2.nf \
-              -profile local,conda \
+              -profile local,docker \
               -w work \
               --output results \
               --reference 'sars-cov-2' \
@@ -79,7 +79,7 @@ jobs:
         run: |
             pushd cievad
             tree .
-            nextflow run eval.nf -profile local,conda --callsets_dir callsets --reference MN908947.3.fasta
+            nextflow run eval.nf -profile local,docker --callsets_dir callsets --reference MN908947.3.fasta
             tree results
             popd
 
