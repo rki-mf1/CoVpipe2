@@ -10,7 +10,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        profile: [docker]
+        profile: ["docker"]
     env:
       NXF_ANSI_LOG: false
     steps:
