@@ -17,21 +17,27 @@ jobs:
       - uses: actions/checkout@v4
       - uses: conda-incubator/setup-miniconda@v3
         with:
-          miniconda-version: "latest"
-          channels: bioconda,conda-forge,defaults
+          miniconda-version: "py312_25.1.1-2"
+          channels: bioconda,conda-forge
           channel-priority: true
           auto-activate-base: true
+
+      - name: Prepare Conda cache
+        run: |
+          mkdir -p "$RUNNER_TEMP/conda-pkgs"
+          echo "CONDA_PKGS_DIRS=$RUNNER_TEMP/conda-pkgs" >> "$GITHUB_ENV"
 
       - name: Check conda installation
         run: |
           conda info
           conda list
+          conda config --remove channels defaults
           conda config --show-sources
           conda config --show
 
       - name: Install nextflow
         run: |
-          conda install -c bioconda nextflow
+          conda install -c bioconda nextflow=22.10.1
           nextflow -version
 
       - name: Check CovPipe2 presence
@@ -62,7 +68,7 @@ jobs:
             for s in $(seq 1 $NB_SAMPLES); do echo "hap${s},cievad/results/simulated_hap${s}.NGSWGS.R1.fastq,cievad/results/simulated_hap${s}.NGSWGS.R2.fastq" >> samplesheet.csv; done
             cat samplesheet.csv
             nextflow run CoVpipe2.nf \
-              -profile local,conda \
+              -profile local,docker \
               -w work \
               --output results \
               --reference 'sars-cov-2' \

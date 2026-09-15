@@ -1,6 +1,9 @@
-work/
+work*/
 results*/
 conda/
 .nextflow/
-.nextflow.log*
+*.nextflow.log*
 nextflow-autodownload-databases/
+tests_*/
+tmp/
+settings.json

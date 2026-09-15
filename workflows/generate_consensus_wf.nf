@@ -14,12 +14,12 @@ workflow generate_consensus{
     main:
         filter_variants_hard(vcf)
 
-        if (params.cns_gt_adjust > 0) {
-            adjust_gt(filter_variants_hard.out, params.cns_gt_adjust) \
+        if (params.cns_gt_adjust_ao > 0 || params.cns_gt_adjust_ro > 0) {
+            adjust_gt(filter_variants_hard.out, params.cns_gt_adjust_ao, params.cns_gt_adjust_ro) \
                 | bgzip_compress1
                 | set { gt_adjusted_vcf }
         }
-        vcf = params.cns_gt_adjust > 0 ? gt_adjusted_vcf : filter_variants_hard.out
+        vcf = params.cns_gt_adjust_ao > 0 || params.cns_gt_adjust_ro > 0 ? gt_adjusted_vcf : filter_variants_hard.out
         
         if (params.cns_indel_filter > 0) {
             filter_indels(vcf, params.cns_indel_filter) \
